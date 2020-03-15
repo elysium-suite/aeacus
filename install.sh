@@ -17,3 +17,5 @@ apt update
 apt install -y golang-go git
 go get "github.com/urfave/cli"
 go get "github.com/BurntSushi/toml/cmd/tomlv"
+go get "github.com/fatih/color"
+alias build="cd src; go build -o ../aeacus .; cd .."
