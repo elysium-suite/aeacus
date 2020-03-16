@@ -80,13 +80,10 @@ func scoreLinux(mc *metaConfig, id *imageData) {
 			}
 		}
 	}
-
 	if mc.Cli.Bool("v") {
 		infoPrint("")
-		fmt.Printf("Score: ")
+		fmt.Printf("Score: %d\n", id.Score)
 	}
-	fmt.Println(id.Score)
-    genTemplate(mc, id)
 }
 
 func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, arg2 string) bool {

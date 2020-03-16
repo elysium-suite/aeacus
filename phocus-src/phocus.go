@@ -22,6 +22,7 @@ import (
 
 type metaConfig struct {
 	Cli        *cli.Context
+    TeamID      string
 	ConfigName string
 	DataName   string
 	WebName    string
@@ -48,13 +49,16 @@ func main() {
 
 	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
 
+    // read TeamID
+    teamID := "booger"
+
     cli.AppHelpTemplate = "" // No help! >:(
 
 	app := &cli.App{
 		Name:                   "phocus",
 		Usage:                  "score vulnerabilities",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, configName, dataName, webName, scoringChecks{}}
+			mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
 			scoreImage(&mc, &id)
 			return nil
 		},
@@ -72,19 +76,20 @@ func main() {
 
 func scoreImage(mc *metaConfig, id *imageData) {
 	parseConfig(mc, readData(mc))
-	if runtime.GOOS == "linux" {
-		scoreLinux(mc, id)
-	} else {
-		//scoreWindows(mc, id)
-		fmt.Println("weedow")
-	}
-}
-
-func checkConfig(mc *metaConfig) {
-	fileContent, err := readFile(mc.DataName)
-	if err != nil {
-		failPrint("Configuration data not found!")
-		os.Exit(1)
-	}
-	parseConfig(mc, fileContent)
+    connStatus := []string{"green", "OK", "green", "OK", "green", "OK"}
+    if mc.Config.Remote != "" {
+        connStatus, connection := checkServer(mc)
+        if ! connection {
+            failPrint("No connection to server found!")
+            genTemplate(mc, id, connStatus)
+            os.Exit(1)
+        }
+    }
+    if runtime.GOOS == "linux" {
+        scoreLinux(mc, id)
+    } else {
+        //scoreWindows(mc, id)
+        fmt.Println("score wondows")
+    }
+    genTemplate(mc, id, connStatus)
 }

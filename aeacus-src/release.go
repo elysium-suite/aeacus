@@ -19,3 +19,7 @@ func destroyImage() {
 	// destroy the image if outside time range or time limit
 	fmt.Println("destroying the system lol")
 }
+
+func sendNotification(notifyText string) {
+    // send notification
+}
