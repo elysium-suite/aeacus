@@ -4,7 +4,7 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 
 dev command
 ```
-DOCKER_ID=$(sudo docker run -v $(pwd):/opt/aeacus -p 80:80 -t -d ubuntu)
+DOCKER_ID=$(sudo docker run -v $(pwd):/opt/aeacus -td ubuntu)
 sudo docker exec -it $DOCKER_ID "/bin/bash"
 cd /opt/aeacus && ./install.sh
 ```
@@ -102,11 +102,20 @@ arg1="ballen"
 The configuration is written in TOML. See the below example:
 
 ```
-# Cool Practice Image
 name = "ubuntu-18-supercool" # Unique identifier name
 title = "CoolCyberStuff Practice Round" # Round title
 user = "coolUser" # Main user for the image
-# permitted_time_range
+
+# If remote is specified, aeacus will report its score
+# and refuse to score if the remote server does not accept
+# its messages (uses Minos remote reporting API).
+# Additionally, a team id will be required
+remote = "192.168.1.100"
+
+valid_until = "2020/03/21 15:04:05 PDT"
+# If valid_until exists, image will self destruct
+# after the time specified. The format is:
+# YEAR/MO/DA HR:MN:SC ZONE
 
 [[check]]
 message = "Removed insecure sudoers rule"
@@ -163,7 +172,7 @@ points = -5 # This check is now a penalty
 
 ## Contributing and Disclaimer
 
-Thanks to Tanay for help with this project!
+Thanks to Tanay for help with this project! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
 
 If you have anything you would like to add or fix, please make a pull request! No improvement or fix is too small, and help is always appreciated.
 

@@ -20,6 +20,8 @@ type scoringChecks struct {
 	Name  string
 	Title string
 	User  string
+    Remote string
+    EndDate string
 	Check []check
 }
 

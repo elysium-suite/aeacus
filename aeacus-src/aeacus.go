@@ -1,15 +1,10 @@
 package main
 
 import (
-
-	// Standard imports
 	"fmt"
 	"log"
 	"os"
-
     "runtime"
-
-	// Github/External
 	"github.com/urfave/cli"
 )
 
@@ -23,6 +18,7 @@ import (
 
 type metaConfig struct {
 Cli        *cli.Context
+TeamID  string
 	ConfigName string
 	DataName   string
 	WebName   string
@@ -47,6 +43,9 @@ func main() {
         os.Exit(1)
     }
 
+    // read TeamID
+    teamID := "booger"
+
     id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
 
 	app := &cli.App{
@@ -55,7 +54,8 @@ func main() {
 		Name:                   "aeacus",
 		Usage:                  "setup and score vulnerabilities in an image",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, configName, dataName, webName, scoringChecks{}}
+			mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+            checkConfig(&mc)
 			scoreImage(&mc, &id)
 			return nil
 		},
@@ -72,7 +72,7 @@ func main() {
 				Aliases: []string{"s"},
 				Usage:   "(default) Score image with current scoring config",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, configName, dataName, webName, scoringChecks{}}
+					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
                     checkConfig(&mc)
 					scoreImage(&mc, &id)
 					return nil
@@ -83,7 +83,7 @@ func main() {
 				Aliases: []string{"i"},
 				Usage:   "Score image with current scoring data",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, configName, dataName, webName, scoringChecks{}}
+					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
                     parseConfig(&mc, readData(&mc))
 					scoreImage(&mc, &id)
 					return nil
@@ -94,7 +94,7 @@ func main() {
 				Aliases: []string{"c"},
 				Usage:   "Check that the scoring config is valid",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, configName, dataName, webName, scoringChecks{}}
+					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
 					checkConfig(&mc)
 					return nil
 				},
@@ -104,7 +104,7 @@ func main() {
 				Aliases: []string{"e"},
 				Usage:   "Encrypt scoring.conf to scoring.dat",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, configName, dataName, webName, scoringChecks{}}
+					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
 					writeConfig(&mc)
 					return nil
 				},
@@ -114,7 +114,7 @@ func main() {
 				Aliases: []string{"d"},
 				Usage:   "Encrypt scoring.conf to scoring.dat",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, configName, dataName, webName, scoringChecks{}}
+					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
                     fmt.Println(readData(&mc))
 					return nil
 				},
@@ -124,7 +124,7 @@ func main() {
 				Aliases: []string{"r"},
 				Usage:   "Switch to production binary (phocus), clean up image for release",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, configName, dataName, webName, scoringChecks{}}
+					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
 					releaseImage(&mc)
 					return nil
 				},
@@ -143,12 +143,22 @@ func main() {
 ///////////////////////
 
 func scoreImage(mc *metaConfig, id *imageData) {
+    connStatus := []string{"green", "OK", "green", "OK", "green", "OK"}
+    if mc.Config.Remote != "" {
+        connStatus, connection := checkServer(mc)
+        if ! connection {
+            failPrint("Can't access remote scoring server!")
+            genTemplate(mc, id, connStatus)
+            os.Exit(1)
+        }
+    }
     if runtime.GOOS == "linux" {
         scoreLinux(mc, id)
     } else {
         //scoreWindows(mc, id)
         fmt.Println("score wondows")
     }
+    genTemplate(mc, id, connStatus)
 }
 
 func checkConfig(mc *metaConfig) {

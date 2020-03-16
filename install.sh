@@ -18,4 +18,4 @@ apt install -y golang-go git
 go get "github.com/urfave/cli"
 go get "github.com/BurntSushi/toml/cmd/tomlv"
 go get "github.com/fatih/color"
-alias build="cd src; go build -o ../aeacus .; cd .."
+echo "alias builda=\"cd aeacus-src; go build -o ../aeacus .; cd ..\"; alias buildp=\"cd phocus-src; go build -o ../phocus .; cd ..\""

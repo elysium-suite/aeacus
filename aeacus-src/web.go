@@ -18,7 +18,7 @@ func writeToHtml(mc *metaConfig, htmlFile string) {
 	}
 }
 
-func genTemplate(mc *metaConfig, id *imageData) {
+func genTemplate(mc *metaConfig, id *imageData, connStatus []string) {
 
 	header := `<!DOCTYPE html> <html> <head> <title>Aeacus Scoring Report</title> <style type="text/css"> h1 { text-align: center; } h2 { text-align: center; } body { font-family: Arial, Verdana, sans-serif; font-size: 14px; margin: 0; padding: 0; width: 100%; height: 100%; background: url('background.png'); background-size: cover; background-attachment: fixed; background-position: top center; background-color: #336699; } .red {color: red;} .green {color: green;} .blue {color: blue;} .main { margin-top: 10px; margin-bottom: 10px; margin-left: auto; margin-right: auto; padding: 0px; border-radius: 12px; background-color: white; width: 900px; max-width: 100%; min-width: 600px; box-shadow: 0px 0px 12px #003366; } .text { padding: 12px; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } .center { text-align: center; } .binary { position: relative; overflow: hidden; } .binary::before { position: absolute; top: -75%; left: -125%; display: block; width: 200%; height: 150%; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -ms-transform: rotate(-45deg); transform: rotate(-45deg); content: attr(data-binary); opacity: 0.16; line-height: 2em; letter-spacing: 2px; color: #369; font-size: 10px; pointer-events: none; } </style> <meta http-equiv="refresh"> </head> <body><div class="main"><div class="text"><div class="binary" data-binary="0000 0000 11010000 01100100"><p align=center style="width:100%;text-align:center"><img align=middle style="width:180px; float:middle" src="logo.png"></p>`
 
@@ -31,16 +31,23 @@ func genTemplate(mc *metaConfig, id *imageData) {
 	htmlFile.WriteString(fmt.Sprintf("<h2>Report Generated At: %s </h2>", genTime.Format("2006/01/02 15:04:05 MST")))
 	htmlFile.WriteString(`<script language="Javascript"> var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(4096).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CCS Scoring service may not be running</h2></span>'); } </script>`)
 
-	htmlFile.WriteString(`<h3 class="center">Approximate Image Running Time: 00:00:00</h3>`)
-	htmlFile.WriteString(`<h3 class="center">Approximate Team Running Time: 00:00:00</h3>`)
-	htmlFile.WriteString(`<h3 class="center">Current Team ID: 0000-0000-0000</h3>`)
+    // Who needs timers, am I right
+	//htmlFile.WriteString(`<h3 class="center">Approximate Image Running Time: 00:00:00</h3>`)
+	//htmlFile.WriteString(`<h3 class="center">Approximate Team Running Time: 00:00:00</h3>`)
+
+    if mc.Config.Remote != "" {
+       htmlFile.WriteString(fmt.Sprintf(`<h3 class="center">Current Team ID: %s</h3>`, mc.TeamID))
+    }
+
 	htmlFile.WriteString(fmt.Sprintf(`<h2> %d out of %d points received</h2>`, id.Score, id.TotalPoints))
 
-	// if remote enabled
-	htmlFile.WriteString(`<a href="http://IP">Click here to view the public scoreboard</a><br>`)
+    if mc.Config.Remote != "" {
+    	htmlFile.WriteString(fmt.Sprintf(`<a href="http://%s/scores/css">Click here to view the public scoreboard</a><br>`, mc.Config.Remote))
 
-	// do connection tests
-	htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:green">OK<span></h3> <p>Internet Connectivity Check: <span style="color:green">OK</span> <br> Aeacus Server Connection Status: <span style="color:green">OK</span> <br> </p>`)
+    	htmlFile.WriteString(fmt.Sprintf(`<p><h3>Connection Status: <span style="color:%s">%s<span></h3>`, connStatus[0], connStatus[1]))
+    	htmlFile.WriteString(fmt.Sprintf(`Internet Connectivity Check: <span style="color:%s">%s</span><br>`, connStatus[2], connStatus[3]))
+    	htmlFile.WriteString(fmt.Sprintf(`Aeacus Server Connection Status: <span style="color:%s">%s</span></p>`, connStatus[4], connStatus[5]))
+    }
 
 	htmlFile.WriteString(fmt.Sprintf(`<h3> %d penalties assessed, for a loss of %.0f points: </h3> <p> <span style="color:red">`, len(id.Penalties), math.Abs(float64(id.Detracts))))
 
