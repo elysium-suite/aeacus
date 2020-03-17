@@ -1,0 +1,101 @@
+# Cool Practice Image
+name = "ubuntu-18-supercool"
+title = "CoolCyberStuff Practice Round"
+user = "shane"
+os = "Ubuntu 18.04"
+remote = "172.17.0.1"
+
+[[check]]
+message = "Removed insecure sudoers rule"
+points = 10
+
+    [[check.pass]]
+    type="FileContainsNot"
+    arg1="/etc/sudoers"
+    arg2="NOPASSWD"
+
+[[check]]
+points = 20
+
+    [[check.pass]]
+    type="FileExistsNot"
+    arg1="/etc/secrets.zip"
+
+    [[check.pass]] # You can code multiple pass conditions
+    type="Command" # If any pass, the check passes
+    arg1="ufw status"
+
+[[check]]
+    [[check.pass]]
+    type="Command"
+    arg1="cat /etc/passwd /etc/shadow"
+
+[[check]]
+message = "Don't change /etc/passwd"
+points = 10
+
+    [[check.pass]]
+    type="FileEquals"
+    arg1="/etc/passwd"
+    arg2="232963f8231342b55b85d450065e106fad105242"
+
+    [[check.fail]]       # If any fail conditions pass,
+    type="FileExistsNot" # the check fails, even if
+    arg1="/etc/passwd"   # pass conditions succeeded
+
+[[check]]
+message = "Administrator has been removed"
+points = -5 # This check is now a penalty
+
+    [[check.pass]]
+    type="FileExistsNot"
+    arg1="/etc"
+
+[[check]]
+    [[check.pass]]
+    type="PackageInstalled"
+    arg1="software-properties-common"
+
+[[check]]
+    [[check.pass]]
+    type="UserExists"
+    arg1="root"
+
+
+[[check]]
+    [[check.pass]]
+    type="FileContains"
+    arg1="/etc/passwd"
+    arg2="admin"
+
+[[check]]
+    [[check.pass]]
+    type="FileContains"
+    arg1="/etc/passwd"
+    arg2="admin"
+
+[[check]]
+points = -10
+    [[check.pass]]
+    type="FileContains"
+    arg1="/etc/passwd"
+    arg2="admin"
+[[check]]
+    [[check.pass]]
+    type="FileContains"
+    arg1="/etc/passwd"
+    arg2="admin"
+
+[[check]]
+        [[check.pass]]
+        type="PackageInstalledNot"
+        arg1="nmap"
+[[check]]
+        [[check.pass]]
+        type="UserExistsNot"
+        arg1="bob"
+[[check]]
+    [[check.pass]]
+    type="FileContainsRegex"
+    arg1="/etc/passwd"
+    arg2="[a-zA-Z\"]+"
