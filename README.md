@@ -2,7 +2,7 @@
 
 This is a client-side scoring system meant to imitate the functionality of UTSA's CIAS CyberPatriot Scoring System (CSS) with an emphasis on simplicity. Named after the Greek myth of King Aeacus, a judge of the dead.
 
-dev command
+dev environment (dont use lol)
 ```
 DOCKER_ID=$(sudo docker run -v $(pwd):/opt/aeacus -td ubuntu)
 sudo docker exec -it $DOCKER_ID "/bin/bash"
@@ -11,30 +11,40 @@ cd /opt/aeacus && ./install.sh
 
 ## Installation
 
-0. Download the most recent zip from releases into /opt/ on your vulnerable virtual machine.
-```
-cd /opt && git clone https://github.com/sourque/aeacus/releases...
-```
-1. Write your config in `/opt/aeacus/scoring.conf`.
-> Don't have a config? See the example at the bottom of this README.
+0. Extract the release into `/opt/aeacus`.
+1. Set up the environment.
+    - Put your config in `/opt/aeacus/scoring.conf`.
+    > Don't have a config? See the example at the bottom of this README.
+
+    - Put your README text in README.conf. (TODO)
+    - Use `./aeacus createfqs` to create Forensic Question files on the Desktop of the main user (TODO)
+
 
 2. Check that your config is valid.
 ```
 aeacus --verbose check
 ```
+> Check out what you can do with `aeacus` with `./aeacus --help`!
+
 3. Score the image with the current config to verify your checks work as expected.
 ```
 aeacus --verbose score
+aeacus --verbose encrypt
+aeacus --verbose simulate
 ```
 4. Prepare the image for release.
 ```
 aeacus --verbose release
 ```
-> WARNING: this will remove `scoring.conf`. Back it up somewhere if you want to save it!
+> WARNING: This will remove `scoring.conf`. Back it up somewhere if you want to save it!
 
-## Screenshot
+## Screenshots
 
+#### Scoring Report:
 ![Scoring Report](web/ScoringReport.png)
+
+#### ReadMe:
+![ReadMe](web/ReadMe.png)
 
 ## Features
 
@@ -105,6 +115,7 @@ The configuration is written in TOML. See the below example:
 name = "ubuntu-18-supercool" # Unique identifier name
 title = "CoolCyberStuff Practice Round" # Round title
 user = "coolUser" # Main user for the image
+os = "Ubuntu 18.04" # Operating system used for ReadMe
 
 # If remote is specified, aeacus will report its score
 # and refuse to score if the remote server does not accept
@@ -170,9 +181,56 @@ points = -5 # This check is now a penalty
 
 ```
 
+## ReadMe Configuration
+
+Put your README in `ReadMe.conf`. It's pretty self explanatory. Here's a template:
+
+```
+<!-- Put your comments/additions to the normal ReadMe here! -->
+<p>
+Uncomplicated Firewall (UFW) is the only company
+approved Firewall for use on Linux machines at this time.
+</p>
+
+<p>
+Congratulations! You just recruited a promising new team member. Create a new Standard user account named "bobbington" with a temporary password of your choosing.
+</p>
+
+<p>
+Authorized users must be able to access this computer remotely using ssh.
+</p>
+
+<!-- Put your critical services here! -->
+<p><b>Critical Services:</b></p>
+    <ul>
+        <li>OpenSSH Server (sshd)</li>
+        <li>Other cool service</li>
+    </ul>
+
+
+<!-- Put your users here! -->
+<h2>Authorized Administrators and Users</h2>
+
+<pre>
+<b>Authorized Administrators:</b>
+coolUser (you)
+    password: coolPassword
+bob
+    password: bob
+
+<b>Authorized Users:</b>
+coolFriend
+awesomeUser
+radUser
+coolGuy
+niceUser
+superCoolDude
+</pre>
+```
+
 ## Contributing and Disclaimer
 
-Thanks to Tanay for help with this project! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
+Thanks to Tanay, Arjun, Pranav, and Akshay for help with this project! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
 
 If you have anything you would like to add or fix, please make a pull request! No improvement or fix is too small, and help is always appreciated.
 

@@ -61,7 +61,7 @@ func checkServer(mc *metaConfig) ([]string, bool) {
     // Overall
     if connStatus[3] == "FAIL" && connStatus[5] == "OK" {
         connStatus[0] = "yellow"
-        connStatus[1] = "Server connection good but no Internet. Assuming you're on an isolated lan."
+        connStatus[1] = "Server connection good but no Internet. Assuming you're on an isolated LAN."
         return connStatus, true
     } else if connStatus[5] == "FAIL" {
         connStatus[0] = "red"

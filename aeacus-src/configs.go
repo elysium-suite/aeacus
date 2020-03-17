@@ -70,9 +70,19 @@ func writeConfig(mc *metaConfig) {
 
     // formulate key with hashes + modified day of config
     key := xor(hashOne, hashTwo)
-    info, _ = os.Stat(mc.ConfigName)
+    info, err = os.Stat(mc.ConfigName)
+    if err != nil {
+        failPrint("Crypto magic can not ensue! No configuration file found.")
+        os.Exit(1)
+    }
     modifiedTime := info.ModTime().Format("01/02/2006")
-    key = xor(modifiedTime, key)
+    modifiedTimeHash := "1230-8123nasklnaegklnjwh0-91uiowasfml;3tr23"
+    if err == nil {
+    	hasher := sha1.New()
+    	hasher.Write([]byte(modifiedTime))
+    	modifiedTimeHash = hex.EncodeToString(hasher.Sum(nil))
+    }
+    key = xor(modifiedTimeHash, key)
 
     // swap some bytes just 4 fun
     // TODO
@@ -132,9 +142,19 @@ func readData(mc *metaConfig) string {
 
     // formulate key with hashes + modified day of config
     key := xor(hashOne, hashTwo)
-    info, _ := os.Stat(mc.DataName)
+    info, err := os.Stat(mc.DataName)
+    if err != nil {
+        failPrint("Oops, you yoinked scoring.dat? Uncool.")
+        os.Exit(1)
+    }
     modifiedTime := info.ModTime().Format("01/02/2006")
-    key = xor(modifiedTime, key)
+    modifiedTimeHash := "1230-8123nasklnaegklnjwh0-91uiowasfml;3tr23"
+    if err == nil {
+    	hasher := sha1.New()
+    	hasher.Write([]byte(modifiedTime))
+    	modifiedTimeHash = hex.EncodeToString(hasher.Sum(nil))
+    }
+    key = xor(modifiedTimeHash, key)
 
     // swap some bytes just 4 fun
     // TODO
@@ -219,6 +239,13 @@ func printConfig(mc *metaConfig) {
 func readFile(fileName string) (string, error) {
 	fileContent, err := ioutil.ReadFile(fileName)
 	return string(fileContent), err
+}
+
+func writeFile(fileName string, fileContent string) {
+	err := ioutil.WriteFile(fileName, []byte(fileContent), 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func passPrint(toPrint string) {
