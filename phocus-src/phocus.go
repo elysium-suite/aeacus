@@ -25,7 +25,7 @@ type metaConfig struct {
     TeamID      string
 	ConfigName string
 	DataName   string
-	WebName    string
+	WebPath    string
 	Config     scoringChecks
 }
 
@@ -81,7 +81,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
         connStatus, connection := checkServer(mc)
         if ! connection {
             failPrint("No connection to server found!")
-            genTemplate(mc, id, connStatus)
+            genReport(mc, id, connStatus)
             os.Exit(1)
         }
     }
@@ -91,5 +91,5 @@ func scoreImage(mc *metaConfig, id *imageData) {
         //scoreWindows(mc, id)
         fmt.Println("score wondows")
     }
-    genTemplate(mc, id, connStatus)
+    genReport(mc, id, connStatus)
 }

@@ -21,7 +21,7 @@ Cli        *cli.Context
 TeamID  string
 	ConfigName string
 	DataName   string
-	WebName   string
+	WebPath   string
 	Config     scoringChecks
 }
 
@@ -33,18 +33,18 @@ func main() {
     if runtime.GOOS == "linux" {
         configName = "/opt/aeacus/scoring.conf"
     	dataName = "/opt/aeacus/scoring.dat"
-    	webName = "/opt/aeacus/web/ScoringReport.html"
+    	webName = "/opt/aeacus/web/"
     } else if runtime.GOOS == "windows" {
         configName = "C:\\aeacus\\scoring.conf"
     	dataName = "C:\\aeacus\\scoring.dat"
-    	webName = "C:\\aeacus\\web\\ScoringReport.html"
+    	webName = "C:\\aeacus\\web\\"
     } else {
         failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
         os.Exit(1)
     }
 
     // read TeamID
-    teamID := "booger"
+    teamID := "B emoji"
 
     id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
 
@@ -79,7 +79,7 @@ func main() {
 				},
 			},
 			{
-				Name:    "sim",
+				Name:    "simulate",
 				Aliases: []string{"i"},
 				Usage:   "Score image with current scoring data",
 				Action: func(c *cli.Context) error {
@@ -109,20 +109,29 @@ func main() {
 					return nil
 				},
 			},
-			{ // FIXME REMOVE ONCE CRYPTO WORKS
-				Name:    "decrypt",
-				Aliases: []string{"d"},
-				Usage:   "Encrypt scoring.conf to scoring.dat",
+		//	{
+		//		Name:    "decrypt",
+		//		Aliases: []string{"d"},
+		//		Usage:   "Encrypt scoring.conf to scoring.dat",
+		//		Action: func(c *cli.Context) error {
+		//			mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+  //                  fmt.Println(readData(&mc))
+		//			return nil
+		//		},
+		//	},
+			{
+				Name:    "createfqs",
+				Aliases: []string{"f"},
+				Usage:   "Create forensic question files (3 by default)",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
-                    fmt.Println(readData(&mc))
+                    fmt.Println("todo")
 					return nil
 				},
 			},
 			{
 				Name:    "release",
 				Aliases: []string{"r"},
-				Usage:   "Switch to production binary (phocus), clean up image for release",
+				Usage:   "Prepare the image for release",
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
 					releaseImage(&mc)
@@ -148,7 +157,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
         connStatus, connection := checkServer(mc)
         if ! connection {
             failPrint("Can't access remote scoring server!")
-            genTemplate(mc, id, connStatus)
+            genReport(mc, id, connStatus)
             os.Exit(1)
         }
     }
@@ -158,7 +167,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
         //scoreWindows(mc, id)
         fmt.Println("score wondows")
     }
-    genTemplate(mc, id, connStatus)
+    genReport(mc, id, connStatus)
 }
 
 func checkConfig(mc *metaConfig) {
@@ -176,8 +185,11 @@ func checkConfig(mc *metaConfig) {
 func releaseImage(mc *metaConfig) {
     checkConfig(mc)
 	writeConfig(mc)
-	cleanUp()
-	fmt.Println("release - put stuff on desktop, service, etc")
+    genReadMe(mc)
+	warnPrint("The rest of this doesn't actually do anything yet. Just pretend like it does lol")
+	cleanUp(mc)
+    writeDesktopFiles(mc)
+    installService(mc)
 	// add self to services
 	// set up notifications
 
