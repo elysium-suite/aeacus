@@ -17,35 +17,32 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type metaConfig struct {
-Cli        *cli.Context
-TeamID  string
-	ConfigName string
-	DataName   string
-	WebPath   string
+    Cli        *cli.Context
+    TeamID  string
+	DirPath string
 	Config     scoringChecks
 }
 
 func main() {
 
-    var configName string
-    var dataName string
-    var webName string
+    var dirPath string
     if runtime.GOOS == "linux" {
-        configName = "/opt/aeacus/scoring.conf"
-    	dataName = "/opt/aeacus/scoring.dat"
-    	webName = "/opt/aeacus/web/"
+        if ! adminCheckL() {
+            failPrint("You need to run this binary as root!")
+            os.Exit(1)
+        }
+    	dirPath = "/opt/aeacus/"
     } else if runtime.GOOS == "windows" {
-        configName = "C:\\aeacus\\scoring.conf"
-    	dataName = "C:\\aeacus\\scoring.dat"
-    	webName = "C:\\aeacus\\web\\"
+        if ! adminCheckW() {
+            failPrint("You need to run this binary as Administrator!")
+        }
+        dirPath = "C:\\aeacus\\"
     } else {
         failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
         os.Exit(1)
     }
 
-    // read TeamID
-    teamID := "B emoji"
-
+    var teamID string
     id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
 
 	app := &cli.App{
@@ -54,7 +51,7 @@ func main() {
 		Name:                   "aeacus",
 		Usage:                  "setup and score vulnerabilities in an image",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+        	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
             checkConfig(&mc)
 			scoreImage(&mc, &id)
 			return nil
@@ -72,7 +69,7 @@ func main() {
 				Aliases: []string{"s"},
 				Usage:   "(default) Score image with current scoring config",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
                     checkConfig(&mc)
 					scoreImage(&mc, &id)
 					return nil
@@ -83,7 +80,7 @@ func main() {
 				Aliases: []string{"i"},
 				Usage:   "Score image with current scoring data",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
                     parseConfig(&mc, readData(&mc))
 					scoreImage(&mc, &id)
 					return nil
@@ -94,7 +91,7 @@ func main() {
 				Aliases: []string{"c"},
 				Usage:   "Check that the scoring config is valid",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					checkConfig(&mc)
 					return nil
 				},
@@ -104,7 +101,7 @@ func main() {
 				Aliases: []string{"e"},
 				Usage:   "Encrypt scoring.conf to scoring.dat",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					writeConfig(&mc)
 					return nil
 				},
@@ -114,7 +111,7 @@ func main() {
 		//		Aliases: []string{"d"},
 		//		Usage:   "Encrypt scoring.conf to scoring.dat",
 		//		Action: func(c *cli.Context) error {
-		//			mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+                	//mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
   //                  fmt.Println(readData(&mc))
 		//			return nil
 		//		},
@@ -129,11 +126,20 @@ func main() {
 				},
 			},
 			{
+				Name:    "gooey",
+				Aliases: []string{"g"},
+				Usage:   "Launch gui tests",
+				Action: func(c *cli.Context) error {
+                    launchGui()
+					return nil
+				},
+			},
+			{
 				Name:    "release",
 				Aliases: []string{"r"},
 				Usage:   "Prepare the image for release",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					releaseImage(&mc)
 					return nil
 				},
@@ -151,27 +157,8 @@ func main() {
 // CONTROL FUNCTIONS //
 ///////////////////////
 
-func scoreImage(mc *metaConfig, id *imageData) {
-    connStatus := []string{"green", "OK", "green", "OK", "green", "OK"}
-    if mc.Config.Remote != "" {
-        connStatus, connection := checkServer(mc)
-        if ! connection {
-            failPrint("Can't access remote scoring server!")
-            genReport(mc, id, connStatus)
-            os.Exit(1)
-        }
-    }
-    if runtime.GOOS == "linux" {
-        scoreLinux(mc, id)
-    } else {
-        //scoreWindows(mc, id)
-        fmt.Println("score wondows")
-    }
-    genReport(mc, id, connStatus)
-}
-
 func checkConfig(mc *metaConfig) {
-    fileContent, err := readFile(mc.ConfigName)
+    fileContent, err := readFile(mc.DirPath + "scoring.conf")
     if err != nil {
         failPrint("Configuration file not found!")
         os.Exit(1)
@@ -186,11 +173,13 @@ func releaseImage(mc *metaConfig) {
     checkConfig(mc)
 	writeConfig(mc)
     genReadMe(mc)
-	warnPrint("The rest of this doesn't actually do anything yet. Just pretend like it does lol")
-	cleanUp(mc)
-    writeDesktopFiles(mc)
-    installService(mc)
-	// add self to services
-	// set up notifications
-
+    if runtime.GOOS == "linux" {
+        writeDesktopFilesL(mc)
+        installServiceL(mc)
+        cleanUpL(mc)
+    } else {
+        writeDesktopFilesW(mc)
+        installServiceW(mc)
+        cleanUpW(mc)
+    }
 }

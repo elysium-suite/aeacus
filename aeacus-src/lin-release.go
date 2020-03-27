@@ -5,7 +5,38 @@ import (
     "os/exec"
 )
 
-func cleanUp(mc *metaConfig) {
+
+func writeDesktopFilesL(mc *metaConfig) {
+
+    if mc.Cli.Bool("v") {
+    	infoPrint("Writing shortcuts to Desktop...")
+    }
+
+    cmd := exec.Command("sh", "-c", "ln -sf " + mc.DirPath + "web/ReadMe.html /home/"+ mc.Config.User + "/Desktop/ReadMe")
+    cmd.Run()
+    cmd = exec.Command("sh", "-c", "ln -sf " + mc.DirPath + "web/ScoringReport.html /home/" + mc.Config.User + "/Desktop/ScoringReport")
+    cmd.Run()
+
+    if mc.Cli.Bool("v") {
+    	infoPrint("Creating TeamID.txt file...")
+    }
+
+    cmd = exec.Command("sh", "-c", "ln -sf " + mc.DirPath + "web/ReadMe.html /home/"+ mc.Config.User + "/Desktop/ReadMe")
+    cmd.Run()
+    cmd = exec.Command("sh", "-c", "ln -sf " + mc.DirPath + "web/ScoringReport.html /home/" + mc.Config.User + "/Desktop/ScoringReport")
+    cmd.Run()
+}
+
+func installServiceL(mc *metaConfig) {
+    if mc.Cli.Bool("v") {
+    	infoPrint("Installing service...")
+    }
+    cmd := exec.Command("sh", "-c", "echo '* * * * * root /opt/aeacus/phocus' >> /etc/crontab")
+    cmd.Run()
+    fmt.Println("Not really sure how to do that... atm doing cronjob. it works tm?")
+}
+
+func cleanUpL(mc *metaConfig) {
 
     if mc.Cli.Bool("v") {
     	infoPrint("Removing .viminfo files...")
@@ -53,30 +84,5 @@ func cleanUp(mc *metaConfig) {
     	infoPrint("Removing aeacus binary...")
     }
     cmd = exec.Command("sh", "-c", "rm /opt/aeacus/aeacus")
-    cmd.Run()
-
-}
-
-func writeDesktopFiles(mc *metaConfig) {
-    if mc.Cli.Bool("v") {
-    	infoPrint("Writing shortcut to ReadMe.html...")
-    	infoPrint("Writing shortcut to ScoringReport.html...")
-    	infoPrint("Creating TeamID.txt file...")
-    }
-}
-
-func installService(mc *metaConfig) {
-    if mc.Cli.Bool("v") {
-    	infoPrint("Installing service...")
-    }
-}
-
-func destroyImage() {
-	// destroy the image if outside time range
-	fmt.Println("destroying the system lol. todo")
-}
-
-func sendNotification(notifyTitle string, notifyBody string) {
-	cmd := exec.Command("notify-send", "-i", "/opt/aeacus/web/assets/logo.png", notifyTitle, notifyBody)
     cmd.Run()
 }

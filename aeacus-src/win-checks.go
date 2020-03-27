@@ -1,8 +1,6 @@
 package main
 
 import (
-
-	// Checks
 	"crypto/sha1"
 	"encoding/hex"
     "strings"
@@ -12,7 +10,15 @@ import (
 	"os/exec"
 )
 
-func scoreLinux(mc *metaConfig, id *imageData) {
+func adminCheckW() bool {
+	_, err := os.Open("\\\\.\\PHYSICALDRIVE0")
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func scoreW(mc *metaConfig, id *imageData) {
 	id.Score = 0
 	id.ScoredVulns = 0
 	id.TotalPoints = 0
@@ -46,13 +52,13 @@ func scoreLinux(mc *metaConfig, id *imageData) {
 		status := false
 		failStatus := false
 		for _, condition := range check.Pass {
-			status = processCheck(mc, &check, condition.Type, condition.Arg1, condition.Arg2)
+			status = processCheckW(mc, &check, condition.Type, condition.Arg1, condition.Arg2)
 			if status {
 				break
 			}
 		}
 		for _, condition := range check.Fail {
-			failStatus = processCheck(mc, &check, condition.Type, condition.Arg1, condition.Arg2)
+			failStatus = processCheckW(mc, &check, condition.Type, condition.Arg1, condition.Arg2)
 			if failStatus {
                 status = false
 				break
@@ -86,13 +92,13 @@ func scoreLinux(mc *metaConfig, id *imageData) {
 	}
 }
 
-func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, arg2 string) bool {
+func processCheckW(mc *metaConfig, check *check, checkType string, arg1 string, arg2 string) bool {
 	switch checkType {
 	case "Command":
 		if check.Message == "" {
 			check.Message = "Command \"" + arg1 + "\" passed"
 		}
-        result, err := CommandL(arg1)
+        result, err := CommandW(arg1)
         if err != nil {
             return false
         }
@@ -101,7 +107,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "Command \"" + arg1 + "\" failed"
 		}
-        result, err := CommandL(arg1)
+        result, err := CommandW(arg1)
         if err != nil {
             return false
         }
@@ -110,7 +116,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" exists"
 		}
-        result, err := FileExistsL(arg1)
+        result, err := FileExistsW(arg1)
         if err != nil {
             return false
         }
@@ -119,7 +125,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" does not exist"
 		}
-        result, err := FileExistsL(arg1)
+        result, err := FileExistsW(arg1)
         if err != nil {
             return false
         }
@@ -128,7 +134,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" contains \"" + arg2 + "\""
 		}
-        result, err := FileContainsL(arg1, arg2)
+        result, err := FileContainsW(arg1, arg2)
         if err != nil {
             return false
         }
@@ -137,7 +143,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" does not contain + \"" + arg2 + "\""
 		}
-        result, err := FileContainsL(arg1, arg2)
+        result, err := FileContainsW(arg1, arg2)
         if err != nil {
             return false
         }
@@ -146,7 +152,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" contains expression \"" + arg2 + "\""
 		}
-        result, err := FileContainsRegexL(arg1, arg2)
+        result, err := FileContainsRegexW(arg1, arg2)
         if err != nil {
             return false
         }
@@ -155,7 +161,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" does not contain expression \"" + arg2 + "\""
 		}
-        result, err := FileContainsRegexL(arg1, arg2)
+        result, err := FileContainsRegexW(arg1, arg2)
         if err != nil {
             return false
         }
@@ -164,7 +170,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" matches hash"
 		}
-        result, err := FileEqualsL(arg1, arg2)
+        result, err := FileEqualsW(arg1, arg2)
         if err != nil {
             return false
         }
@@ -173,7 +179,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" doesn't match hash"
 		}
-        result, err := FileEqualsL(arg1, arg2)
+        result, err := FileEqualsW(arg1, arg2)
         if err != nil {
             return false
         }
@@ -182,7 +188,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" is installed"
 		}
-        result, err := PackageInstalledL(arg1)
+        result, err := PackageInstalledW(arg1)
         if err != nil {
             return false
         }
@@ -191,7 +197,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "Package " + arg1 + " has been removed"
 		}
-        result, err := PackageInstalledL(arg1)
+        result, err := PackageInstalledW(arg1)
         if err != nil {
             return false
         }
@@ -200,7 +206,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "User " + arg1 + " has been added"
 		}
-        result, err := UserExistsL(arg1)
+        result, err := UserExistsW(arg1)
         if err != nil {
             return false
         }
@@ -209,7 +215,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 		if check.Message == "" {
 			check.Message = "User " + arg1 + " has been removed"
 		}
-        result, err := UserExistsL(arg1)
+        result, err := UserExistsW(arg1)
         if err != nil {
             return false
         }
@@ -226,7 +232,7 @@ func processCheck(mc *metaConfig, check *check, checkType string, arg1 string, a
 // CHECK FUNCTIONS //
 /////////////////////
 
-func CommandL(commandGiven string) (bool, error) {
+func CommandW(commandGiven string) (bool, error) {
 	cmd := exec.Command("sh", "-c", commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
@@ -236,23 +242,23 @@ func CommandL(commandGiven string) (bool, error) {
 	return true, nil
 }
 
-func FileExistsL(fileName string) (bool, error) {
+func FileExistsW(fileName string) (bool, error) {
 	_, err := os.Stat(fileName)
     return ! os.IsNotExist(err), nil
 }
 
-func FileContainsL(fileName string, searchString string) (bool, error) {
+func FileContainsW(fileName string, searchString string) (bool, error) {
     fileContent, err := readFile(fileName)
     return strings.Contains(fileContent, searchString), err
 }
 
-func FileContainsRegexL(fileName string, expressionString string) (bool, error) {
+func FileContainsRegexW(fileName string, expressionString string) (bool, error) {
     fileContent, _ := readFile(fileName)
     matched, err := regexp.Match(expressionString, []byte(fileContent))
     return matched, err
 }
 
-func FileEqualsL(fileName string, fileHash string) (bool, error) {
+func FileEqualsW(fileName string, fileHash string) (bool, error) {
 	fileContent, err := readFile(fileName)
     if err != nil {
         return false, err
@@ -263,16 +269,16 @@ func FileEqualsL(fileName string, fileHash string) (bool, error) {
     return hash == fileHash, err
 }
 
-func PackageInstalledL(packageName string) (bool, error) {
+func PackageInstalledW(packageName string) (bool, error) {
     // not super happy with the command implementation
     // could just keylog sh or replace dpkg binary or something
     // should use golang dpkg library if it existed and was good
-    result, err := CommandL(fmt.Sprintf("dpkg -l %s", packageName))
+    result, err := CommandW(fmt.Sprintf("dpkg -l %s", packageName))
     return result, err
 }
 
-func UserExistsL(userName string) (bool, error) {
+func UserExistsW(userName string) (bool, error) {
     // see above comment
-    result, err := CommandL(fmt.Sprintf("id -u %s", userName))
+    result, err := CommandW(fmt.Sprintf("id -u %s", userName))
     return result, err
 }

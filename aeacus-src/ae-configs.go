@@ -8,12 +8,10 @@ import (
     "io"
 
     // crypto magic
-	"io/ioutil"
 	"compress/zlib"
 	"crypto/sha1"
 	"encoding/hex"
 
-	"github.com/fatih/color"
 	"github.com/BurntSushi/toml"
 )
 
@@ -30,10 +28,10 @@ func parseConfig(mc *metaConfig, configContent string) {
 
 func writeConfig(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
-		infoPrint("Reading configuration from " + mc.ConfigName + "...")
+		infoPrint("Reading configuration from " + mc.DirPath + "scoring.conf" + "...")
 	}
 
-	configFile, err := os.Open(mc.ConfigName)
+	configFile, err := os.Open(mc.DirPath + "scoring.conf")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -70,7 +68,7 @@ func writeConfig(mc *metaConfig) {
 
     // formulate key with hashes + modified day of config
     key := xor(hashOne, hashTwo)
-    info, err = os.Stat(mc.ConfigName)
+    info, err = os.Stat(mc.DirPath + "scoring.conf")
     if err != nil {
         failPrint("Crypto magic can not ensue! No configuration file found.")
         os.Exit(1)
@@ -102,9 +100,9 @@ func writeConfig(mc *metaConfig) {
     // TODO
 
 	if mc.Cli.Bool("v") {
-		infoPrint("Writing data to " + mc.DataName + "...")
+		infoPrint("Writing data to " + mc.DirPath + "/...")
 	}
-	err = ioutil.WriteFile(mc.DataName, []byte(xordFile), info.Mode())
+	writeFile(mc.DirPath + "scoring.dat", xordFile)
 }
 
 ////////////////////
@@ -113,10 +111,10 @@ func writeConfig(mc *metaConfig) {
 
 func readData(mc *metaConfig) string {
 	if mc.Cli.Bool("v") {
-		infoPrint("Decrypting data from " + mc.DataName)
+		infoPrint("Decrypting data from " + mc.DirPath + "scoring.dat...")
 	}
 
-	dataFile, err := readFile(mc.DataName)
+	dataFile, err := readFile(mc.DirPath + "scoring.dat")
 	if err != nil {
         failPrint("Data file not found.")
         os.Exit(1)
@@ -142,7 +140,7 @@ func readData(mc *metaConfig) string {
 
     // formulate key with hashes + modified day of config
     key := xor(hashOne, hashTwo)
-    info, err := os.Stat(mc.DataName)
+    info, err := os.Stat(mc.DirPath + "scoring.dat")
     if err != nil {
         failPrint("Oops, you yoinked scoring.dat? Uncool.")
         os.Exit(1)
@@ -199,7 +197,7 @@ func xor (key string, plaintext string) string {
 //////////////////////
 
 func printConfig(mc *metaConfig) {
-	passPrint("Configuration " + mc.ConfigName + " check passed!")
+	passPrint("Configuration " + mc.DirPath + "scoring.conf" + " check passed!")
 	fmt.Printf("Title: %s (%s)\n", mc.Config.Title, mc.Config.Name)
 	fmt.Printf("User: %s\n", mc.Config.User)
     if mc.Config.Remote == "" {
@@ -233,43 +231,5 @@ func printConfig(mc *metaConfig) {
 				fmt.Printf("\t\t\t%s: %s, %s\n", condition.Type, condition.Arg1, condition.Arg2)
 			}
 		}
-	}
-}
-
-func readFile(fileName string) (string, error) {
-	fileContent, err := ioutil.ReadFile(fileName)
-	return string(fileContent), err
-}
-
-func writeFile(fileName string, fileContent string) {
-	err := ioutil.WriteFile(fileName, []byte(fileContent), 0644)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
-func passPrint(toPrint string) {
-	printer(color.FgGreen, "PASS", toPrint)
-}
-
-func failPrint(toPrint string) {
-	printer(color.FgRed, "FAIL", toPrint)
-}
-
-func warnPrint(toPrint string) {
-	printer(color.FgYellow, "WARN", toPrint)
-}
-
-func infoPrint(toPrint string) {
-	printer(color.FgBlue, "INFO", toPrint)
-}
-
-func printer(colorChosen color.Attribute, messageType string, toPrint string) {
-	printer := color.New(colorChosen, color.Bold)
-	fmt.Printf("[")
-	printer.Printf(messageType)
-	fmt.Printf("] %s", toPrint)
-	if toPrint != "" {
-		fmt.Printf("\n")
 	}
 }

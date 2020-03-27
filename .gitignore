@@ -2,6 +2,7 @@ scoring.dat
 scoring.conf
 aeacus
 phocus
+*.zip
 
 # Binaries for programs and plugins
 *.exe

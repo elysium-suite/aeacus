@@ -1,9 +1,39 @@
 package main
 
 import (
+    "os"
     "fmt"
+    "runtime"
     "net/http"
 )
+
+func readTeamID(mc *metaConfig) {
+    var fileContent string
+    if runtime.GOOS == "linux" {
+        fileContent, err := readFile("/home/" + mc.Config.User + "/Desktop/TeamID.txt")
+        if err != nil {
+            failPrint("TeamID.txt does not exist!")
+            os.Exit(1)
+        }
+        if fileContent == "" {
+            failPrint("TeamID.txt is empty!")
+            os.Exit(1)
+        }
+    } else {
+        fileContent, err := readFile("C:\\Users\\" + mc.Config.User + "\\Desktop\\TeamID.txt")
+        if err != nil {
+            failPrint("TeamID.txt does not exist! (And also your OS is lame).")
+            os.Exit(1)
+        }
+        if fileContent == "" {
+            failPrint("TeamID.txt is empty! (And also Windows is lame).")
+            os.Exit(1)
+        }
+    }
+    // teamid validity checks here
+    // todo... what does that even look like?
+    mc.TeamID = fileContent
+}
 
 func getAuthToken() {
     fmt.Println("init connection")
