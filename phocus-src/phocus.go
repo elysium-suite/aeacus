@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/urfave/cli"
 	"log"
 	"os"
@@ -23,34 +22,31 @@ import (
 type metaConfig struct {
 	Cli        *cli.Context
     TeamID      string
-	ConfigName string
-	DataName   string
-	WebPath    string
+	DirPath    string
 	Config     scoringChecks
 }
 
 func main() {
 
-	var configName string
-	var dataName string
-	var webName string
-	if runtime.GOOS == "linux" {
-		configName = "/opt/aeacus/scoring.conf"
-		dataName = "/opt/aeacus/scoring.dat"
-		webName = "/opt/aeacus/web/ScoringReport.html"
-	} else if runtime.GOOS == "windows" {
-		configName = "C:\\aeacus\\scoring.conf"
-		dataName = "C:\\aeacus\\scoring.dat"
-		webName = "C:\\aeacus\\web\\ScoringReport.html"
-	} else {
-		failPrint("What are you doing?")
-		os.Exit(1)
-	}
+    var dirPath string
+    if runtime.GOOS == "linux" {
+        if ! adminCheckL() {
+            failPrint("You need to run this binary as root!")
+            os.Exit(1)
+        }
+    	dirPath = "/opt/aeacus/"
+    } else if runtime.GOOS == "windows" {
+        if ! adminCheckW() {
+            failPrint("You need to run this binary as Administrator!")
+        }
+        dirPath = "C:\\aeacus\\"
+    } else {
+        failPrint("What are you doing?")
+        os.Exit(1)
+    }
 
-	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
-
-    // read TeamID
-    teamID := "booger"
+    var teamID string
+    id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
 
     cli.AppHelpTemplate = "" // No help! >:(
 
@@ -58,7 +54,8 @@ func main() {
 		Name:                   "phocus",
 		Usage:                  "score vulnerabilities",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, teamID, configName, dataName, webName, scoringChecks{}}
+			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+            parseConfig(&mc, readData(&mc))
 			scoreImage(&mc, &id)
 			return nil
 		},
@@ -68,28 +65,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-///////////////////////
-// CONTROL FUNCTIONS //
-///////////////////////
-
-func scoreImage(mc *metaConfig, id *imageData) {
-	parseConfig(mc, readData(mc))
-    connStatus := []string{"green", "OK", "green", "OK", "green", "OK"}
-    if mc.Config.Remote != "" {
-        connStatus, connection := checkServer(mc)
-        if ! connection {
-            failPrint("No connection to server found!")
-            genReport(mc, id, connStatus)
-            os.Exit(1)
-        }
-    }
-    if runtime.GOOS == "linux" {
-        scoreLinux(mc, id)
-    } else {
-        //scoreWindows(mc, id)
-        fmt.Println("score wondows")
-    }
-    genReport(mc, id, connStatus)
 }

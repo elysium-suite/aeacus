@@ -2,39 +2,39 @@
 
 This is a client-side scoring system meant to imitate the functionality of UTSA's CIAS CyberPatriot Scoring System (CSS) with an emphasis on simplicity. Named after the Greek myth of King Aeacus, a judge of the dead.
 
-dev environment (dont use lol)
+
+Dev environment
 ```
 DOCKER_ID=$(sudo docker run -v $(pwd):/opt/aeacus -td ubuntu)
 sudo docker exec -it $DOCKER_ID "/bin/bash"
-cd /opt/aeacus && ./install.sh
+cd /opt/minos/setup && ./install.sh
 ```
 
 ## Installation
 
-0. Extract the release into `/opt/aeacus`.
-1. Set up the environment.
+0. __Extract the release__ into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
+1. __Set up the environment.__
     - Put your config in `/opt/aeacus/scoring.conf`.
     > Don't have a config? See the example at the bottom of this README.
 
-    - Put your README text in README.conf. (TODO)
-    - Use `./aeacus createfqs` to create Forensic Question files on the Desktop of the main user (TODO)
+    - Put your README html in ReadMe.conf.
+    - Use `./aeacus createfqs` to create Forensic Question files on the Desktop of the main user. TODO
 
-
-2. Check that your config is valid.
+2. __Check that your config is valid.__
 ```
-aeacus --verbose check
+./aeacus --verbose check
 ```
 > Check out what you can do with `aeacus` with `./aeacus --help`!
 
-3. Score the image with the current config to verify your checks work as expected.
+3. __Score the image with the current config to verify your checks work as expected.__
 ```
-aeacus --verbose score
-aeacus --verbose encrypt
-aeacus --verbose simulate
+./aeacus --verbose score
+./aeacus --verbose encrypt
+./aeacus --verbose simulate
 ```
-4. Prepare the image for release.
+4. __Prepare the image for release.__
 ```
-aeacus --verbose release
+./aeacus --verbose release
 ```
 > WARNING: This will remove `scoring.conf`. Back it up somewhere if you want to save it!
 
@@ -106,6 +106,15 @@ arg1="ballen"
 ```
 
 > __Note!__ If a check has negative points assigned to it, it automatically becomes a penalty.
+
+### Linux-Specific Checks
+???
+
+
+### Windows-Specific Checks
+
+Registry
+
 
 ## Configuration
 
@@ -227,6 +236,13 @@ niceUser
 superCoolDude
 </pre>
 ```
+
+## Information Gathering
+
+The `aeacus` binary supports gathering information on the system (especially for Windows) in cases where it's tough to gather what the scoring system can see.
+
+- (All todo)
+- installed packages
 
 ## Contributing and Disclaimer
 
