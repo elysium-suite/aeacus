@@ -100,7 +100,7 @@ func writeConfig(mc *metaConfig) {
 	// TODO
 
 	if mc.Cli.Bool("v") {
-		infoPrint("Writing data to " + mc.DirPath + "/...")
+		infoPrint("Writing data to " + mc.DirPath + "...")
 	}
 	writeFile(mc.DirPath+"scoring.dat", xordFile)
 }

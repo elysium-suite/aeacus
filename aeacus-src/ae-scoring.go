@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 	"strconv"
 )
@@ -16,7 +15,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
 		if !connection {
 			failPrint("Can't access remote scoring server!")
 			genReport(mc, id, connStatus)
-			os.Exit(1)
+            return
 		}
 	}
 

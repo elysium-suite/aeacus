@@ -26,10 +26,14 @@ func adminCheckL() bool {
 }
 
 func scoreL(mc *metaConfig, id *imageData) {
+
 	id.Score = 0
 	id.ScoredVulns = 0
 	id.TotalPoints = 0
+    id.Contribs = 0
+    id.Detracts = 0
 	id.Points = []scoreItem{}
+	id.Penalties = []scoreItem{}
 	pointlessChecks := []int{}
 
 	for i, check := range mc.Config.Check {

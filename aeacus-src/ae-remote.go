@@ -15,9 +15,10 @@ import (
 
 func readTeamID(mc *metaConfig) {
 	if runtime.GOOS == "linux" {
-		fileContent, err := readFile("/home/" + mc.Config.User + "/Desktop/TeamID.txt")
+		fileContent, err := readFile("/opt/aeacus/desktop/TeamID.txt")
 		if err != nil {
 			failPrint("TeamID.txt does not exist!")
+            fmt.Println(err)
 			os.Exit(1)
 		}
 		if fileContent == "" {
@@ -58,7 +59,7 @@ func genChallenge() string {
 }
 
 func reportScore(mc *metaConfig, id *imageData) {
-	resp, err := http.PostForm("http://"+mc.Config.Remote+"/scores/css/update",
+	resp, err := http.PostForm("https://"+mc.Config.Remote+"/scores/css/update",
 		url.Values{"team": {mc.TeamID},
 			"image":     {mc.Config.Name},
 			"score":     {strconv.Itoa(id.Score)},
@@ -70,7 +71,7 @@ func reportScore(mc *metaConfig, id *imageData) {
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	if string(body) == "FAIL" {
+	if string(body) != "OK" {
 		failPrint("Failed to upload score! Is your TeamID wrong?")
         os.Exit(1)
 	}
@@ -102,7 +103,7 @@ func checkServer(mc *metaConfig) ([]string, bool) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Checking for scoring engine connection...")
 	}
-	_, err = http.Get("http://" + mc.Config.Remote)
+	_, err = http.Get("https://" + mc.Config.Remote)
 	if err != nil {
 		connStatus[4] = "red"
 		connStatus[5] = "FAIL"

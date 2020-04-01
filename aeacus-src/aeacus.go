@@ -74,18 +74,7 @@ func main() {
 					scoreImage(&mc, &id)
 					return nil
 				},
-			},
-			{
-				Name:    "simulate",
-				Aliases: []string{"i"},
-				Usage:   "Score image with current scoring data",
-				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					parseConfig(&mc, readData(&mc))
-					scoreImage(&mc, &id)
-					return nil
-				},
-			},
+		},
 			{
 				Name:    "check",
 				Aliases: []string{"c"},
@@ -106,16 +95,6 @@ func main() {
 					return nil
 				},
 			},
-			//	{
-			//		Name:    "decrypt",
-			//		Aliases: []string{"d"},
-			//		Usage:   "Encrypt scoring.conf to scoring.dat",
-			//		Action: func(c *cli.Context) error {
-			//mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-			//                  fmt.Println(readData(&mc))
-			//			return nil
-			//		},
-			//	},
 			{
 				Name:    "createfqs",
 				Aliases: []string{"f"},

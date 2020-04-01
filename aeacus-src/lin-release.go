@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os/exec"
 )
 
@@ -11,18 +10,9 @@ func writeDesktopFilesL(mc *metaConfig) {
 		infoPrint("Writing shortcuts to Desktop...")
 	}
 
-	cmd := exec.Command("sh", "-c", "ln -sf "+mc.DirPath+"web/ReadMe.html /home/"+mc.Config.User+"/Desktop/ReadMe")
+	cmd := exec.Command("sh", "-c", "cp /opt/aeacus/desktop/*.desktop /home/"+mc.Config.User+"/Desktop/")
 	cmd.Run()
-	cmd = exec.Command("sh", "-c", "ln -sf "+mc.DirPath+"web/ScoringReport.html /home/"+mc.Config.User+"/Desktop/ScoringReport")
-	cmd.Run()
-
-	if mc.Cli.Bool("v") {
-		infoPrint("Creating TeamID.txt file...")
-	}
-
-	cmd = exec.Command("sh", "-c", "ln -sf "+mc.DirPath+"web/ReadMe.html /home/"+mc.Config.User+"/Desktop/ReadMe")
-	cmd.Run()
-	cmd = exec.Command("sh", "-c", "ln -sf "+mc.DirPath+"web/ScoringReport.html /home/"+mc.Config.User+"/Desktop/ScoringReport")
+	cmd = exec.Command("sh", "-c", "chmod +x /home/"+mc.Config.User+"/Desktop/*.desktop")
 	cmd.Run()
 }
 
@@ -30,9 +20,12 @@ func installServiceL(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Installing service...")
 	}
-	cmd := exec.Command("sh", "-c", "echo '* * * * * root /opt/aeacus/phocus' >> /etc/crontab")
+	cmd := exec.Command("sh", "-c", "cp /opt/aeacus/misc/aeacus-client /etc/init.d/")
 	cmd.Run()
-	fmt.Println("Not really sure how to do that... atm doing cronjob. it works tm?")
+	cmd = exec.Command("sh", "-c", "chmod +x /etc/init.d/aeacus-client")
+	cmd.Run()
+	cmd = exec.Command("sh", "-c", "systemctl enable aeacus-client")
+	cmd.Run()
 }
 
 func cleanUpL(mc *metaConfig) {
@@ -83,6 +76,12 @@ func cleanUpL(mc *metaConfig) {
 		infoPrint("Removing scoring.conf...")
 	}
 	cmd = exec.Command("sh", "-c", "rm /opt/aeacus/scoring.conf")
+	cmd.Run()
+
+	if mc.Cli.Bool("v") {
+		infoPrint("Removing other setup files...")
+	}
+	cmd = exec.Command("sh", "-c", "rm -rf /opt/aeacus/misc ReadMe.conf README.md TODO.md")
 	cmd.Run()
 
 	if mc.Cli.Bool("v") {

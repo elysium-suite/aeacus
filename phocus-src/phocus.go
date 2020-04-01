@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/urfave/cli"
-	"log"
 	"os"
+	"log"
+    "time"
 	"runtime"
+    "math/rand"
+	"github.com/urfave/cli"
 )
 
 /////////////////////////////////////////////////////////////////////
@@ -45,18 +47,20 @@ func main() {
         os.Exit(1)
     }
 
-    var teamID string
-    id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
-
     cli.AppHelpTemplate = "" // No help! >:(
-
 	app := &cli.App{
 		Name:                   "phocus",
 		Usage:                  "score vulnerabilities",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+			mc := metaConfig{c, "", dirPath, scoringChecks{}}
             parseConfig(&mc, readData(&mc))
-			scoreImage(&mc, &id)
+            rand.Seed(time.Now().UnixNano())
+            for {
+                id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
+    			scoreImage(&mc, &id)
+                jitter := time.Duration(rand.Intn(20) + 6)
+                time.Sleep(jitter * time.Second)
+            }
 			return nil
 		},
 	}
