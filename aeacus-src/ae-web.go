@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"os"
-    "os/exec"
 	"runtime"
 	"strings"
 	"time"
@@ -61,14 +60,6 @@ func genReport(mc *metaConfig, id *imageData, connStatus []string) {
 		infoPrint("Writing HTML to ScoringReport.html...")
 	}
 	writeFile(mc.DirPath+"web/ScoringReport.html", htmlFile.String())
-
-    if runtime.GOOS == "linux" {
-    	if mc.Cli.Bool("v") {
-    		infoPrint("Marking ScoringReport.html as immutable...")
-    	}
-        cmd := exec.Command("sh", "-c", "chattr +i " + mc.DirPath + "web/ScoringReport.html")
-        cmd.Run()
-    }
 }
 
 func genReadMe(mc *metaConfig) {
@@ -111,12 +102,4 @@ func genReadMe(mc *metaConfig) {
 		infoPrint("Writing HTML to ReadMe.html...")
 	}
 	writeFile(mc.DirPath+"web/ReadMe.html", htmlFile.String())
-
-    if runtime.GOOS == "linux" {
-    	if mc.Cli.Bool("v") {
-    		infoPrint("Marking ReadMe.html as immutable...")
-    	}
-        cmd := exec.Command("sh", "-c", "chattr +i " + mc.DirPath + "web/ReadMe.html")
-        cmd.Run()
-    }
 }
