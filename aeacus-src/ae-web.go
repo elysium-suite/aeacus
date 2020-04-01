@@ -1,12 +1,13 @@
 package main
 
 import (
-    "os"
 	"fmt"
 	"math"
-    "time"
+	"os"
+    "os/exec"
+	"runtime"
 	"strings"
-    "runtime"
+	"time"
 )
 
 func genReport(mc *metaConfig, id *imageData, connStatus []string) {
@@ -17,28 +18,28 @@ func genReport(mc *metaConfig, id *imageData, connStatus []string) {
 
 	var htmlFile strings.Builder
 	htmlFile.WriteString(header)
-    genTime := time.Now()
+	genTime := time.Now()
 	htmlFile.WriteString(fmt.Sprintf("<h1>%s</h1>", mc.Config.Title))
 	htmlFile.WriteString(fmt.Sprintf("<h2>Report Generated At: %s </h2>", genTime.Format("2006/01/02 15:04:05 MST")))
 	htmlFile.WriteString(`<script language="Javascript"> var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(4096).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CCS Scoring service may not be running</h2></span>'); } </script>`)
 
-    // Who needs timers, am I right
+	// Who needs timers, am I right
 	//htmlFile.WriteString(`<h3 class="center">Approximate Image Running Time: 00:00:00</h3>`)
 	//htmlFile.WriteString(`<h3 class="center">Approximate Team Running Time: 00:00:00</h3>`)
 
-    if mc.Config.Remote != "" {
-       htmlFile.WriteString(fmt.Sprintf(`<h3 class="center">Current Team ID: %s</h3>`, mc.TeamID))
-    }
+	if mc.Config.Remote != "" {
+		htmlFile.WriteString(fmt.Sprintf(`<h3 class="center">Current Team ID: %s</h3>`, mc.TeamID))
+	}
 
 	htmlFile.WriteString(fmt.Sprintf(`<h2> %d out of %d points received</h2>`, id.Score, id.TotalPoints))
 
-    if mc.Config.Remote != "" {
-    	htmlFile.WriteString(fmt.Sprintf(`<a href="http://%s/scores/css">Click here to view the public scoreboard</a><br>`, mc.Config.Remote))
+	if mc.Config.Remote != "" {
+		htmlFile.WriteString(fmt.Sprintf(`<a href="http://%s/scores/css">Click here to view the public scoreboard</a><br>`, mc.Config.Remote))
 
-    	htmlFile.WriteString(fmt.Sprintf(`<p><h3>Connection Status: <span style="color:%s">%s<span></h3>`, connStatus[0], connStatus[1]))
-    	htmlFile.WriteString(fmt.Sprintf(`Internet Connectivity Check: <span style="color:%s">%s</span><br>`, connStatus[2], connStatus[3]))
-    	htmlFile.WriteString(fmt.Sprintf(`Aeacus Server Connection Status: <span style="color:%s">%s</span></p>`, connStatus[4], connStatus[5]))
-    }
+		htmlFile.WriteString(fmt.Sprintf(`<p><h3>Connection Status: <span style="color:%s">%s<span></h3>`, connStatus[0], connStatus[1]))
+		htmlFile.WriteString(fmt.Sprintf(`Internet Connectivity Check: <span style="color:%s">%s</span><br>`, connStatus[2], connStatus[3]))
+		htmlFile.WriteString(fmt.Sprintf(`Aeacus Server Connection Status: <span style="color:%s">%s</span></p>`, connStatus[4], connStatus[5]))
+	}
 
 	htmlFile.WriteString(fmt.Sprintf(`<h3> %d penalties assessed, for a loss of %.0f points: </h3> <p> <span style="color:red">`, len(id.Penalties), math.Abs(float64(id.Detracts))))
 
@@ -56,10 +57,18 @@ func genReport(mc *metaConfig, id *imageData, connStatus []string) {
 
 	htmlFile.WriteString(footer)
 
-    if mc.Cli.Bool("v") {
-        infoPrint("Writing HTML to ScoringReport.html...")
+	if mc.Cli.Bool("v") {
+		infoPrint("Writing HTML to ScoringReport.html...")
+	}
+	writeFile(mc.DirPath+"web/ScoringReport.html", htmlFile.String())
+
+    if runtime.GOOS == "linux" {
+    	if mc.Cli.Bool("v") {
+    		infoPrint("Marking ScoringReport.html as immutable...")
+    	}
+        cmd := exec.Command("sh", "-c", "chattr +i " + mc.DirPath + "web/ScoringReport.html")
+        cmd.Run()
     }
-    writeFile(mc.DirPath + "web/ScoringReport.html", htmlFile.String())
 }
 
 func genReadMe(mc *metaConfig) {
@@ -68,7 +77,7 @@ func genReadMe(mc *metaConfig) {
 
 	footer := `<h2>Competition Guidelines</h2><ul><li> In order to provide a better competition experience, you are <b>NOT</b> required to change the password of the primary, auto-login, user account. Changing the password of a user that is set to automatically log in may lock you out of your computer.</li><li> Authorized administrator passwords were correct the last time you did a password audit, but are not guaranteed to be currently accurate.</li><li> Do not stop or disable the CCS Client service or process.</li><li> Do not remove any authorized users or their home directories.</li><li> The time zone of this image is set to UTC. Please do not change the time zone, date, or time on this image.</li><li> You can view your current scoring report by double-clicking the "CyberPatriot Scoring Report" desktop icon.</li><li> JavaScript is required for some error messages that appear on the "CyberPatriot Scoring Report." To ensure that you only receive correct error messages, please do not disable JavaScript.</li><li> Some security settings may prevent the Stop Scoring application from running. If this happens, the safest way to stop scoring is to suspend the virtual machine. You should <b>NOT</b> power on the VM again before deleting.</li></ul><p align="center" style="text-align:center"> The Aeacus Project is in no way affiliated or endorsed by the Air Force Association or the University of Texas at San Antonio.</p></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="footer"><div class="footer-copyright-wrap"><div class="container"><div class="footer-copyright-content"><ul><li>Copyright Never &copy;</li><li>No rights reserved</li></ul></div></div></div></div></body></html>  `
 
-    header_the_sequel := `<p> Please read the entire README thoroughly before modifying anything on this computer.</p><h2>Unique Identifier</h2><p> If you have not yet entered a valid Team ID, please do so immediately by double clicking on the "Aeacus Set Team ID" icon on the desktop. If you do not enter a valid Team ID this VM may stop functioning after a short period of time.</p><h2>Forensics Questions</h2><p> If there are "Forensics Questions" on your Desktop, you will receive points for answering these questions correctly. Valid (scored) "Forensics Questions" will only be located directly on your Desktop. Please read all "Forensics Questions" thoroughly before modifying this computer, as you may change something that prevents you from answering the question correctly.</p><h2>Competition Scenario</h2><p> This company's security policies require that all user accounts be password protected. Employees are required to choose secure passwords, however this policy may not be currently enforced on this computer. The presence of any non-work related media files and "hacking tools" on any computers is strictly prohibited. This company currently does not use any centralized maintenance or polling tools to manage their IT equipment. This computer is for official business use only by authorized users. This is a critical computer in a production environment. Please do <b>NOT</b> attempt to upgrade the operating system on this machine.</p>`
+	header_the_sequel := `<p> Please read the entire README thoroughly before modifying anything on this computer.</p><h2>Unique Identifier</h2><p> If you have not yet entered a valid Team ID, please do so immediately by double clicking on the "Aeacus Set Team ID" icon on the desktop. If you do not enter a valid Team ID this VM may stop functioning after a short period of time.</p><h2>Forensics Questions</h2><p> If there are "Forensics Questions" on your Desktop, you will receive points for answering these questions correctly. Valid (scored) "Forensics Questions" will only be located directly on your Desktop. Please read all "Forensics Questions" thoroughly before modifying this computer, as you may change something that prevents you from answering the question correctly.</p><h2>Competition Scenario</h2><p> This company's security policies require that all user accounts be password protected. Employees are required to choose secure passwords, however this policy may not be currently enforced on this computer. The presence of any non-work related media files and "hacking tools" on any computers is strictly prohibited. This company currently does not use any centralized maintenance or polling tools to manage their IT equipment. This computer is for official business use only by authorized users. This is a critical computer in a production environment. Please do <b>NOT</b> attempt to upgrade the operating system on this machine.</p>`
 
 	var htmlFile strings.Builder
 	htmlFile.WriteString(header)
@@ -77,7 +86,7 @@ func genReadMe(mc *metaConfig) {
 
 	htmlFile.WriteString(fmt.Sprintf("<h2><b>%s</b></h2>", mc.Config.OS))
 
-    htmlFile.WriteString(fmt.Sprintf(`<p>
+	htmlFile.WriteString(fmt.Sprintf(`<p>
     It is company policy to use only %s on this
     computer. It is also company policy to use only the
     latest, official, stable %s packages available
@@ -86,20 +95,28 @@ func genReadMe(mc *metaConfig) {
     all users on this computer should be the latest stable
     version of Firefox.`, mc.Config.OS, mc.Config.OS))
 
-    if runtime.GOOS == "linux" {
-        htmlFile.WriteString(` Company policy is to never let users log in as root. If administrators need to run commands as root, they are required to use the "sudo" command.`)
-    }
+	if runtime.GOOS == "linux" {
+		htmlFile.WriteString(` Company policy is to never let users log in as root. If administrators need to run commands as root, they are required to use the "sudo" command.`)
+	}
 
-    htmlFile.WriteString("</p>")
-    userReadMe, err := readFile("ReadMe.conf")
-    if err != nil {
-        failPrint("No ReadMe.conf file found!")
-        os.Exit(1)
-    }
-    htmlFile.WriteString(userReadMe)
+	htmlFile.WriteString("</p>")
+	userReadMe, err := readFile("ReadMe.conf")
+	if err != nil {
+		failPrint("No ReadMe.conf file found!")
+		os.Exit(1)
+	}
+	htmlFile.WriteString(userReadMe)
 	htmlFile.WriteString(footer)
-    if mc.Cli.Bool("v") {
-        infoPrint("Writing HTML to ReadMe.html...")
+	if mc.Cli.Bool("v") {
+		infoPrint("Writing HTML to ReadMe.html...")
+	}
+	writeFile(mc.DirPath+"web/ReadMe.html", htmlFile.String())
+
+    if runtime.GOOS == "linux" {
+    	if mc.Cli.Bool("v") {
+    		infoPrint("Marking ReadMe.html as immutable...")
+    	}
+        cmd := exec.Command("sh", "-c", "chattr +i " + mc.DirPath + "web/ReadMe.html")
+        cmd.Run()
     }
-    writeFile(mc.DirPath + "web/ReadMe.html", htmlFile.String())
 }

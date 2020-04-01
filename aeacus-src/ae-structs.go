@@ -17,13 +17,13 @@ type scoreItem struct {
 }
 
 type scoringChecks struct {
-	Name  string
-	Title string
-	User  string
-    OS string
-    Remote string
-    EndDate string
-	Check []check
+	Name    string
+	Title   string
+	User    string
+	OS      string
+	Remote  string
+	EndDate string
+	Check   []check
 }
 
 type check struct {
