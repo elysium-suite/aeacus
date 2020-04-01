@@ -55,6 +55,12 @@ func cleanUpL(mc *metaConfig) {
     cmd.Run()
 
     if mc.Cli.Bool("v") {
+		infoPrint("Removing .swp files")
+	}
+	cmd = exec.Command("sh", "-c", "rm -rf find / -type f -iname '*.swp' -delete")
+    cmd.Run()
+
+    if mc.Cli.Bool("v") {
 		infoPrint("Removing cache...")
 	}
 	cmd = exec.Command("sh", "-c", "rm -rf /home/*/.cache/")
