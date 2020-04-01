@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/urfave/cli"
 	"log"
 	"os"
-    "runtime"
-	"github.com/urfave/cli"
+	"runtime"
 )
 
 //////////////////////////////////////////////////////////////////
@@ -17,33 +17,33 @@ import (
 //////////////////////////////////////////////////////////////////
 
 type metaConfig struct {
-    Cli        *cli.Context
-    TeamID  string
+	Cli     *cli.Context
+	TeamID  string
 	DirPath string
-	Config     scoringChecks
+	Config  scoringChecks
 }
 
 func main() {
 
-    var dirPath string
-    if runtime.GOOS == "linux" {
-        if ! adminCheckL() {
-            failPrint("You need to run this binary as root!")
-            os.Exit(1)
-        }
-    	dirPath = "/opt/aeacus/"
-    } else if runtime.GOOS == "windows" {
-        if ! adminCheckW() {
-            failPrint("You need to run this binary as Administrator!")
-        }
-        dirPath = "C:\\aeacus\\"
-    } else {
-        failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
-        os.Exit(1)
-    }
+	var dirPath string
+	if runtime.GOOS == "linux" {
+		if !adminCheckL() {
+			failPrint("You need to run this binary as root!")
+			os.Exit(1)
+		}
+		dirPath = "/opt/aeacus/"
+	} else if runtime.GOOS == "windows" {
+		if !adminCheckW() {
+			failPrint("You need to run this binary as Administrator!")
+		}
+		dirPath = "C:\\aeacus\\"
+	} else {
+		failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
+		os.Exit(1)
+	}
 
-    var teamID string
-    id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
+	var teamID string
+	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
 
 	app := &cli.App{
 		UseShortOptionHandling: true,
@@ -51,8 +51,8 @@ func main() {
 		Name:                   "aeacus",
 		Usage:                  "setup and score vulnerabilities in an image",
 		Action: func(c *cli.Context) error {
-        	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-            checkConfig(&mc)
+			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+			checkConfig(&mc)
 			scoreImage(&mc, &id)
 			return nil
 		},
@@ -69,8 +69,8 @@ func main() {
 				Aliases: []string{"s"},
 				Usage:   "(default) Score image with current scoring config",
 				Action: func(c *cli.Context) error {
-                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-                    checkConfig(&mc)
+					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					checkConfig(&mc)
 					scoreImage(&mc, &id)
 					return nil
 				},
@@ -80,18 +80,18 @@ func main() {
 				Aliases: []string{"i"},
 				Usage:   "Score image with current scoring data",
 				Action: func(c *cli.Context) error {
-                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-                    parseConfig(&mc, readData(&mc))
+					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					parseConfig(&mc, readData(&mc))
 					scoreImage(&mc, &id)
 					return nil
 				},
 			},
-            {
+			{
 				Name:    "check",
 				Aliases: []string{"c"},
 				Usage:   "Check that the scoring config is valid",
 				Action: func(c *cli.Context) error {
-                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					checkConfig(&mc)
 					return nil
 				},
@@ -101,27 +101,27 @@ func main() {
 				Aliases: []string{"e"},
 				Usage:   "Encrypt scoring.conf to scoring.dat",
 				Action: func(c *cli.Context) error {
-                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					writeConfig(&mc)
 					return nil
 				},
 			},
-		//	{
-		//		Name:    "decrypt",
-		//		Aliases: []string{"d"},
-		//		Usage:   "Encrypt scoring.conf to scoring.dat",
-		//		Action: func(c *cli.Context) error {
-                	//mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-  //                  fmt.Println(readData(&mc))
-		//			return nil
-		//		},
-		//	},
+			//	{
+			//		Name:    "decrypt",
+			//		Aliases: []string{"d"},
+			//		Usage:   "Encrypt scoring.conf to scoring.dat",
+			//		Action: func(c *cli.Context) error {
+			//mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+			//                  fmt.Println(readData(&mc))
+			//			return nil
+			//		},
+			//	},
 			{
 				Name:    "createfqs",
 				Aliases: []string{"f"},
 				Usage:   "Create forensic question files (3 by default)",
 				Action: func(c *cli.Context) error {
-                    fmt.Println("todo")
+					fmt.Println("todo")
 					return nil
 				},
 			},
@@ -130,7 +130,7 @@ func main() {
 				Aliases: []string{"g"},
 				Usage:   "Launch gui tests",
 				Action: func(c *cli.Context) error {
-                    launchGui()
+					launchGui()
 					return nil
 				},
 			},
@@ -139,7 +139,7 @@ func main() {
 				Aliases: []string{"r"},
 				Usage:   "Prepare the image for release",
 				Action: func(c *cli.Context) error {
-                	mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					releaseImage(&mc)
 					return nil
 				},
@@ -158,11 +158,11 @@ func main() {
 ///////////////////////
 
 func checkConfig(mc *metaConfig) {
-    fileContent, err := readFile(mc.DirPath + "scoring.conf")
-    if err != nil {
-        failPrint("Configuration file not found!")
-        os.Exit(1)
-    }
+	fileContent, err := readFile(mc.DirPath + "scoring.conf")
+	if err != nil {
+		failPrint("Configuration file not found!")
+		os.Exit(1)
+	}
 	parseConfig(mc, fileContent)
 	if mc.Cli.Bool("v") {
 		printConfig(mc)
@@ -170,16 +170,16 @@ func checkConfig(mc *metaConfig) {
 }
 
 func releaseImage(mc *metaConfig) {
-    checkConfig(mc)
+	checkConfig(mc)
 	writeConfig(mc)
-    genReadMe(mc)
-    if runtime.GOOS == "linux" {
-        writeDesktopFilesL(mc)
-        installServiceL(mc)
-        cleanUpL(mc)
-    } else {
-        writeDesktopFilesW(mc)
-        installServiceW(mc)
-        cleanUpW(mc)
-    }
+	genReadMe(mc)
+	if runtime.GOOS == "linux" {
+		writeDesktopFilesL(mc)
+		installServiceL(mc)
+		cleanUpL(mc)
+	} else {
+		writeDesktopFilesW(mc)
+		installServiceW(mc)
+		cleanUpW(mc)
+	}
 }
