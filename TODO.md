@@ -8,12 +8,11 @@ play sound when gaining/losing points
     - requirement of teamid and teamid parsing from desktop
         - teamid parsing done
     - make TEAMID being wrong actually show up on the scoring report
+    - status/time limit
+    - dont die when teamid is wrong / if wrong, constnatly check for it
 
 - gui
     teamid and dev gui?
-
-- release
-    - (better) service creation
 
 - helpers
     - fq creators
@@ -24,10 +23,8 @@ play sound when gaining/losing points
  release
  - autologin user
  - chown user:user desktop files
- - remove swp files
  - remove .git files?
  - fix releas perms
-
 
  features/checks
  - user group check
