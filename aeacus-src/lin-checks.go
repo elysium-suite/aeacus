@@ -152,7 +152,7 @@ func processCheckL(mc *metaConfig, check *check, checkType string, arg1 string, 
 		return result
 	case "FileContainsNot":
 		if check.Message == "" {
-			check.Message = "File \"" + arg1 + "\" does not contain + \"" + arg2 + "\""
+			check.Message = "File \"" + arg1 + "\" does not contain \"" + arg2 + "\""
 		}
 		result, err := FileContainsL(arg1, arg2)
 		if err != nil {

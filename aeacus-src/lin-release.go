@@ -39,37 +39,31 @@ func cleanUpL(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing .viminfo files...")
 	}
-	cmd = exec.Command("sh", "-c", "find / -name \".viminfo\" -exec rm {} \\;")
+	cmd = exec.Command("sh", "-c", "find / -name \".viminfo\" -delete")
 	cmd.Run()
 
 	if mc.Cli.Bool("v") {
-		infoPrint("Removing .bash_history...")
+		infoPrint("Symlinking .bash_history to /dev/null...")
 	}
-	cmd = exec.Command("sh", "-c", "find / -name \".bash_history\" -exec rm {} \\;")
+	cmd = exec.Command("sh", "-c", "find / -name \".bash_history\" -exec ln -sf /dev/null {} \\;")
 	cmd.Run()
-
-	if mc.Cli.Bool("v") {
-		infoPrint("Removing recently-used...")
-	}
-	cmd = exec.Command("sh", "-c", "rm -rf /home/*/.local/share/recently-used.xbel")
-    cmd.Run()
 
     if mc.Cli.Bool("v") {
 		infoPrint("Removing .swp files")
 	}
-	cmd = exec.Command("sh", "-c", "rm -rf find / -type f -iname '*.swp' -delete")
+	cmd = exec.Command("sh", "-c", "find / -type f -iname '*.swp' -delete")
     cmd.Run()
 
     if mc.Cli.Bool("v") {
-		infoPrint("Removing .swp files")
+		infoPrint("Removing .local files")
 	}
-	cmd = exec.Command("sh", "-c", "rm -rf /home/*/.local/")
+	cmd = exec.Command("sh", "-c", "rm -rf /root/.local /home/*/.local/")
     cmd.Run()
 
     if mc.Cli.Bool("v") {
 		infoPrint("Removing cache...")
 	}
-	cmd = exec.Command("sh", "-c", "rm -rf /home/*/.cache/")
+	cmd = exec.Command("sh", "-c", "rm -rf /root/.cache /home/*/.cache/")
 	cmd.Run()
 
 	if mc.Cli.Bool("v") {
@@ -93,13 +87,13 @@ func cleanUpL(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing scoring.conf...")
 	}
-	cmd = exec.Command("sh", "-c", "rm /opt/aeacus/scoring.conf")
+	cmd = exec.Command("sh", "-c", "rm /opt/aeacus/scoring.conf*")
 	cmd.Run()
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing other setup files...")
 	}
-	cmd = exec.Command("sh", "-c", "rm -rf /opt/aeacus/misc ReadMe.conf README.md TODO.md")
+	cmd = exec.Command("sh", "-c", "rm -rf /opt/aeacus/misc /opt/aeacus/ReadMe.conf /opt/aeacus/README.md /opt/aeacus/TODO.md")
 	cmd.Run()
 
 	if mc.Cli.Bool("v") {
