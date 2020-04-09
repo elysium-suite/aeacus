@@ -9,6 +9,8 @@ type imageData struct {
 	Penalties   []scoreItem
 	Detracts    int
 	TotalPoints int
+    ConnStatus  []string
+    Connection  bool
 }
 
 type scoreItem struct {
@@ -22,6 +24,7 @@ type scoringChecks struct {
 	User    string
 	OS      string
 	Remote  string
+    Local   string
 	EndDate string
 	Check   []check
 }
@@ -37,4 +40,6 @@ type condition struct {
 	Type string
 	Arg1 string
 	Arg2 string
+    Arg3 string
+    Arg4 string
 }
