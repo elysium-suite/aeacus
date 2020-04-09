@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"bufio"
 	"bytes"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 
+	"github.com/fatih/color"
 	"github.com/BurntSushi/toml"
 )
 
@@ -230,5 +232,43 @@ func printConfig(mc *metaConfig) {
 				fmt.Printf("\t\t\t%s: %s, %s\n", condition.Type, condition.Arg1, condition.Arg2)
 			}
 		}
+	}
+}
+
+func readFile(fileName string) (string, error) {
+	fileContent, err := ioutil.ReadFile(fileName)
+	return string(fileContent), err
+}
+
+func writeFile(fileName string, fileContent string) {
+	err := ioutil.WriteFile(fileName, []byte(fileContent), 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func passPrint(toPrint string) {
+	printer(color.FgGreen, "PASS", toPrint)
+}
+
+func failPrint(toPrint string) {
+	printer(color.FgRed, "FAIL", toPrint)
+}
+
+func warnPrint(toPrint string) {
+	printer(color.FgYellow, "WARN", toPrint)
+}
+
+func infoPrint(toPrint string) {
+	printer(color.FgBlue, "INFO", toPrint)
+}
+
+func printer(colorChosen color.Attribute, messageType string, toPrint string) {
+	printer := color.New(colorChosen, color.Bold)
+	fmt.Printf("[")
+	printer.Printf(messageType)
+	fmt.Printf("] %s", toPrint)
+	if toPrint != "" {
+		fmt.Printf("\n")
 	}
 }

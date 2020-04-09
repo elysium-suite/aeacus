@@ -30,33 +30,33 @@ type metaConfig struct {
 
 func main() {
 
-    var dirPath string
-    if runtime.GOOS == "linux" {
-        if ! adminCheckL() {
-            failPrint("You need to run this binary as root!")
-            os.Exit(1)
-        }
-    	dirPath = "/opt/aeacus/"
-    } else if runtime.GOOS == "windows" {
-        if ! adminCheckW() {
-            failPrint("You need to run this binary as Administrator!")
-        }
-        dirPath = "C:\\aeacus\\"
-    } else {
-        failPrint("What are you doing?")
-        os.Exit(1)
-    }
+	var teamID string
+	var dirPath string
+
+	if !adminCheck() {
+		failPrint("You need to run this binary as root or Administrator!")
+		os.Exit(1)
+	}
+	if runtime.GOOS == "linux" {
+		dirPath = "/opt/aeacus/"
+	} else if runtime.GOOS == "windows" {
+		dirPath = "C:\\aeacus\\"
+	} else {
+		failPrint("What are you up to?")
+		os.Exit(1)
+	}
 
     cli.AppHelpTemplate = "" // No help! >:(
 	app := &cli.App{
 		Name:                   "phocus",
 		Usage:                  "score vulnerabilities",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, "", dirPath, scoringChecks{}}
+			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
             parseConfig(&mc, readData(&mc))
             rand.Seed(time.Now().UnixNano())
             for {
-                id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
+            	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
+                infoPrint("Scoring image...")
     			scoreImage(&mc, &id)
                 jitter := time.Duration(rand.Intn(20) + 6)
                 time.Sleep(jitter * time.Second)
