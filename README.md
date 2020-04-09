@@ -2,14 +2,6 @@
 
 This is a client-side scoring system meant to imitate the functionality of UTSA's CIAS CyberPatriot Scoring System (CSS) with an emphasis on simplicity. Named after the Greek myth of King Aeacus, a judge of the dead.
 
-
-Dev environment
-```
-DOCKER_ID=$(sudo docker run -v $(pwd):/opt/aeacus -td ubuntu)
-sudo docker exec -it $DOCKER_ID "/bin/bash"
-cd /opt/minos/setup && ./install.sh
-```
-
 ## Installation
 
 0. __Extract the release__ into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
@@ -108,12 +100,17 @@ arg1="ballen"
 > __Note!__ If a check has negative points assigned to it, it automatically becomes a penalty.
 
 ### Linux-Specific Checks
-???
+
+None (at the moment).
 
 
 ### Windows-Specific Checks
 
-Registry
+__RegistryKey__: pass if key is equal to value
+```
+type="RegistryKey"
+arg1="SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+```
 
 
 ## Configuration
@@ -128,14 +125,19 @@ os = "Ubuntu 18.04" # Operating system used for ReadMe
 
 # If remote is specified, aeacus will report its score
 # and refuse to score if the remote server does not accept
-# its messages (uses Minos remote reporting API).
-# Additionally, a team id will be required
-remote = "192.168.1.100"
+# its messages and Team ID (unless local_enabled)
+# Make sure to include the scheme (http, https...)
+remote = "https://192.168.1.100"
 
-valid_until = "2020/03/21 15:04:05 PDT"
+# If local is set to yes, then the image will give
+# feedback and score regardless of whether or not
+# remote scoring is working
+local = "yes"
+
 # If valid_until exists, image will self destruct
 # after the time specified. The format is:
 # YEAR/MO/DA HR:MN:SC ZONE
+valid_until = "2020/03/21 15:04:05 PDT"
 
 [[check]]
 message = "Removed insecure sudoers rule"

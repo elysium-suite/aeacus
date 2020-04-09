@@ -25,25 +25,23 @@ type metaConfig struct {
 
 func main() {
 
+	var teamID string
 	var dirPath string
+
+	if !adminCheck() {
+		failPrint("You need to run this binary as root or Administrator!")
+		os.Exit(1)
+	}
 	if runtime.GOOS == "linux" {
-		if !adminCheckL() {
-			failPrint("You need to run this binary as root!")
-			os.Exit(1)
-		}
 		dirPath = "/opt/aeacus/"
 	} else if runtime.GOOS == "windows" {
-		if !adminCheckW() {
-			failPrint("You need to run this binary as Administrator!")
-		}
 		dirPath = "C:\\aeacus\\"
 	} else {
 		failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
 		os.Exit(1)
 	}
 
-	var teamID string
-	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0}
+	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 
 	app := &cli.App{
 		UseShortOptionHandling: true,
@@ -152,13 +150,7 @@ func releaseImage(mc *metaConfig) {
 	checkConfig(mc)
 	writeConfig(mc)
 	genReadMe(mc)
-	if runtime.GOOS == "linux" {
-		writeDesktopFilesL(mc)
-		installServiceL(mc)
-		cleanUpL(mc)
-	} else {
-		writeDesktopFilesW(mc)
-		installServiceW(mc)
-		cleanUpW(mc)
-	}
+	writeDesktopFiles(mc)
+	installService(mc)
+	cleanUp(mc)
 }
