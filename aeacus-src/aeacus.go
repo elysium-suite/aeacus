@@ -123,6 +123,15 @@ func main() {
 				},
 			},
 			{
+				Name:    "info",
+				Aliases: []string{"i"},
+				Usage:   "Get info about the system",
+				Action: func(c *cli.Context) error {
+					getInfo(c.Args().Get(0))
+					return nil
+				},
+			},
+			{
 				Name:    "release",
 				Aliases: []string{"r"},
 				Usage:   "Prepare the image for release",
