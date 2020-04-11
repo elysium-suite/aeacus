@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+    "math"
+    "time"
 	"runtime"
 	"strconv"
 	"strings"
 	"net/url"
 	"net/http"
 	"io/ioutil"
-	"crypto/sha1"
+	"crypto/sha256"
 )
 
 func readTeamID(mc *metaConfig, id *imageData) {
@@ -40,20 +42,39 @@ func readTeamID(mc *metaConfig, id *imageData) {
 func genChallenge(mc *metaConfig) string {
 	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
 	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
-	chalString := xor(randomHash1, randomHash2)
+	chalString := hexEncode(xor(randomHash1, randomHash2))
     if mc.Config.Password != "" {
-    	hasher := sha1.New()
+    	hasher := sha256.New()
     	hasher.Write([]byte(mc.Config.Password))
-        return hexEncode(xor(string(hasher.Sum(nil)), chalString))
+        key := hexEncode(string(hasher.Sum(nil)))
+        return hexEncode(xor(key, chalString))
 	}
 	return chalString
 }
 
 func genVulns(mc *metaConfig, id *imageData) string {
 	var vulnString strings.Builder
-    // build vuln string
-	vulnString.WriteString("muh vulns lol")
+
+    // Vulns achieved
+	vulnString.WriteString(fmt.Sprintf("%d|", len(id.Points)))
+    // Total vulns
+	vulnString.WriteString(fmt.Sprintf("%d|", id.ScoredVulns))
+
+    // Build vuln string
+	for _, penalty := range id.Penalties {
+		vulnString.WriteString(fmt.Sprintf("%s - %.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
+		vulnString.WriteString("|")
+	}
+
+	for _, point := range id.Points {
+		vulnString.WriteString(fmt.Sprintf("%s - %d pts", point.Message, point.Points))
+		vulnString.WriteString("|")
+	}
+
     if mc.Config.Password != "" {
+        if mc.Cli.Bool("v") {
+            infoPrint("Encrypting vulnerabilities for score report...")
+        }
         return hexEncode(encryptString(mc.Config.Password, vulnString.String()))
     }
     return hexEncode(vulnString.String())
@@ -105,7 +126,12 @@ func checkServer(mc *metaConfig, id *imageData) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Checking for internet connection...")
 	}
-	_, err := http.Get("http://clients3.google.com/generate_204")
+
+    client := http.Client{
+        Timeout: 5 * time.Second,
+    }
+	_, err := client.Get("http://clients3.google.com/generate_204")
+
 	if err != nil {
 		id.ConnStatus[2] = "red"
 		id.ConnStatus[3] = "FAIL"
@@ -114,11 +140,11 @@ func checkServer(mc *metaConfig, id *imageData) {
 		id.ConnStatus[3] = "OK"
 	}
 
-	// Scoring engine check (required)
+	// Scoring engine check
 	if mc.Cli.Bool("v") {
 		infoPrint("Checking for scoring engine connection...")
 	}
-	_, err = http.Get(mc.Config.Remote)
+	_, err = client.Get(mc.Config.Remote)
 	if err != nil {
 		id.ConnStatus[4] = "red"
 		id.ConnStatus[5] = "FAIL"
@@ -141,11 +167,13 @@ func checkServer(mc *metaConfig, id *imageData) {
 		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Failure! Can't access remote scoring server."
 		failPrint("Can't access remote scoring server!")
+		sendNotification(mc.Config.User, "Score upload failure! Unable to access remote server.")
 		id.Connection = false
 	} else if id.ConnStatus[4] == "ERROR" {
 		id.ConnStatus[0] = "red"
-		id.ConnStatus[1] = "Score upload failure! Can't send scores to remote server."
+		id.ConnStatus[1] = "Score upload failure. Can't send scores to remote server."
 		failPrint("Remote server returned an error for its status!")
+		sendNotification(mc.Config.User, "Score upload failure! Remote server returned an error.")
 		id.Connection = false
 	} else {
 		id.ConnStatus[0] = "green"

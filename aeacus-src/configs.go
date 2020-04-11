@@ -72,15 +72,8 @@ func writeConfig(mc *metaConfig) {
 	writer.Write(configBuffer)
 	writer.Close()
 
-    var encryptedFileString string;
-    if mc.Config.Password != "" {
-        encryptedFileString = encryptString(mc.Config.Password, encryptedFile.String())
-    } else {
-        encryptedFileString = encryptedFile.String()
-    }
-
 	// apply xor key
-	xordFile := xor(key, encryptedFileString)
+	xordFile := xor(key, encryptedFile.String())
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing data to " + mc.DirPath + "...")
@@ -120,11 +113,6 @@ func readData(mc *metaConfig) string {
 
 	// decrypt with xor key
 	dataFile = xor(key, dataFile)
-
-	// decrypt aes if key
-    if mc.Config.Password != "" {
-        dataFile = decryptString(mc.Config.Password, dataFile)
-    }
 
 	// zlib decompress
 	reader, err := zlib.NewReader(bytes.NewReader([]byte(dataFile)))
