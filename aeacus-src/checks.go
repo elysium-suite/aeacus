@@ -1,14 +1,13 @@
 package main
 
 import (
-    "os"
+	"os"
 
-    "regexp"
-    "strings"
 	"crypto/sha1"
 	"encoding/hex"
+	"regexp"
+	"strings"
 )
-
 
 func processCheckWrapper(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
 	switch checkType {
@@ -139,7 +138,7 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 		}
 		return !result
 	default:
-        return processCheck(check, checkType, arg1, arg2, arg3)
+		return processCheck(check, checkType, arg1, arg2, arg3)
 	}
 }
 

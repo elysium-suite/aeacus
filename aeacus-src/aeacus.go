@@ -72,7 +72,7 @@ func main() {
 					scoreImage(&mc, &id)
 					return nil
 				},
-		},
+			},
 			{
 				Name:    "check",
 				Aliases: []string{"c"},

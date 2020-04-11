@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/fatih/color"
+	"io/ioutil"
 	"os/exec"
 	"runtime"
-	"io/ioutil"
-	"github.com/fatih/color"
 )
 
 func shellCommand(commandGiven string) {
@@ -19,7 +19,7 @@ func shellCommand(commandGiven string) {
 
 func sendNotification(userName string, notifyText string) {
 	fmt.Println("not supported yet oopsies")
-    fmt.Printf("tried to send notification as user %s with text %s", userName, notifyText)
+	fmt.Printf("tried to send notification as user %s with text %s", userName, notifyText)
 }
 
 func destroyImage() {
