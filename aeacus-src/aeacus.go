@@ -109,7 +109,7 @@ func main() {
 				Aliases: []string{"g"},
 				Usage:   "Launch gui tests",
 				Action: func(c *cli.Context) error {
-					launchGui()
+					getInfo(c.Args().Get(0))
 					return nil
 				},
 			},
