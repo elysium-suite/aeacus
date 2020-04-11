@@ -109,9 +109,22 @@ None (at the moment).
 __RegistryKey__: pass if key is equal to value
 ```
 type="RegistryKey"
-arg1="SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+arg2="0"
 ```
+> Note: Make sure to escape your slashes (`\` --> `\\`)
 
+## Information Gathering
+
+The `aeacus` binary supports gathering information on the system (especially for Windows) in cases where it's tough to gather what the scoring system can see.
+
+Print information with `./aeacus info type` or `./aeacus info type` where `type` is one the following:
+
+### Linux
+- N/A (atm)
+
+### Windows
+- packages
 
 ## Configuration
 
@@ -197,6 +210,7 @@ points = -5 # This check is now a penalty
 
 ```
 
+
 ## ReadMe Configuration
 
 Put your README in `ReadMe.conf`. It's pretty self explanatory. Here's a template:
@@ -244,12 +258,6 @@ superCoolDude
 </pre>
 ```
 
-## Information Gathering
-
-The `aeacus` binary supports gathering information on the system (especially for Windows) in cases where it's tough to gather what the scoring system can see.
-
-- (All todo)
-- installed packages
 
 ## Contributing and Disclaimer
 
