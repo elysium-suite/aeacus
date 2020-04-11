@@ -4,8 +4,8 @@ func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing shortcuts to Desktop...")
 	}
-	shellCommand("cp /opt/aeacus/desktop/*.desktop /home/"+mc.Config.User+"/Desktop/")
-	shellCommand("chmod +x /home/"+mc.Config.User+"/Desktop/*.desktop")
+	shellCommand("cp " + mc.DirPath + "misc/*.desktop /home/" + mc.Config.User + "/Desktop/")
+	shellCommand("chmod +x /home/" + mc.Config.User + "/Desktop/*.desktop")
 }
 
 func installService(mc *metaConfig) {
@@ -34,17 +34,17 @@ func cleanUp(mc *metaConfig) {
 	}
 	shellCommand("find / -name \".bash_history\" -exec ln -sf /dev/null {} \\;")
 
-    if mc.Cli.Bool("v") {
+	if mc.Cli.Bool("v") {
 		infoPrint("Removing .swp files")
 	}
 	shellCommand("find / -type f -iname '*.swp' -delete")
 
-    if mc.Cli.Bool("v") {
+	if mc.Cli.Bool("v") {
 		infoPrint("Removing .local files")
 	}
 	shellCommand("rm -rf /root/.local /home/*/.local/")
 
-    if mc.Cli.Bool("v") {
+	if mc.Cli.Bool("v") {
 		infoPrint("Removing cache...")
 	}
 	shellCommand("rm -rf /root/.cache /home/*/.cache/")

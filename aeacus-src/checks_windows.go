@@ -95,20 +95,20 @@ func UserExistsW(userName string) (bool, error) {
 }
 
 func RegistryKey(keyName string, keyValue string) (bool, error) {
-    registryArgs := regexp.MustCompile("[\\s]+").Split(keyName, -1)
-    keyPath := registryArgs[:len(registryArgs) - 1]
-    keyLoc := registryArgs[len(registryArgs)]
-    fmt.Printf("PATH %s getting KEY %s", keyPath, keyLoc)
-    k, err := registry.OpenKey(registry.LOCAL_MACHINE, keyPath, registry.QUERY_VALUE)
-    if err != nil {
-    	return false, err
-    }
-    defer k.Close()
+	registryArgs := regexp.MustCompile("[\\s]+").Split(keyName, -1)
+	keyPath := registryArgs[:len(registryArgs)-1]
+	keyLoc := registryArgs[len(registryArgs)]
+	fmt.Printf("PATH %s getting KEY %s", keyPath, keyLoc)
+	k, err := registry.OpenKey(registry.LOCAL_MACHINE, keyPath, registry.QUERY_VALUE)
+	if err != nil {
+		return false, err
+	}
+	defer k.Close()
 
-    s, _, err := k.GetStringValue(keyLoc)
-    if err != nil {
-    	return false, err
-    }
-    fmt.Printf("retreievd reg value was %s", s)
-    return true, err
+	s, _, err := k.GetStringValue(keyLoc)
+	if err != nil {
+		return false, err
+	}
+	fmt.Printf("retreievd reg value was %s", s)
+	return true, err
 }

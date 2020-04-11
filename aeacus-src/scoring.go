@@ -12,7 +12,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
 		checkServer(mc, id)
 		if !id.Connection {
 			genReport(mc, id)
-            return
+			return
 		}
 	}
 
@@ -20,9 +20,9 @@ func scoreImage(mc *metaConfig, id *imageData) {
 	if mc.Config.Remote != "" {
 		reportScore(mc, id)
 	}
-    genReport(mc, id)
+	genReport(mc, id)
 
-    // Check if points increased/decreased
+	// Check if points increased/decreased
 	prevPoints, err := readFile(mc.DirPath + "web/assets/previous.txt")
 	if err == nil {
 		prevScore, _ := strconv.Atoi(prevPoints)
@@ -42,7 +42,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
 
 func scoreChecks(mc *metaConfig, id *imageData) {
 
-    clearImageData(id)
+	clearImageData(id)
 	pointlessChecks := []int{}
 
 	for i, check := range mc.Config.Check {
@@ -113,11 +113,11 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 }
 
 func clearImageData(id *imageData) {
-    id.Score = 0
+	id.Score = 0
 	id.ScoredVulns = 0
 	id.TotalPoints = 0
-    id.Contribs = 0
-    id.Detracts = 0
+	id.Contribs = 0
+	id.Detracts = 0
 	id.Points = []scoreItem{}
 	id.Penalties = []scoreItem{}
 }

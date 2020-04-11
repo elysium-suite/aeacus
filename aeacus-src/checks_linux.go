@@ -1,11 +1,9 @@
-// +build linux
-
 package main
 
 import (
 	"fmt"
+	"os/exec"
 	"os/user"
-    "os/exec"
 	"strconv"
 )
 

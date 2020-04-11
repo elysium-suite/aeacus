@@ -118,16 +118,22 @@ arg1="SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
 The configuration is written in TOML. See the below example:
 
 ```
-name = "ubuntu-18-supercool" # Unique identifier name
+name = "ubuntu-18-supercool" # Image name
 title = "CoolCyberStuff Practice Round" # Round title
 user = "coolUser" # Main user for the image
-os = "Ubuntu 18.04" # Operating system used for ReadMe
+os = "Ubuntu 18.04"
 
 # If remote is specified, aeacus will report its score
 # and refuse to score if the remote server does not accept
 # its messages and Team ID (unless local_enabled)
 # Make sure to include the scheme (http, https...)
 remote = "https://192.168.1.100"
+
+# If password is specified, it will be used to
+# encrypt config and client and server traffic
+# NOTE: Server must have same password set
+# if you want score reporting to work
+password = "HackersArentReal"
 
 # If local is set to yes, then the image will give
 # feedback and score regardless of whether or not
@@ -162,9 +168,8 @@ points = 20
 
 [[check]]
 # If no points are specified, they are auto-calculated
-# out of 100 points
-# ex. 50 specified points, 5 checks with no points specified
-# then they're 10 points each
+# out of 100 points (ex. 50 specified points, 5 checks
+# with no points specified-- they're 10 points each)
     [[check.pass]]
     type="CommandNot"
     arg1="cat /etc/passwd /etc/shadow"
