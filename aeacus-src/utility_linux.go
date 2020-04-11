@@ -8,7 +8,7 @@ func shellCommand(commandGiven string) {
 	cmd := exec.Command("sh", "-c", commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
-			failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
+			failPrint("Command \"" + commandGiven + "\" errored out (" + err.Error() + ").")
 		}
 	}
 }
@@ -19,5 +19,5 @@ func sendNotification(userName string, notifyText string) {
 }
 
 func destroyImage() {
-    warnPrint("Destroying the image! (jk for now. that's dangerous)")
+	warnPrint("Destroying the image! (jk for now. that's dangerous)")
 }

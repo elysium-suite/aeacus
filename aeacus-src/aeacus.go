@@ -72,7 +72,7 @@ func main() {
 					scoreImage(&mc, &id)
 					return nil
 				},
-		},
+			},
 			{
 				Name:    "check",
 				Aliases: []string{"c"},
@@ -90,6 +90,17 @@ func main() {
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					writeConfig(&mc)
+					return nil
+				},
+			},
+			{
+				Name:    "decrypt",
+				Aliases: []string{"d"},
+				Usage:   "decrypt lol",
+				Action: func(c *cli.Context) error {
+					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+                    parseConfig(&mc, readData(&mc))
+					scoreImage(&mc, &id)
 					return nil
 				},
 			},

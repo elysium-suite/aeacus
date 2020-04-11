@@ -1,11 +1,11 @@
 package main
 
 import (
-	"io/ioutil"
 	"bufio"
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 
 	// crypto magic
@@ -13,8 +13,8 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 
-	"github.com/fatih/color"
 	"github.com/BurntSushi/toml"
+	"github.com/fatih/color"
 )
 
 func parseConfig(mc *metaConfig, configContent string) {
@@ -50,44 +50,21 @@ func writeConfig(mc *metaConfig) {
 		infoPrint("Encrypting configuration...")
 	}
 
-	// "static" hash #1
-	hashOne := "7z7551253a53s0f974e3d03d0cf839e7ccfc!879"
-	hashOneContent, err := readFile("/bin/bash")
-	if err == nil {
-		hasher := sha1.New()
-		hasher.Write([]byte(hashOneContent))
-		hashOne = hex.EncodeToString(hasher.Sum(nil))
-	}
-
-	// "static" hash #2
-	hashTwo := "3384b1be7ac2a~9ahc8b4488d4cc2edb5ag497fz"
-	hashTwoContent, err := readFile("/usr/lib/apt/apt-helper")
-	if err == nil {
-		hasher := sha1.New()
-		hasher.Write([]byte(hashTwoContent))
-		hashTwo = hex.EncodeToString(hasher.Sum(nil))
-	}
-
-	// formulate key with hashes + modified day of config
-	key := xor(hashOne, hashTwo)
 	info, err = os.Stat(mc.DirPath + "scoring.conf")
 	if err != nil {
-		failPrint("Crypto magic can not ensue! No configuration file found.")
+		failPrint("Crypto magic can not occur! No configuration file found.")
 		os.Exit(1)
 	}
+
+    // Additionally, XOR it with ModTime
 	modifiedTime := info.ModTime().Format("01/02/2006")
-	modifiedTimeHash := "1230-8123nasklnaegklnjwh0-91uiowasfml;3tr23"
+	modifiedTimeHash := "3208c653a58297997ae22a3ea21be68fb2f4d06"
 	if err == nil {
 		hasher := sha1.New()
 		hasher.Write([]byte(modifiedTime))
 		modifiedTimeHash = hex.EncodeToString(hasher.Sum(nil))
 	}
-	key = xor(modifiedTimeHash, key)
-
-	// swap some bytes just 4 fun
-	// TODO
-	//key = append(key, key[7])
-	//key = append(key, key[10])
+	key := xor(modifiedTimeHash, getXORKey())
 
 	// zlib compress
 	var encryptedFile bytes.Buffer
@@ -97,9 +74,6 @@ func writeConfig(mc *metaConfig) {
 
 	// apply xor key
 	xordFile := xor(key, encryptedFile.String())
-
-	// aes with reversed byte string or something
-	// TODO
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing data to " + mc.DirPath + "...")
@@ -122,55 +96,29 @@ func readData(mc *metaConfig) string {
 		os.Exit(1)
 	}
 
-	// "static" hash #1
-	hashOne := "7z7551253a53s0f974e3d03d0cf839e7ccfc!879"
-	hashOneContent, err := readFile("/bin/bash")
-	if err == nil {
-		hasher := sha1.New()
-		hasher.Write([]byte(hashOneContent))
-		hashOne = hex.EncodeToString(hasher.Sum(nil))
-	}
-
-	// "static" hash #2
-	hashTwo := "3384b1be7ac2a~9ahc8b4488d4cc2edb5ag497fz"
-	hashTwoContent, err := readFile("/usr/lib/apt/apt-helper")
-	if err == nil {
-		hasher := sha1.New()
-		hasher.Write([]byte(hashTwoContent))
-		hashTwo = hex.EncodeToString(hasher.Sum(nil))
-	}
-
-	// formulate key with hashes + modified day of config
-	key := xor(hashOne, hashTwo)
+    // Apply jank ModTime hash
 	info, err := os.Stat(mc.DirPath + "scoring.dat")
 	if err != nil {
 		failPrint("Oops, you yoinked scoring.dat? Uncool.")
 		os.Exit(1)
 	}
 	modifiedTime := info.ModTime().Format("01/02/2006")
-	modifiedTimeHash := "1230-8123nasklnaegklnjwh0-91uiowasfml;3tr23"
+	modifiedTimeHash := "3208c653a58297997ae22a3ea21be68fb2f4d06"
 	if err == nil {
 		hasher := sha1.New()
 		hasher.Write([]byte(modifiedTime))
 		modifiedTimeHash = hex.EncodeToString(hasher.Sum(nil))
 	}
-	key = xor(modifiedTimeHash, key)
+	key := xor(modifiedTimeHash, getXORKey())
 
-	// swap some bytes just 4 fun
-	// TODO
-	//key = append(key, key[7])
-	//key = append(key, key[10])
-
-	// undo aes
-
-	// apply xor key
+	// decrypt with xor key
 	dataFile = xor(key, dataFile)
 
 	// zlib decompress
 	reader, err := zlib.NewReader(bytes.NewReader([]byte(dataFile)))
 	if err != nil {
 		failPrint("Error decrypting scoring.dat. You naughty little competitor. Commencing self destruct...")
-		// lol jk... for now
+        destroyImage()
 		os.Exit(1)
 	}
 	defer reader.Close()
@@ -179,18 +127,6 @@ func readData(mc *metaConfig) string {
 	io.Copy(dataBuffer, reader)
 
 	return string(dataBuffer.Bytes())
-}
-
-/////////////////////////////
-// CRYPTOGRAPHIC FUNCTIONS //
-/////////////////////////////
-
-func xor(key string, plaintext string) string {
-	ciphertext := make([]byte, len(plaintext))
-	for i := 0; i < len(plaintext); i++ {
-		ciphertext[i] = key[i%len(key)] ^ plaintext[i]
-	}
-	return string(ciphertext)
 }
 
 //////////////////////
