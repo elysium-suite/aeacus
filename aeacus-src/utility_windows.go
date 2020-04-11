@@ -2,10 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
-	"io/ioutil"
 	"os/exec"
-	"runtime"
 )
 
 func shellCommand(commandGiven string) {
