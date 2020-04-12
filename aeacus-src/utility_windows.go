@@ -19,6 +19,12 @@ func sendNotification(userName string, notifyText string) {
 	fmt.Printf("tried to send notification as user %s with text %s", userName, notifyText)
 }
 
+func playAudio(wavPath string) {
+	commandText := "(New-Object Media.SoundPlayer '" + wavPath + "').PlaySync();"
+	shellCommand(commandText)
+}
+
+
 func destroyImage() {
 	fmt.Println("cant do that yet. not supported on windows. enjoy ur undestryoed imaeg")
 }

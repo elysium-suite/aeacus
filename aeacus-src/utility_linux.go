@@ -18,12 +18,7 @@ func sendNotification(userName string, notifyText string) {
 	shellCommand(commandText)
 }
 
-func playGain(wavPath string) {
-	commandText := "aplay " + wavPath
-	shellCommand(commandText)
-}
-
-func playAlarm(wavPath string) {
+func playAudio(wavPath string) {
 	commandText := "aplay " + wavPath
 	shellCommand(commandText)
 }
