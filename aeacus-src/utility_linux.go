@@ -18,6 +18,16 @@ func sendNotification(userName string, notifyText string) {
 	shellCommand(commandText)
 }
 
+func playGain(wavPath string) {
+	commandText := "aplay " + wavPath
+	shellCommand(commandText)
+}
+
+func playAlarm(wavPath string) {
+	commandText := "aplay " + wavPath
+	shellCommand(commandText)
+}
+
 func destroyImage() {
 	warnPrint("Destroying the image! (jk for now. that's dangerous)")
 }
