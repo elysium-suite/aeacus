@@ -58,16 +58,15 @@ func Command(commandGiven string) (bool, error) {
 }
 
 func PackageInstalled(packageName string) (bool, error) {
-	// not super happy with the command implementation
-	// could just keylog sh or replace dpkg binary or something
-	// should use golang dpkg library if it existed and was good
+	// TODO: just check the list returned from the winapi (see info)
 	result, err := Command(fmt.Sprintf("dpkg -l %s", packageName))
 	return result, err
 }
 
 func UserExists(userName string) (bool, error) {
 	// see above comment
-	result, err := Command(fmt.Sprintf("id -u %s", userName))
+
+	result, err := Command(fmt.Sprintf("Get-LocalUser %s", userName))
 	return result, err
 }
 
@@ -108,7 +107,7 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
     registrySlice := make([]byte, 256)
 	regLength, valType, err := k.GetValue(keyLoc, registrySlice)
     registrySlice = registrySlice[:regLength]
-	fmt.Printf("Retrieved registry value was %d (length %d, type %d)\n", registrySlice, regLength, valType)
+	//fmt.Printf("Retrieved registry value was %d (length %d, type %d)\n", registrySlice, regLength, valType)
 
     // Determine value type to convert to string
     var registryValue string
@@ -129,7 +128,7 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
         return false, err
 	}
 
-    fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
+    //fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
     if registryValue == keyValue {
     	return true, err
     }
