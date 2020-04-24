@@ -6,7 +6,7 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 
 0. __Extract the release__ into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
 1. __Set up the environment.__
-    - Put your config in `/opt/aeacus/scoring.conf`.
+    - Put your config in `/opt/aeacus/scoring.conf` or `C:\aeacus\scoring.conf`
     > Don't have a config? See the example at the bottom of this README.
 
     - Put your README html in ReadMe.conf.
@@ -33,10 +33,10 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 ## Screenshots
 
 #### Scoring Report:
-![Scoring Report](web/ScoringReport.png)
+![Scoring Report](misc/ScoringReport.png)
 
 #### ReadMe:
-![ReadMe](web/ReadMe.png)
+![ReadMe](misc/ReadMe.png)
 
 ## Features
 
@@ -109,7 +109,7 @@ None (at the moment).
 __RegistryKey__: pass if key is equal to value
 ```
 type="RegistryKey"
-arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD"
 arg2="0"
 ```
 > Note: Make sure to escape your slashes (`\` --> `\\`)
@@ -257,6 +257,13 @@ niceUser
 superCoolDude
 </pre>
 ```
+
+
+## Troubleshooting and Errors
+
+Please refer to the following flowchart:
+
+![Troubleshooting Flowchart](misc/troubleshooting.png)
 
 
 ## Contributing and Disclaimer

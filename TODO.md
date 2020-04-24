@@ -1,12 +1,9 @@
 # todo
 
 - general
-play sound when gaining/losing points
+    - move wavs to misc
 
-- Remote stuff
-    - minos api, auth token, etc
-    - requirement of teamid and teamid parsing from desktop
-        - teamid parsing done
+- remote
     - status/time limit
 
 - gui
@@ -15,13 +12,32 @@ play sound when gaining/losing points
 - helpers
     - fq creators
     - install script to fetch release from ?web? and put in right place
-    gui
+- gui / info
     - create list of admins/users
+
+- windows
+    - reading TEAMID fails beacuse it's unicode by default and ioutil/program expects ANSI
+    - make it a service
+        - or at least hide the shell:startup window (https://superuser.com/questions/140047/how-to-run-a-batch-file-without-launching-a-command-window)
+    - notifications
+
+- windows (wrappers/regs)
+    - firewall
+    - services
+    - scheduled takss
+    - installed programas
+    - local users/groups
+    - secpol????? awful to implement
+    - user rights assignments
+    - audit policy
+    - shares
+    - startup programs
+    - account/password policies
 
  release
  - autologin user
  - chown user:user desktop files
- - fix releas perms
+ - fix release perms
 
  features/checks
  - user group check

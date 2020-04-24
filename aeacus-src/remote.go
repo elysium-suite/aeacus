@@ -104,7 +104,7 @@ func reportScore(mc *metaConfig, id *imageData) {
 		id.ConnStatus[1] = "Failed to upload score! Please ensure that your Team ID is correct."
 		id.Connection = false
         sendNotification(mc.Config.User, "Failed to upload score! Is your Team ID correct?")
-		if strings.ToLower(mc.Config.Local) != "yes" {
+		if mc.Config.Local != "yes" {
 			if mc.Cli.Bool("v") {
 				warnPrint("Local is not set to \"yes\". Clearing scoring data.")
 			}
