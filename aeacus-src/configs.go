@@ -1,12 +1,13 @@
 package main
 
 import (
+	"os"
+	"io"
+	"fmt"
 	"bufio"
 	"bytes"
-	"fmt"
-	"io"
+    "strings"
 	"io/ioutil"
-	"os"
 
 	// crypto magic
 	"compress/zlib"
@@ -22,6 +23,7 @@ func parseConfig(mc *metaConfig, configContent string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+    mc.Config.Local = strings.ToLower(mc.Config.Local)
 }
 
 ////////////////////
