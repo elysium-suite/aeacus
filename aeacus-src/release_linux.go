@@ -72,7 +72,7 @@ func cleanUp(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing other setup files...")
 	}
-	shellCommand("rm -rf /opt/aeacus/misc /opt/aeacus/ReadMe.conf /opt/aeacus/README.md /opt/aeacus/TODO.md")
+	shellCommand("rm -rf /opt/aeacus/misc /opt/aeacus/web/assets/previous.txt /opt/aeacus/ReadMe.conf /opt/aeacus/README.md /opt/aeacus/TODO.md")
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing aeacus binary...")

@@ -13,6 +13,7 @@ import (
     "golang.org/x/sys/windows/registry"
 )
 
+// adminCheck will return true if process is being run as Administrator
 func adminCheck() bool {
 	_, err := os.Open("\\\\.\\PHYSICALDRIVE0")
 	if err != nil {
@@ -21,6 +22,8 @@ func adminCheck() bool {
 	return true
 }
 
+// This Windows processCheck will process Windows-specific checks
+// handed to it by the processCheckWrapper function
 func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
 	switch checkType {
 	case "RegistryKey":
@@ -37,6 +40,42 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 			check.Message = "Registry key " + arg1 + " does not match \"" + arg2 + "\""
 		}
 		result, err := RegistryKey(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return !result
+    case "UserRights":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " has privilege \"" + arg2 + "\""
+		}
+		result, err := UserRights(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return result
+    case "UserRightsNot":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " does not have privilege \"" + arg2 + "\""
+		}
+		result, err := UserRights(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return !result
+	case "SecurityPolicy":
+		if check.Message == "" {
+			check.Message = "Security policy option " + arg1 + " is \"" + arg2 + "\""
+		}
+		result, err := SecurityPolicy(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return result
+	case "SecurityPolicyNot":
+		if check.Message == "" {
+			check.Message = "Security policy option " + arg1 + " is not \"" + arg2 + "\""
+		}
+		result, err := SecurityPolicy(arg1, arg2)
 		if err != nil {
 			return false
 		}
@@ -58,17 +97,86 @@ func Command(commandGiven string) (bool, error) {
 }
 
 func PackageInstalled(packageName string) (bool, error) {
-	// not super happy with the command implementation
-	// could just keylog sh or replace dpkg binary or something
-	// should use golang dpkg library if it existed and was good
-	result, err := Command(fmt.Sprintf("dpkg -l %s", packageName))
-	return result, err
+    packageList := getPackages()
+    for _, p := range packageList {
+        if p == packageName {
+            return true, nil
+        }
+    }
+	return false, nil
+}
+
+func ServiceUp(serviceName string) (bool, error) {
+	return Command(fmt.Sprintf("if (!((Get-Service -Name '%s').Status -eq 'Running')) { Throw 'Service is stopped' }", serviceName))
 }
 
 func UserExists(userName string) (bool, error) {
-	// see above comment
-	result, err := Command(fmt.Sprintf("id -u %s", userName))
-	return result, err
+    // eventually going to not use powershell for everything
+    // but until then...
+	return Command(fmt.Sprintf("Get-LocalUser %s", userName))
+}
+
+func FirewallUp() (bool, error) {
+    fwProfiles := []string{"Domain", "Public", "Private"}
+    for _, profile := range fwProfiles {
+        // This is kind of jank and kind of slow
+        cmdText := fmt.Sprintf("if (!((Get-NetFirewallProfile -Name '%s').Enabled -eq 'True')) { Throw 'Firewall profile is disabled' }", profile)
+        result, err := Command(cmdText)
+        if result == false || err != nil {
+            return result, err
+        }
+    }
+    return true, nil
+}
+
+func UserRights(userOrGroup string, privilege string) (bool, error) {
+    // todo consider /mergedpolicy when windows domain is active?
+    // domain support is untested, it should be easy to add a domain
+    // flag in the config though. then just make sure you're not getting
+    // invalid local policies instead of gpo
+    seceditOutput, err := getSecedit()
+    if err != nil {
+        return false, err
+    }
+    re := regexp.MustCompile("(?m)[\r\n]+^.*" + privilege + ".*$")
+    privilegeString := string(re.Find([]byte(seceditOutput)))
+    privStringSplit := strings.Split(privilegeString, " ")
+    privStringSplit = strings.Split(string(privStringSplit[2]), ",")
+    if privilegeString == "" {
+        return false, errors.New("Invalid privilege")
+    }
+    for _, sidValue := range privStringSplit {
+        sidValue = strings.TrimSpace(sidValue)
+        userForSid := strings.Split(sidToLocalUser(sidValue[1:]), "\\")
+        userSid := strings.TrimSpace(userForSid[0])
+        if len(userForSid) == 2 {
+            userSid = strings.TrimSpace(userForSid[1])
+        }
+        if userSid == userOrGroup {
+            return true, nil
+        }
+    }
+    return false, err
+}
+
+func SecurityPolicy(keyName string, keyValue string) (bool, error) {
+    var desiredString string
+    if regKey, ok := secpolToKey[keyName]; ok {
+        return RegistryKey(regKey, keyValue)
+    } else {
+        // Yes, this is jank, but is there a better way? Probably
+        output, err := shellCommandOutput("secedit.exe /export /cfg lol.cfg /log NUL; Get-Content lol.cfg; Remove-Item lol.cfg")
+        if err != nil {
+            return false, err
+        }
+        if keyName == "NewAdministratorName" || keyName == "NewGuestName" {
+            // These two are strings, not numbers, so they have ""
+            desiredString = fmt.Sprintf("%s = \"%s\"", keyName, keyValue)
+        } else {
+            desiredString = fmt.Sprintf("%s = %s", keyName, keyValue)
+        }
+        return strings.Contains(output, desiredString), err
+    }
 }
 
 func RegistryKey(keyName string, keyValue string) (bool, error) {
@@ -78,22 +186,26 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
     registryHiveText := registryArgs[0]
 	keyPath := fmt.Sprintf(strings.Join(registryArgs[1:len(registryArgs)-1], "\\"))
 	keyLoc := registryArgs[len(registryArgs)-1]
+    //fmt.Printf("REGISTRY: getting keypath %s from %s\n", keyPath, registryHiveText)
 
     var registryHive registry.Key
     switch registryHiveText {
-    case "HKEY_CLASSES_ROOT":
+    case "HKEY_CLASSES_ROOT", "HKCR":
         registryHive = registry.CLASSES_ROOT
-    case "HKEY_CURRENT_USER":
+    case "HKEY_CURRENT_USER", "HKCU":
         registryHive = registry.CURRENT_USER
-    case "HKEY_LOCAL_MACHINE":
+    case "HKEY_LOCAL_MACHINE", "HKLM", "MACHINE":
         registryHive = registry.LOCAL_MACHINE
-    case "HKEY_USERS":
+    case "HKEY_USERS", "HKU":
         registryHive = registry.USERS
-    case "HKEY_CURRENT_CONFIG":
+    case "HKEY_CURRENT_CONFIG", "HKCC":
         registryHive = registry.CURRENT_CONFIG
+    case "SOFTWARE":
+        registryHive = registry.LOCAL_MACHINE
+        keyPath = "SOFTWARE\\" + keyPath
     default:
         failPrint("Unknown registry hive: " +  registryHiveText)
-        return false, errors.New("Unkown registry hive")
+        return false, errors.New("Unkown registry hive" + registryHiveText)
     }
 
     // Actually get the key
@@ -108,7 +220,7 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
     registrySlice := make([]byte, 256)
 	regLength, valType, err := k.GetValue(keyLoc, registrySlice)
     registrySlice = registrySlice[:regLength]
-	fmt.Printf("Retrieved registry value was %d (length %d, type %d)\n", registrySlice, regLength, valType)
+	//fmt.Printf("Retrieved registry value was %d (length %d, type %d)\n", registrySlice, regLength, valType)
 
     // Determine value type to convert to string
     var registryValue string
@@ -129,7 +241,7 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
         return false, err
 	}
 
-    fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
+    //fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
     if registryValue == keyValue {
     	return true, err
     }
