@@ -17,5 +17,8 @@ apt install -y golang-go git
 go get "github.com/urfave/cli"
 go get "github.com/BurntSushi/toml/cmd/tomlv"
 go get "github.com/fatih/color"
+go get "github.com/iamacarpet/go-win64api"
+go get "github.com/go-ole/go-ole"
+go get "golang.org/x/sys/windows"
 echo "alias builda=\"cd aeacus-src; go build -o ../aeacus .; cd ..\"; alias buildp=\"cd phocus-src; go build -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
 echo "alias pbuilda=\"cd aeacus-src; go build -ldflags '-s -w' -o ../aeacus .; cd ..\"; alias pbuildp=\"cd phocus-src; go build -ldflags '-s -w' -o ../phocus .; cd ..\"" >> /etc/bash.bashrc

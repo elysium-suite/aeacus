@@ -10,14 +10,14 @@ func scoreImage(mc *metaConfig, id *imageData) {
 	// Check connection and configuration
 	if mc.Config.Remote != "" {
 		checkServer(mc, id)
-		if !id.Connection {
+		if !id.Connection && mc.Config.Local != "yes" {
 			genReport(mc, id)
 			return
 		}
 	}
 
 	scoreChecks(mc, id)
-	if mc.Config.Remote != "" {
+	if id.Connection && mc.Config.Remote != "" {
 		reportScore(mc, id)
 	}
 	genReport(mc, id)
@@ -28,10 +28,10 @@ func scoreImage(mc *metaConfig, id *imageData) {
 		prevScore, _ := strconv.Atoi(prevPoints)
 		if prevScore < id.Score {
 			sendNotification(mc.Config.User, "You gained points!")
-			playAudio(mc.DirPath + "web/assets/gain.wav")
+			playAudio(mc.DirPath + "misc/gain.wav")
 		} else if prevScore > id.Score {
 			sendNotification(mc.Config.User, "You lost points!")
-			playAudio(mc.DirPath + "web/assets/alarm.wav")
+			playAudio(mc.DirPath + "misc/alarm.wav")
 		}
 	} else {
 		fmt.Println(err)
