@@ -1,14 +1,19 @@
 package main
 
+// This file contains checks that are identical for both Linux and Windows.
+// If a checkType does not match one specified, it is handed off to
+// processCheck for the OS-specific checks
+
 import (
 	"os"
-
-	"crypto/sha1"
-	"encoding/hex"
 	"regexp"
 	"strings"
+	"crypto/sha1"
+	"encoding/hex"
 )
 
+// processCheckWrapper takes the data from a check in the config
+// and runs the correct function with the correct parameters
 func processCheckWrapper(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
 	switch checkType {
 	case "Command":
@@ -119,7 +124,25 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			return false
 		}
 		return !result
-	case "UserExists":
+	case "ServiceUp":
+		if check.Message == "" {
+			check.Message = "Service \"" + arg1 + "\" is installed and running"
+		}
+		result, err := ServiceUp(arg1)
+		if err != nil {
+			return false
+		}
+		return result
+	case "ServiceUpNot":
+		if check.Message == "" {
+			check.Message = "Service " + arg1 + " has been stopped"
+		}
+		result, err := ServiceUp(arg1)
+		if err != nil {
+			return false
+		}
+		return !result
+    case "UserExists":
 		if check.Message == "" {
 			check.Message = "User " + arg1 + " has been added"
 		}
@@ -133,6 +156,26 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			check.Message = "User " + arg1 + " has been removed"
 		}
 		result, err := UserExists(arg1)
+		if err != nil {
+			return false
+		}
+		return !result
+    case "FirewallUp":
+		if check.Message == "" {
+			check.Message = "Firewall has been enabled"
+		}
+		result, err := FirewallUp()
+		if err != nil {
+			return false
+		}
+		return result
+    case "FirewallUpNot":
+		if check.Message == "" {
+            // Who is ever going to use this?
+            // Maybe as a penalty?
+			check.Message = "Firewall has been disabled"
+		}
+		result, err := FirewallUp()
 		if err != nil {
 			return false
 		}
@@ -158,6 +201,8 @@ func FileContainsRegex(fileName string, expressionString string) (bool, error) {
 	return matched, err
 }
 
+// FileEquals calculates the SHA1 sum of a file and compares it
+// with the hash provided in the check
 func FileEquals(fileName string, fileHash string) (bool, error) {
 	fileContent, err := readFile(fileName)
 	if err != nil {
