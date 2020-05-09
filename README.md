@@ -22,8 +22,6 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 3. __Score the image with the current config to verify your checks work as expected.__
 ```
 ./aeacus --verbose score
-./aeacus --verbose encrypt
-./aeacus --verbose simulate
 ```
 4. __Prepare the image for release.__
 ```
@@ -41,11 +39,15 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 
 ## Features
 
-- In-depth and simple vulnerability scorer
+- Robust yet simple vulnerability scorer
 - Image deployment (cleanup, README, etc)
-- Remote score reporting through a REST-like API
+- Remote score reporting
 
 > Note: `aeacus` ships with very weak crypto on purpose. You need to implement your own crypto functions. See the [Adding Crypto](/docs/crypto.md) for more information.
+
+## Checks
+
+All checks (with examples and notes) [are documented here](docs/checks.md).
 
 ## Configuration
 
@@ -130,9 +132,6 @@ points = -5 # This check is now a penalty
     arg1="coolAdmin"
 
 ```
-## Checks
-
-All checks (with examples and notes) [are documented here](docs/checks.md).
 
 ## Information Gathering
 
