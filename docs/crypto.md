@@ -1,4 +1,4 @@
-# aeacus: Cryptographical Security
+# aeacus
 
 ## Adding Crypto
 

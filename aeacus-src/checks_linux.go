@@ -63,6 +63,6 @@ func UserExists(userName string) (bool, error) {
 	return Command("id -u " + userName)
 }
 
-func FirewallUp(userName string) (bool, error) {
+func FirewallUp() (bool, error) {
 	return FileExists("/proc/net/ip_tables_names")
 }
