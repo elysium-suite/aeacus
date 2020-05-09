@@ -30,3 +30,4 @@
  - autologin user
  - chown user:user desktop files
  - fix release perms
+ - put 0 in previous
