@@ -7,6 +7,7 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 0. __Extract the release__ into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
 1. __Set up the environment.__
     - Put your config in `/opt/aeacus/scoring.conf` or `C:\aeacus\scoring.conf`
+
     > Don't have a config? See the example at the bottom of this README.
 
     - Put your README html in ReadMe.conf.
@@ -44,87 +45,7 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 - Image deployment (cleanup, README, etc)
 - Remote score reporting through a REST-like API
 
-## Checks
-
-This is a list of vulnerability checks that can be used in the configuration for aeacus.
-
-> __Note!__ Each of these check types can be used for either `Pass` or `Fail` conditions, and there can be multiple `Pass` or `Fail` conditions per check.
-
-__Command__: pass if command succeeds (exit code `0`)
-```
-type="Command"
-arg1="grep 'pam_history.so' /etc/pam.d/common-password"
-```
-
-> __Note!__ Each of the commands here can check for the opposite by appending "Not" to the check type. For example, `CommandNot` to pass if a command does not return exit code `0`.
-
-__FileExists__: pass if specified file exists
-```
-type="FileExists"
-arg1="/etc/passwd"
-```
-
-__FileContains__: pass if file contains string
-```
-type="FileContains"
-arg1="/home/coolUser/Desktop/Forensic Question 1.txt"
-arg2="ANSWER: SomeCoolAnswer"
-```
-
-__FileContainsRegex__: pass if file contains regex string
-```
-type="FileContains"
-arg1="/home/coolUser/Desktop/Forensic Question 1.txt"
-arg2="ANSWER:\sCool[a-zA-Z]+VariedAnswer"
-```
-
-__FileEquals__: pass if file equals sha1 hash
-```
-type="FileEquals"
-arg1="/etc/sysctl.conf"
-arg2="403926033d001b5279df37cbbe5287b7c7c267fa"
-```
-
-__PackageInstalled__: pass if package is installed
-```
-type="PackageInstalled"
-arg1="tcpd"
-```
-
-__UserExists__: pass if user exists on system
-```
-type="UserExists"
-arg1="ballen"
-```
-
-> __Note!__ If a check has negative points assigned to it, it automatically becomes a penalty.
-
-### Linux-Specific Checks
-
-None (at the moment).
-
-
-### Windows-Specific Checks
-
-__RegistryKey__: pass if key is equal to value
-```
-type="RegistryKey"
-arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD"
-arg2="0"
-```
-> Note: Make sure to escape your slashes (`\` --> `\\`)
-
-## Information Gathering
-
-The `aeacus` binary supports gathering information on the system (especially for Windows) in cases where it's tough to gather what the scoring system can see.
-
-Print information with `./aeacus info type` or `./aeacus info type` where `type` is one the following:
-
-### Linux
-- N/A (atm)
-
-### Windows
-- packages
+> Note: `aeacus` ships with very weak crypto on purpose. You need to implement your own crypto functions. See the [Adding Crypto](/docs/crypto.md) for more information.
 
 ## Configuration
 
@@ -209,6 +130,21 @@ points = -5 # This check is now a penalty
     arg1="coolAdmin"
 
 ```
+## Checks
+
+All checks (with examples and notes) [are documented here](docs/checks.md).
+
+## Information Gathering
+
+The `aeacus` binary supports gathering information on the system (especially for Windows) in cases where it's tough to gather what the scoring system can see.
+
+Print information with `./aeacus info type` or `./aeacus info {type}` where `{type}` is one the following:
+
+### Linux
+- N/A (atm)
+
+### Windows
+- packages
 
 
 ## ReadMe Configuration
@@ -258,17 +194,16 @@ superCoolDude
 </pre>
 ```
 
-
 ## Troubleshooting and Errors
 
 Please refer to the following flowchart:
 
-![Troubleshooting Flowchart](misc/troubleshooting.png)
+![Troubleshooting Flowchart](docs/troubleshooting.png)
 
 
 ## Contributing and Disclaimer
 
-Thanks to Tanay, Arjun, Pranav, and Akshay for help with this project! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
+Thanks to Akshay, Tanay, Arjun, Pranav and others for help with this project! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
 
 If you have anything you would like to add or fix, please make a pull request! No improvement or fix is too small, and help is always appreciated.
 

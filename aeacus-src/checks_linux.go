@@ -51,12 +51,18 @@ func PackageInstalled(packageName string) (bool, error) {
 	// not super happy with the command implementation
 	// could just keylog sh or replace dpkg binary or something
 	// should use golang dpkg library if it existed and was good
-	result, err := Command(fmt.Sprintf("dpkg -l %s", packageName))
-	return result, err
+	return Command(fmt.Sprintf("dpkg -l %s", packageName))
+}
+
+func ServiceUp(serviceName string) (bool, error) {
+	return Command("systemctl is-active " + serviceName)
 }
 
 func UserExists(userName string) (bool, error) {
 	// see above comment
-	result, err := Command(fmt.Sprintf("id -u %s", userName))
-	return result, err
+	return Command("id -u " + userName)
+}
+
+func FirewallUp(userName string) (bool, error) {
+	return FileExists("/proc/net/ip_tables_names")
 }
