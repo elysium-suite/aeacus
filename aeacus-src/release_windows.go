@@ -10,8 +10,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Creating TeamID.txt file...")
 	}
-	shellCommand(`echo 'YOUR-TEAMID-HERE' > C:\Users\` + mc.Config.User + `\Des
-ktop\TeamID.txt`)
+	shellCommand(`echo 'YOUR-TEAMID-HERE' > C:\Users\` + mc.Config.User + `\Desktop\TeamID.txt`)
 }
 
 func installService(mc *metaConfig) {
