@@ -103,7 +103,7 @@ arg2="0"
 ```
 > TODO: add specific settings for interactive logon/etc that take relative operators (ex. For Password age, should check if value is x or higher)
 
-> Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](docs/securitypolicy.md).
+> Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](securitypolicy.md).
 
 __RegistryKey__: pass if key is equal to value
 ```
