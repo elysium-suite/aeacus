@@ -4,13 +4,14 @@
 
 This is a list of vulnerability checks that can be used in the configuration for aeacus.
 
-> __Note!__ Each of these check types can be used for either `Pass` or `Fail` conditions, and there can be multiple conditions per check.
 
 __Command__: pass if command succeeds (exit code `0`)
 ```
 type="Command"
 arg1="grep 'pam_history.so' /etc/pam.d/common-password"
 ```
+
+> __Note!__ Each of these check types can be used for either `Pass` or `Fail` conditions, and there can be multiple conditions per check.
 
 __FileExists__: pass if specified file exists
 ```
@@ -33,6 +34,8 @@ type="FileContains"
 arg1="C:\Users\coolUser\Desktop\Forensic Question 1.txt"
 arg2="ANSWER:\sCool[a-zA-Z]+VariedAnswer"
 ```
+
+> __Note!__ A check passes by default. This means that you can use two failing conditions to simulate two conditions that should pass only if they're _BOTH_ true. That's confusing, so here's an example: you want a check to pass only if this file AND that file contain a string. So, instead of two pass conditions (pass if FileContains, pass if FileContains) (where the check will pass if either pass), you can code two fail conditions where the check will pass only if _BOTH_ fail conditions do not pass (fail if FileContainsNot, fail if FileContainsNot).
 
 __FileEquals__: pass if file equals sha1 hash
 ```
