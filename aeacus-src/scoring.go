@@ -69,7 +69,7 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 	}
 
 	for _, check := range mc.Config.Check {
-		status := false
+		status := true
 		failStatus := false
 		for _, condition := range check.Pass {
 			status = processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)

@@ -140,11 +140,14 @@ func UserRights(userOrGroup string, privilege string) (bool, error) {
     }
     re := regexp.MustCompile("(?m)[\r\n]+^.*" + privilege + ".*$")
     privilegeString := string(re.Find([]byte(seceditOutput)))
-    privStringSplit := strings.Split(privilegeString, " ")
-    privStringSplit = strings.Split(string(privStringSplit[2]), ",")
     if privilegeString == "" {
         return false, errors.New("Invalid privilege")
     }
+    privStringSplit := strings.Split(privilegeString, " ")
+    if len(privStringSplit) != 3 {
+        return false, errors.New("Error splitting privilege")
+    }
+    privStringSplit = strings.Split(string(privStringSplit[2]), ",")
     for _, sidValue := range privStringSplit {
         sidValue = strings.TrimSpace(sidValue)
         userForSid := strings.Split(sidToLocalUser(sidValue[1:]), "\\")
@@ -211,7 +214,7 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
     // Actually get the key
     k, err := registry.OpenKey(registryHive, keyPath, registry.QUERY_VALUE)
 	if err != nil {
-        fmt.Println("errored out 1", err.Error())
+        failPrint("Registry opening key failed: " + err.Error())
 		return false, err
 	}
 	defer k.Close()
@@ -219,6 +222,14 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
     // Fetch registry value
     registrySlice := make([]byte, 256)
 	regLength, valType, err := k.GetValue(keyLoc, registrySlice)
+	if err != nil {
+        // Error is probably about the key not existing.
+        // This is fine, some keys are not defined until the setting
+        // is explicitly set. However, the check should not pass
+        // for RegistryKey or RegistryKeyNot, so we return an error
+        return false, err
+	}
+
     registrySlice = registrySlice[:regLength]
 	//fmt.Printf("Retrieved registry value was %d (length %d, type %d)\n", registrySlice, regLength, valType)
 
@@ -236,10 +247,6 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
     default:
         failPrint("Unknown registry type: " + string(valType))
     }
-	if err != nil {
-        fmt.Println("Registry error:", err.Error())
-        return false, err
-	}
 
     //fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
     if registryValue == keyValue {

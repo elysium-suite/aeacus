@@ -25,7 +25,8 @@ func shellCommandOutput(commandGiven string) (string, error) {
 }
 
 func sendNotification(userName string, notifyText string) {
-	fmt.Printf("(WIP) tried to send notification as user %s with text %s", userName, notifyText)
+    cmdText := `Add-Type -AssemblyName System.Windows.Forms; $global:balloon = New-Object System.Windows.Forms.NotifyIcon; $path = (Get-Process -id $pid).Path; $balloon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path); $balloon.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info; $balloon.BalloonTipText = '` + notifyText + `'; $balloon.BalloonTipTitle = 'Aeacus Scoring Engine'; $balloon.Visible = $true; $balloon.ShowBalloonTip(5000)`
+    shellCommand(cmdText)
 }
 
 func playAudio(wavPath string) {
