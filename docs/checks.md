@@ -114,8 +114,14 @@ type="RegistryKey"
 arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD"
 arg2="0"
 ```
-> Note: Make sure to escape your slashes (`\` --> `\\`)
+> Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to check that a key was deleted, use `RegistryKeyExistsNot`.
 
+__RegistryKeyExists__: pass if key exists
+```
+type="RegistryKeyExists"
+arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD"
+```
+> Note: Make sure to escape your slashes (`\` --> `\\`)
 
 (WORK IN PROGRESS dont use) __AdminTemplate__: pass if specified template item is equal to value
 ```
