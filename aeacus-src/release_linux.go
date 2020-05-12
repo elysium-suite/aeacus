@@ -20,19 +20,20 @@ func installService(mc *metaConfig) {
 func cleanUp(mc *metaConfig) {
 
 	if mc.Cli.Bool("v") {
-		infoPrint("Changing perms to 644 in /opt/aeacus...")
+		infoPrint("Changing perms to 755 in /opt/aeacus...")
 	}
-	shellCommand("chmod 644 -R /opt/aeacus")
-
+	shellCommand("chmod 755 -R /opt/aeacus")
+	
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing .viminfo files...")
 	}
 	shellCommand("find / -name \".viminfo\" -delete")
 
 	if mc.Cli.Bool("v") {
-		infoPrint("Symlinking .bash_history to /dev/null...")
+		infoPrint("Symlinking .bash_history and .zsh_history to /dev/null...")
 	}
 	shellCommand("find / -name \".bash_history\" -exec ln -sf /dev/null {} \\;")
+	shellCommand("find / -name \".zsh_history\" -exec ln -sf /dev/null {} \\;")
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing .swp files")
@@ -63,6 +64,11 @@ func cleanUp(mc *metaConfig) {
 		infoPrint("Removing apt and dpkg logs...")
 	}
 	shellCommand("rm -rf /var/log/apt/* /var/log/dpkg.log")
+
+	if mc.Cli.Bool("v") {
+		infoPrint("Removing auth and syslog")
+	}
+	shellCommand("rm -f /var/log/auth.log* /var/log/syslog*")
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing scoring.conf...")
