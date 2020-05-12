@@ -30,7 +30,7 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		if check.Message == "" {
 			check.Message = "Registry key " + arg1 + " matches \"" + arg2 + "\""
 		}
-		result, err := RegistryKey(arg1, arg2)
+		result, err := RegistryKey(arg1, arg2, false)
 		if err != nil {
 			return false
 		}
@@ -39,7 +39,25 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		if check.Message == "" {
 			check.Message = "Registry key " + arg1 + " does not match \"" + arg2 + "\""
 		}
-		result, err := RegistryKey(arg1, arg2)
+		result, err := RegistryKey(arg1, arg2, false)
+		if err != nil {
+			return false
+		}
+		return !result
+	case "RegistryKeyExists":
+		if check.Message == "" {
+			check.Message = "Registry key " + arg1 + " exists"
+		}
+		result, err := RegistryKey(arg1, arg2, true)
+		if err != nil {
+			return false
+		}
+		return result
+	case "RegistryKeyExistsNot":
+		if check.Message == "" {
+			check.Message = "Registry key " + arg1 + " does not exist"
+		}
+		result, err := RegistryKey(arg1, arg2, true)
 		if err != nil {
 			return false
 		}
@@ -107,7 +125,7 @@ func PackageInstalled(packageName string) (bool, error) {
 }
 
 func ServiceUp(serviceName string) (bool, error) {
-	return Command(fmt.Sprintf("if (!((Get-Service -Name '%s').Status -eq 'Running')) { Throw 'Service is stopped' }", serviceName))
+	return Command("(!((Get-Service -Name '" + serviceName + "').Status -eq 'Running')) { Throw 'Service is stopped' }")
 }
 
 func UserExists(userName string) (bool, error) {
@@ -165,7 +183,7 @@ func UserRights(userOrGroup string, privilege string) (bool, error) {
 func SecurityPolicy(keyName string, keyValue string) (bool, error) {
     var desiredString string
     if regKey, ok := secpolToKey[keyName]; ok {
-        return RegistryKey(regKey, keyValue)
+        return RegistryKey(regKey, keyValue, false)
     } else {
         // Yes, this is jank, but is there a better way? Probably
         output, err := shellCommandOutput("secedit.exe /export /cfg lol.cfg /log NUL; Get-Content lol.cfg; Remove-Item lol.cfg")
@@ -182,7 +200,7 @@ func SecurityPolicy(keyName string, keyValue string) (bool, error) {
     }
 }
 
-func RegistryKey(keyName string, keyValue string) (bool, error) {
+func RegistryKey(keyName string, keyValue string, existCheck bool) (bool, error) {
 
     // Break down input
 	registryArgs := regexp.MustCompile("[\\\\]+").Split(keyName, -1)
@@ -207,15 +225,23 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
         registryHive = registry.LOCAL_MACHINE
         keyPath = "SOFTWARE\\" + keyPath
     default:
-        failPrint("Unknown registry hive: " +  registryHiveText)
-        return false, errors.New("Unkown registry hive" + registryHiveText)
+        if existCheck {
+            return false, nil
+        } else {
+            failPrint("Unknown registry hive: " +  registryHiveText)
+            return false, errors.New("Unknown registry hive" + registryHiveText)
+        }
     }
 
     // Actually get the key
     k, err := registry.OpenKey(registryHive, keyPath, registry.QUERY_VALUE)
 	if err != nil {
-        failPrint("Registry opening key failed: " + err.Error())
-		return false, err
+        if existCheck {
+            return false, nil
+        } else {
+            failPrint("Registry opening key failed: " + err.Error())
+    		return false, err
+        }
 	}
 	defer k.Close()
 
@@ -227,8 +253,17 @@ func RegistryKey(keyName string, keyValue string) (bool, error) {
         // This is fine, some keys are not defined until the setting
         // is explicitly set. However, the check should not pass
         // for RegistryKey or RegistryKeyNot, so we return an error
-        return false, err
-	}
+        if existCheck {
+            return false, nil
+        } else {
+            failPrint("Registry opening key failed: " + err.Error())
+    		return false, err
+        }
+	} else {
+        if existCheck {
+            return true, nil
+        }
+    }
 
     registrySlice = registrySlice[:regLength]
 	//fmt.Printf("Retrieved registry value was %d (length %d, type %d)\n", registrySlice, regLength, valType)

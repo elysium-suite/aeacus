@@ -33,8 +33,6 @@ func scoreImage(mc *metaConfig, id *imageData) {
 			sendNotification(mc.Config.User, "You lost points!")
 			playAudio(mc.DirPath + "misc/alarm.wav")
 		}
-	} else {
-		fmt.Println(err)
 	}
 
 	writeFile(mc.DirPath+"web/assets/previous.txt", strconv.Itoa(id.Score))

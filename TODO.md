@@ -3,8 +3,10 @@
 - remote
     - status/time limit actually enforced
 
-- info (or gui)
+- gui
     teamid and dev gui?
+
+- info
     create list of admins/users
 
 - helpers
@@ -13,6 +15,7 @@
 
 - linux
     - add a groups check
+    - fix notifs on newer versions?
 
 - windows
     - reading TEAMID fails beacuse it's unicode by default and ioutil/program expects ANSI
