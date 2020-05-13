@@ -7,9 +7,8 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"fmt"
 	"os"
-	"reflect"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -215,7 +214,7 @@ func FileContains(fileName string, searchString string) (bool, error) {
 	return strings.Contains(fileContent, searchString), err
 }
 
-func (fileName string, expressionString string) (bool, error) {
+func FileContainsRegex(fileName string, expressionString string) (bool, error) {
 	fileContent, _ := readFile(fileName)
 	matched, err := regexp.Match(expressionString, []byte(fileContent))
 	return matched, err
