@@ -160,6 +160,24 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			return false
 		}
 		return !result
+	case "UserIsInGroup":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " is in the " + arg2 + " group"
+		}
+		result, err := UserInGroup(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return result
+	case "UserIsInGroupNot":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " is not in the " + arg2 + " group"
+		}
+		result, err := UserInGroup(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return !result
     case "FirewallUp":
 		if check.Message == "" {
 			check.Message = "Firewall has been enabled"
