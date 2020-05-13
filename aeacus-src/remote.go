@@ -1,16 +1,16 @@
 package main
 
 import (
+	"crypto/sha256"
 	"fmt"
-    "math"
-    "time"
+	"io/ioutil"
+	"math"
+	"net/http"
+	"net/url"
 	"runtime"
 	"strconv"
 	"strings"
-	"net/url"
-	"net/http"
-	"io/ioutil"
-	"crypto/sha256"
+	"time"
 )
 
 func readTeamID(mc *metaConfig, id *imageData) {
@@ -34,7 +34,7 @@ func readTeamID(mc *metaConfig, id *imageData) {
 	} else {
 		// teamid validity checks here
 		// todo... what does that even look like?
-        // should there be a standard format? :thinking;
+		// should there be a standard format? :thinking;
 		mc.TeamID = fileContent
 	}
 }
@@ -43,11 +43,11 @@ func genChallenge(mc *metaConfig) string {
 	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
 	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
 	chalString := hexEncode(xor(randomHash1, randomHash2))
-    if mc.Config.Password != "" {
-    	hasher := sha256.New()
-    	hasher.Write([]byte(mc.Config.Password))
-        key := hexEncode(string(hasher.Sum(nil)))
-        return hexEncode(xor(key, chalString))
+	if mc.Config.Password != "" {
+		hasher := sha256.New()
+		hasher.Write([]byte(mc.Config.Password))
+		key := hexEncode(string(hasher.Sum(nil)))
+		return hexEncode(xor(key, chalString))
 	}
 	return chalString
 }
@@ -55,12 +55,12 @@ func genChallenge(mc *metaConfig) string {
 func genVulns(mc *metaConfig, id *imageData) string {
 	var vulnString strings.Builder
 
-    // Vulns achieved
+	// Vulns achieved
 	vulnString.WriteString(fmt.Sprintf("%d|", len(id.Points)))
-    // Total vulns
+	// Total vulns
 	vulnString.WriteString(fmt.Sprintf("%d|", id.ScoredVulns))
 
-    // Build vuln string
+	// Build vuln string
 	for _, penalty := range id.Penalties {
 		vulnString.WriteString(fmt.Sprintf("[PENALTY] %s - %.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
 		vulnString.WriteString("|")
@@ -71,27 +71,27 @@ func genVulns(mc *metaConfig, id *imageData) string {
 		vulnString.WriteString("|")
 	}
 
-    if mc.Config.Password != "" {
-        if mc.Cli.Bool("v") {
-            infoPrint("Encrypting vulnerabilities for score report...")
-        }
-        return hexEncode(encryptString(mc.Config.Password, vulnString.String()))
-    }
-    return hexEncode(vulnString.String())
+	if mc.Config.Password != "" {
+		if mc.Cli.Bool("v") {
+			infoPrint("Encrypting vulnerabilities for score report...")
+		}
+		return hexEncode(encryptString(mc.Config.Password, vulnString.String()))
+	}
+	return hexEncode(vulnString.String())
 }
 
 func reportScore(mc *metaConfig, id *imageData) {
 	resp, err := http.PostForm(mc.Config.Remote+"/scores/css/update",
 		url.Values{"team": {mc.TeamID},
-			"image":     {mc.Config.Name},
-			"score":     {strconv.Itoa(id.Score)},
-            // Challenge string: hash of password
-            // XORd with some random crap
+			"image": {mc.Config.Name},
+			"score": {strconv.Itoa(id.Score)},
+			// Challenge string: hash of password
+			// XORd with some random crap
 			"challenge": {genChallenge(mc)},
-            // Vulns: Hex encoded list of vulns
-            // encrypted if password exists
-            "vulns":     {genVulns(mc, id)},
-			"id":        {"id"}})
+			// Vulns: Hex encoded list of vulns
+			// encrypted if password exists
+			"vulns": {genVulns(mc, id)},
+			"id":    {"id"}})
 	if err != nil {
 		failPrint("error occured :()")
 		fmt.Println(err)
@@ -103,7 +103,7 @@ func reportScore(mc *metaConfig, id *imageData) {
 		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Failed to upload score! Please ensure that your Team ID is correct."
 		id.Connection = false
-        sendNotification(mc.Config.User, "Failed to upload score! Is your Team ID correct?")
+		sendNotification(mc.Config.User, "Failed to upload score! Is your Team ID correct?")
 		if mc.Config.Local != "yes" {
 			if mc.Cli.Bool("v") {
 				warnPrint("Local is not set to \"yes\". Clearing scoring data.")
@@ -116,7 +116,7 @@ func reportScore(mc *metaConfig, id *imageData) {
 func checkScoring(mc *metaConfig) bool {
 	// hit endpoint with check
 	// get status?
-    // check if over time
+	// check if over time
 	return true
 }
 
@@ -127,9 +127,9 @@ func checkServer(mc *metaConfig, id *imageData) {
 		infoPrint("Checking for internet connection...")
 	}
 
-    client := http.Client{
-        Timeout: 5 * time.Second,
-    }
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
 	_, err := client.Get("http://clients3.google.com/generate_204")
 
 	if err != nil {
