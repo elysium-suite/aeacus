@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"github.com/urfave/cli"
 	"log"
 	"os"
 	"runtime"
+
+	"github.com/urfave/cli"
 )
 
 //////////////////////////////////////////////////////////////////
@@ -94,27 +94,18 @@ func main() {
 				},
 			},
 			{
-				Name:    "decrypt",
-				Aliases: []string{"d"},
-				Usage:   "decrypt lol",
+				Name:    "forensics",
+				Aliases: []string{"f"},
+				Usage:   "Create forensic question files",
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					parseConfig(&mc, readData(&mc))
-					scoreImage(&mc, &id)
+					checkConfig(&mc)
+					createFQs(&mc)
 					return nil
 				},
 			},
 			{
-				Name:    "createfqs",
-				Aliases: []string{"f"},
-				Usage:   "Create forensic question files (3 by default)",
-				Action: func(c *cli.Context) error {
-					fmt.Println("todo")
-					return nil
-				},
-			},
-			{
-				Name:    "gooey",
+				Name:    "gui",
 				Aliases: []string{"g"},
 				Usage:   "Launch gui tests",
 				Action: func(c *cli.Context) error {
