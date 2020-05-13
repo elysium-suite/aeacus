@@ -130,12 +130,9 @@ func printerNoNewLine(colorChosen color.Attribute, messageType string, toPrint s
 	fmt.Printf("[")
 	printer.Printf(messageType)
 	fmt.Printf("] %s", toPrint)
-	if toPrint == "" {
-		fmt.Printf("\n")
-	}
 }
 
-func prompt(toPrint string) {
+func printerPrompt(toPrint string) {
 	printerNoNewLine(color.FgBlue, "?", toPrint)
 }
 

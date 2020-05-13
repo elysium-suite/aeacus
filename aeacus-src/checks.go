@@ -5,13 +5,13 @@ package main
 // processCheck for the OS-specific checks
 
 import (
-	"os"
-    "errors"
-	"regexp"
-	"strings"
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
+	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 )
 
 // processCheckWrapper takes the data from a check in the config
@@ -223,32 +223,32 @@ func FileContainsRegex(fileName string, expressionString string) (bool, error) {
 
 // DirContainsRegex returns true if any file in the directory matches the regular expression provided
 func DirContainsRegex(dirName string, expressionString string) (bool, error) {
-    result, err := FileExists(dirName)
-    if err != nil || ! result {
-        return false, errors.New("DirContainsRegex: file does not exist")
-    }
+	result, err := FileExists(dirName)
+	if err != nil || !result {
+		return false, errors.New("DirContainsRegex: file does not exist")
+	}
 	var files []string
 	err = filepath.Walk(dirName, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			files = append(files, path)
 		}
-        if len(files) > 10000 {
-            failPrint("Recursive indexing has exceeded limit, erroring out.")
-            return errors.New("Indexed too many files in recursive search")
-        }
-        return nil
+		if len(files) > 10000 {
+			failPrint("Recursive indexing has exceeded limit, erroring out.")
+			return errors.New("Indexed too many files in recursive search")
+		}
+		return nil
 	})
-    if err != nil {
-        return false, err
-    }
+	if err != nil {
+		return false, err
+	}
 	for _, file := range files {
 		result, err := FileContainsRegex(file, expressionString)
 		if err != nil {
 			return false, err
 		}
-        if result {
-    		return result, nil
-        }
+		if result {
+			return result, nil
+		}
 	}
 	return false, nil
 }
