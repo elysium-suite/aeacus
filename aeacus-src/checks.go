@@ -223,8 +223,12 @@ func FileContainsRegex(fileName string, expressionString string) (bool, error) {
 
 // DirContainsRegex returns true if any file in the directory matches the regular expression provided
 func DirContainsRegex(dirName string, expressionString string) (bool, error) {
+    result, err := FileExists(dirName)
+    if err != nil || ! result {
+        return false, errors.New("DirContainsRegex: file does not exist")
+    }
 	var files []string
-	err := filepath.Walk(dirName, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(dirName, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			files = append(files, path)
 		}
