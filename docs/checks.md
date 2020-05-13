@@ -31,11 +31,19 @@ arg2="ANSWER: SomeCoolAnswer"
 __FileContainsRegex__: pass if file contains regex string
 ```
 type="FileContains"
-arg1="C:\Users\coolUser\Desktop\Forensic Question 1.txt"
+arg1="C:\\Users\\coolUser\\Desktop\\Forensic Question 1.txt"
 arg2="ANSWER:\sCool[a-zA-Z]+VariedAnswer"
 ```
 
 > __Note!__ A check passes by default. This means that you can use two failing conditions to simulate two conditions that should pass only if they're _BOTH_ true. That's confusing, so here's an example: you want a check to pass only if this file AND that file contain a string. So, instead of two pass conditions (pass if FileContains, pass if FileContains) (where the check will pass if either pass), you can code two fail conditions where the check will pass only if _BOTH_ fail conditions do not pass (fail if FileContainsNot, fail if FileContainsNot).
+
+__DirContainsRegex__: pass if directory contains regex string
+```
+type="DirContainsRegex"
+arg1="/etc/sudoers.d/"
+arg2="NOPASSWD"
+```
+> `DirContainsRegex` is recursive! This means it checks every folder and subfolder. It currently is capped at 10,000 files so it doesn't segfault if you try to search `/`...
 
 __FileEquals__: pass if file equals sha1 hash
 ```
@@ -43,6 +51,8 @@ type="FileEquals"
 arg1="/etc/sysctl.conf"
 arg2="403926033d001b5279df37cbbe5287b7c7c267fa"
 ```
+
+> __Note!__ If a check has negative points assigned to it, it automatically becomes a penalty.
 
 __PackageInstalled__: pass if package is installed
 ```
@@ -66,21 +76,26 @@ type="UserExists"
 arg1="ballen"
 ```
 
-> __Note!__ If a check has negative points assigned to it, it automatically becomes a penalty.
 
 __FirewallUp__: pass if firewall is active
 ```
 type="FirewallUp"
 ```
 
+> On Linux, this checks if there are any defined ip tables names. On Window, this passes if all three Windows Firewall profiles are active.
+
+<hr>
+
 ### Linux-Specific Checks
 
-__UserIsInGroup__: pass if specified user is in specified group
+__UserInGroup__: pass if specified user is in specified group
 ```
-type=UserIsInGroup
+type="UserInGroup"
 arg1="ballen"
 arg2="sudo"
 ```
+
+<hr>
 
 ### Windows-Specific Checks
 
@@ -92,6 +107,7 @@ arg1="Administrator"
 arg2="Enforce_password_history"
 arg3=""
 ```
+
 > Docs will be here so you can see what the detail names are
 
 __UserRights__: pass if specified user or group has specified privilege
@@ -119,8 +135,15 @@ type="RegistryKey"
 arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD"
 arg2="0"
 ```
-> Note: Make sure to escape your slashes (`\` --> `\\`)
 
+> Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to check that a key was deleted, use `RegistryKeyExistsNot`.
+
+__RegistryKeyExists__: pass if key exists
+```
+type="RegistryKeyExists"
+arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD"
+```
+> Note: Make sure to escape your slashes (`\` --> `\\`)
 
 (WORK IN PROGRESS dont use) __AdminTemplate__: pass if specified template item is equal to value
 ```
