@@ -7,6 +7,34 @@ import (
 	"strconv"
 )
 
+// This Linux processCheck will process Linux-specific checks
+// handed to it by the processCheckWrapper function
+func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
+	switch checkType {
+	case "UserInGroup":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " is in the " + arg2 + " group"
+		}
+		result, err := UserInGroup(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return result
+	case "UserInGroupNot":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " is not in the " + arg2 + " group"
+		}
+		result, err := UserInGroup(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return !result
+	default:
+		failPrint("No check type " + checkType)
+	}
+	return false
+}
+
 func adminCheck() bool {
 	currentUser, err := user.Current()
 	uid, _ := strconv.Atoi(currentUser.Uid)
@@ -18,23 +46,6 @@ func adminCheck() bool {
 		return false
 	}
 	return true
-}
-
-func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
-	switch checkType {
-	case "MagicLinuxOnlyCheck":
-		if check.Message == "" {
-			check.Message = "User " + arg1 + " has been removed"
-		}
-		result, err := UserExists(arg1)
-		if err != nil {
-			return false
-		}
-		return !result
-	default:
-		failPrint("No check type " + checkType)
-	}
-	return false
 }
 
 func Command(commandGiven string) (bool, error) {

@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os"
-	"fmt"
-    "strings"
-	"io/ioutil"
 	"encoding/hex"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"strings"
 
-	"github.com/fatih/color"
 	"github.com/BurntSushi/toml"
+	"github.com/fatih/color"
 )
 
 func parseConfig(mc *metaConfig, configContent string) {
@@ -16,7 +16,7 @@ func parseConfig(mc *metaConfig, configContent string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-    mc.Config.Local = strings.ToLower(mc.Config.Local)
+	mc.Config.Local = strings.ToLower(mc.Config.Local)
 }
 
 ////////////////////
@@ -27,7 +27,7 @@ func writeConfig(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Reading configuration from " + mc.DirPath + "scoring.conf" + "...")
 	}
-    encryptedConfig := writeCryptoConfig(mc)
+	encryptedConfig := writeCryptoConfig(mc)
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing data to " + mc.DirPath + "...")
 	}
@@ -42,7 +42,7 @@ func readData(mc *metaConfig) string {
 	if mc.Cli.Bool("v") {
 		infoPrint("Decrypting data from " + mc.DirPath + "scoring.dat...")
 	}
-    return readCryptoConfig(mc)
+	return readCryptoConfig(mc)
 }
 
 //////////////////////
@@ -133,6 +133,6 @@ func xor(key string, plaintext string) string {
 	return string(ciphertext)
 }
 
-func hexEncode (inputString string) string {
-    return hex.EncodeToString([]byte(inputString))
+func hexEncode(inputString string) string {
+	return hex.EncodeToString([]byte(inputString))
 }
