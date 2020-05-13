@@ -63,6 +63,10 @@ func UserExists(userName string) (bool, error) {
 	return Command("id -u " + userName)
 }
 
+func UserInGroup(userName string, groupName string) (bool, error) {
+	return Command("groups " + userName + " | grep -q " + groupName)
+}
+
 func FirewallUp() (bool, error) {
 	return FileExists("/proc/net/ip_tables_names")
 }
