@@ -11,7 +11,7 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
     > Don't have a config? See the example at the bottom of this README.
 
     - Put your README html in ReadMe.conf.
-    - Use `./aeacus createfqs` to create Forensic Question files on the Desktop of the main user. TODO
+    - Use `./aeacus forensics` to create Forensic Question files on the Desktop of the main user.
 
 2. __Check that your config is valid.__
 ```
