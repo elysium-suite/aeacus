@@ -2,10 +2,11 @@ package main
 
 import (
 	"crypto/md5"
-	"encoding/hex"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"strconv"
 	"unicode/utf8"
 )
 
@@ -37,35 +38,19 @@ func playAudio(wavPath string) {
 	shellCommand(commandText)
 }
 
-func hash_file_md5(filePath string) (string, error) {
-	//Initialize variable returnMD5String now in case an error has to be returned
+func hashFileMD5(filePath string) (string, error) {
 	var returnMD5String string
-
-	//Open the passed argument and check for any error
 	file, err := os.Open(filePath)
 	if err != nil {
 		return returnMD5String, err
 	}
-
-	//Tell the program to call the following function when the current function returns
 	defer file.Close()
-
-	//Open a new hash interface to write to
 	hash := md5.New()
-
-	//Copy the file in the hash interface and check for any error
 	if _, err := io.Copy(hash, file); err != nil {
 		return returnMD5String, err
 	}
-
-	//Get the 16 bytes hash
 	hashInBytes := hash.Sum(nil)[:16]
-
-	//Convert the bytes to a string
-	returnMD5String = hex.EncodeToString(hashInBytes)
-
-	return returnMD5String, nil
-
+	return hexEncode(string(hashInBytes)), err
 }
 
 func trimFirstRune(s string) string {
@@ -73,22 +58,47 @@ func trimFirstRune(s string) string {
 	return s[i:]
 }
 
-func verifyBinary(binPath string) bool {
-	commandText := "which " + binPath
-	path, err := shellCommandOutput(commandText)
-	binPkg := "dpkg -S" + path + "cut -d':' -f1"
-	thing4 = trimFirstRune(path)
-	thing, err2 := shellCommandOutput(binPkg)
-	thing3 := "grep /var/lib/dpkg/info/" + thing + ".md5sums | grep " + thing4 + " cut -d' ' -f1"
-	thing2 := shellCommandOutput(thing3)
-	thing5 := hash_file_md5(binPath)
-	if thing2 == thing5 {
-		return true //the binary is ok
+func verifyBinary(binName string) bool {
+	// function is untested
+	// TODO
+	binPath, err := shellCommandOutput("which " + binName)
+	if err != nil {
+		return false
 	}
-	return false //the binary is not ok
-	// sorry if the var names make no sense i wrote this at 1 am
+	binPkg := "dpkg -S" + binPath + "cut -d':' -f1"
+	binPath = trimFirstRune(binPath)
+	binPkg, err = shellCommandOutput(binPkg)
+	if err != nil {
+		return false
+	}
+	binHash := "grep /var/lib/dpkg/info/" + binPkg + ".md5sums | grep " + binName + " cut -d' ' -f1"
+	binHash, err = shellCommandOutput(binHash)
+	if err != nil {
+		return false
+	}
+	binHashExpected, err := hashFileMD5(binPath)
+	if err == nil && binHash == binHashExpected {
+		return true
+	}
+	return false
+}
+
+func createFQs(mc *metaConfig) {
+	var numFQ int
+	printerPrompt("How many FQs do you want to create? ")
+	fmt.Scanln(&numFQ)
+
+	for i := 1; i <= numFQ; i++ {
+		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
+		shellCommand("echo 'QUESTION:' > /home/" + mc.Config.User + "/Desktop/" + fileName)
+		shellCommand("echo 'ANSWER:' >> /home/" + mc.Config.User + "/Desktop/" + fileName)
+		if mc.Cli.Bool("v") {
+			infoPrint("Wrote " + fileName + " to Desktop")
+		}
+	}
 }
 
 func destroyImage() {
 	warnPrint("Destroying the image! (jk for now. that's dangerous)")
+	// destroying ideas: start a classic rm -rf in the background, delete /etc/passwd, start a rm -rf in foreground for /etc/, then /bin/, then /home/, then kill -9 all processes, then rm -rf foreground everything else
 }

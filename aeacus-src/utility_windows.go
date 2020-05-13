@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -22,6 +23,21 @@ func shellCommandOutput(commandGiven string) (string, error) {
 		return "", err
 	}
 	return string(out), err
+}
+
+func createFQs(mc *metaConfig) {
+	var numFQ int
+	printerPrompt("How many FQs do you want to create? ")
+	fmt.Scanln(&numFQ)
+
+	for i := 1; i <= numFQ; i++ {
+		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
+		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
+		shellCommand("echo 'ANSWER:' >> C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
+		if mc.Cli.Bool("v") {
+			infoPrint("Wrote " + fileName + " to Desktop")
+		}
+	}
 }
 
 func sendNotification(userName string, notifyText string) {
