@@ -5,11 +5,13 @@ package main
 // processCheck for the OS-specific checks
 
 import (
-	"os"
-	"regexp"
-	"strings"
 	"crypto/sha1"
 	"encoding/hex"
+	"fmt"
+	"os"
+	"reflect"
+	"regexp"
+	"strings"
 )
 
 // processCheckWrapper takes the data from a check in the config
@@ -142,7 +144,7 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			return false
 		}
 		return !result
-    case "UserExists":
+	case "UserExists":
 		if check.Message == "" {
 			check.Message = "User " + arg1 + " has been added"
 		}
@@ -178,7 +180,7 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			return false
 		}
 		return !result
-    case "FirewallUp":
+	case "FirewallUp":
 		if check.Message == "" {
 			check.Message = "Firewall has been enabled"
 		}
@@ -187,10 +189,10 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			return false
 		}
 		return result
-    case "FirewallUpNot":
+	case "FirewallUpNot":
 		if check.Message == "" {
-            // Who is ever going to use this?
-            // Maybe as a penalty?
+			// Who is ever going to use this?
+			// Maybe as a penalty?
 			check.Message = "Firewall has been disabled"
 		}
 		result, err := FirewallUp()
@@ -213,10 +215,38 @@ func FileContains(fileName string, searchString string) (bool, error) {
 	return strings.Contains(fileContent, searchString), err
 }
 
-func FileContainsRegex(fileName string, expressionString string) (bool, error) {
+func (fileName string, expressionString string) (bool, error) {
 	fileContent, _ := readFile(fileName)
 	matched, err := regexp.Match(expressionString, []byte(fileContent))
 	return matched, err
+}
+
+// This works for sure!
+func FilePathWalkDir(root string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			files = append(files, path)
+		}
+		return nil
+	})
+	return files, err
+}
+
+// This, I'm not so sure...
+func DirContainsRegex(dirName string, expressionString string) (bool, error) {
+	files, err := FilePathWalkDir(dirName)
+	if err != nil {
+		panic(err)
+	}
+	for _, file := range files {
+		trueDat, err := FileContainsRegex(file, expressionString)
+		if err != nil {
+			return false, err
+		}
+		return trueDat, nil
+	}
+	return true, nil
 }
 
 // FileEquals calculates the SHA1 sum of a file and compares it

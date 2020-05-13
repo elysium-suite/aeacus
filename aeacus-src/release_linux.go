@@ -24,7 +24,7 @@ func cleanUp(mc *metaConfig) {
 		infoPrint("Changing perms to 755 in /opt/aeacus...")
 	}
 	shellCommand("chmod 755 -R /opt/aeacus")
-	
+
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing .viminfo files...")
 	}
@@ -70,6 +70,11 @@ func cleanUp(mc *metaConfig) {
 		infoPrint("Removing auth and syslog")
 	}
 	shellCommand("rm -f /var/log/auth.log* /var/log/syslog*")
+
+	if mc.Cli.Bool("v") {
+		infoPrint("Removing initial package list")
+	}
+	shellCommand("rm -f /var/log/installer/initial-status.gz")
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing scoring.conf...")
