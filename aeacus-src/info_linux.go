@@ -11,6 +11,8 @@ func getInfo(infoType string) {
 	switch infoType {
 	case "packages":
 		ListPackages()
+	case "kernel":
+		fmt.Println(shellCommandOutput("uname -r"))
 	default:
 		if infoType == "" {
 			failPrint("No info type provided.")
@@ -21,6 +23,8 @@ func getInfo(infoType string) {
 	}
 }
 
-func ListPackages() {
-	fmt.Println("just run dpkg -l")
+func ListPackages() string {
+	// fmt.Println("just run dpkg -l") bro what if i'm too lazy ~ safin
+	pkgs = shellCommand("dpkg -l")
+	return pkgs
 }
