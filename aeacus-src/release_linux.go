@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"strconv"
+)
+
 func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing shortcuts to Desktop...")
@@ -7,6 +12,40 @@ func writeDesktopFiles(mc *metaConfig) {
 	shellCommand("cp " + mc.DirPath + "misc/*.desktop /home/" + mc.Config.User + "/Desktop/")
 	shellCommand("chmod +x /home/" + mc.Config.User + "/Desktop/*.desktop")
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
+
+	if mc.Cli.Bool("v") {
+		infoPrint("Writing FQ files to Desktop...")
+	}
+
+	var numFQ int
+	prompt("How many FQs would you like? ")
+	fmt.Scanln(&numFQ)
+
+	var fqAns []string
+
+	counter := 1
+	for counter <= numFQ {
+		fileName := "FQ" + strconv.Itoa(counter)
+		var fqQ string
+		prompt(fileName + " - " + "Q: ")
+		fmt.Scanln(&fqQ)
+
+		var fqA string
+		prompt(fileName + " - " + "A: ")
+		fmt.Scanln(&fqA)
+
+		fqAns = append(fqAns, fileName+" - "+fqA)
+		shellCommand("echo -e 'Q: " + fqQ + "\nA: ' > " + "/home/" + mc.Config.User + "/Desktop/" + fileName + ".txt")
+		if mc.Cli.Bool("v") {
+			infoPrint("Wrote " + fileName + ".txt to Desktop")
+		}
+		counter++
+	}
+	infoPrint("Remember to add the following to your scoring.conf!")
+
+	for _, i := range fqAns {
+		fmt.Printf("%s\n", i)
+	}
 }
 
 func installService(mc *metaConfig) {

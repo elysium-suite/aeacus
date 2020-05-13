@@ -125,6 +125,20 @@ func printer(colorChosen color.Attribute, messageType string, toPrint string) {
 	}
 }
 
+func printerNoNewLine(colorChosen color.Attribute, messageType string, toPrint string) {
+	printer := color.New(colorChosen, color.Bold)
+	fmt.Printf("[")
+	printer.Printf(messageType)
+	fmt.Printf("] %s", toPrint)
+	if toPrint == "" {
+		fmt.Printf("\n")
+	}
+}
+
+func prompt(toPrint string) {
+	printerNoNewLine(color.FgBlue, "?", toPrint)
+}
+
 func xor(key string, plaintext string) string {
 	ciphertext := make([]byte, len(plaintext))
 	for i := 0; i < len(plaintext); i++ {
