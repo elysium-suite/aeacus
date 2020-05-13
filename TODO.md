@@ -4,7 +4,7 @@
     - status/time limit actually enforced
 
 - gui
-    teamid and dev gui?
+    teamid and dev gui? (for n00bs)
 
 - info
     create list of admins/users
@@ -14,7 +14,6 @@
     - install script to fetch release from ?web? and put in right place
 
 - linux
-    - add a groups check
     - fix notifs on newer versions?
 
 - windows
@@ -24,13 +23,11 @@
     - notifications
 
 - windows (wrappers/regs)
-    - scheduled takss
+    - scheduled tasks
     - shares
     - startup programs
     - account/password policies
 
  release
  - autologin user
- - chown user:user desktop files
- - fix release perms
  - put 0 in previous
