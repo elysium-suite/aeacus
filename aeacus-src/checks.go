@@ -5,12 +5,13 @@ package main
 // processCheck for the OS-specific checks
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
 	"os"
-	"path/filepath"
+    "errors"
 	"regexp"
 	"strings"
+	"crypto/sha1"
+	"encoding/hex"
+	"path/filepath"
 )
 
 // processCheckWrapper takes the data from a check in the config
@@ -89,6 +90,24 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			return false
 		}
 		return !result
+	case "DirContainsRegex":
+		if check.Message == "" {
+			check.Message = "Directory \"" + arg1 + "\" contains expression \"" + arg2 + "\""
+		}
+		result, err := DirContainsRegex(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return result
+	case "DirContainsRegexNot":
+		if check.Message == "" {
+			check.Message = "Directory \"" + arg1 + "\" does not contain expression \"" + arg2 + "\""
+		}
+		result, err := DirContainsRegex(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return !result
 	case "FileEquals":
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" matches hash"
@@ -161,24 +180,6 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			return false
 		}
 		return !result
-	case "UserIsInGroup":
-		if check.Message == "" {
-			check.Message = "User " + arg1 + " is in the " + arg2 + " group"
-		}
-		result, err := UserInGroup(arg1, arg2)
-		if err != nil {
-			return false
-		}
-		return result
-	case "UserIsInGroupNot":
-		if check.Message == "" {
-			check.Message = "User " + arg1 + " is not in the " + arg2 + " group"
-		}
-		result, err := UserInGroup(arg1, arg2)
-		if err != nil {
-			return false
-		}
-		return !result
 	case "FirewallUp":
 		if check.Message == "" {
 			check.Message = "Firewall has been enabled"
@@ -220,32 +221,32 @@ func FileContainsRegex(fileName string, expressionString string) (bool, error) {
 	return matched, err
 }
 
-// This works for sure!
-func FilePathWalkDir(root string) ([]string, error) {
+// DirContainsRegex returns true if any file in the directory matches the regular expression provided
+func DirContainsRegex(dirName string, expressionString string) (bool, error) {
 	var files []string
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(dirName, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			files = append(files, path)
 		}
-		return nil
+        if len(files) > 10000 {
+            failPrint("Recursive indexing has exceeded limit, erroring out.")
+            return errors.New("Indexed too many files in recursive search")
+        }
+        return nil
 	})
-	return files, err
-}
-
-// This, I'm not so sure...
-func DirContainsRegex(dirName string, expressionString string) (bool, error) {
-	files, err := FilePathWalkDir(dirName)
-	if err != nil {
-		panic(err)
-	}
+    if err != nil {
+        return false, err
+    }
 	for _, file := range files {
-		trueDat, err := FileContainsRegex(file, expressionString)
+		result, err := FileContainsRegex(file, expressionString)
 		if err != nil {
 			return false, err
 		}
-		return trueDat, nil
+        if result {
+    		return result, nil
+        }
 	}
-	return true, nil
+	return false, nil
 }
 
 // FileEquals calculates the SHA1 sum of a file and compares it

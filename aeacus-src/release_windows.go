@@ -25,11 +25,11 @@ func cleanUp(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing scoring.conf...")
 	}
-    shellCommand("Remove-Item C:\\aeacus\\scoring.conf")
+	shellCommand("Remove-Item C:\\aeacus\\scoring.conf")
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing aeacus.exe...")
 	}
-    shellCommand("Remove-Item C:\\aeacus\\aeacus.exe")
+	shellCommand("Remove-Item C:\\aeacus\\aeacus.exe")
 	warnPrint("oops cleanup doesnt do too much yet")
 	warnPrint("just empty trash bin? and recently used? idk look around")
 }

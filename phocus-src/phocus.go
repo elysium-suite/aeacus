@@ -1,12 +1,12 @@
 package main
 
 import (
-	"os"
-	"log"
-    "time"
-	"runtime"
-    "math/rand"
 	"github.com/urfave/cli"
+	"log"
+	"math/rand"
+	"os"
+	"runtime"
+	"time"
 )
 
 /////////////////////////////////////////////////////////////////////
@@ -22,10 +22,10 @@ import (
 /////////////////////////////////////////////////////////////////////
 
 type metaConfig struct {
-	Cli        *cli.Context
-    TeamID      string
-	DirPath    string
-	Config     scoringChecks
+	Cli     *cli.Context
+	TeamID  string
+	DirPath string
+	Config  scoringChecks
 }
 
 func main() {
@@ -46,21 +46,21 @@ func main() {
 		os.Exit(1)
 	}
 
-    cli.AppHelpTemplate = "" // No help! >:(
+	cli.AppHelpTemplate = "" // No help! >:(
 	app := &cli.App{
-		Name:                   "phocus",
-		Usage:                  "score vulnerabilities",
+		Name:  "phocus",
+		Usage: "score vulnerabilities",
 		Action: func(c *cli.Context) error {
 			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-            parseConfig(&mc, readData(&mc))
-            rand.Seed(time.Now().UnixNano())
-            for {
-            	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
-                infoPrint("Scoring image...")
-    			scoreImage(&mc, &id)
-                jitter := time.Duration(rand.Intn(20) + 6)
-                time.Sleep(jitter * time.Second)
-            }
+			parseConfig(&mc, readData(&mc))
+			rand.Seed(time.Now().UnixNano())
+			for {
+				id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
+				infoPrint("Scoring image...")
+				scoreImage(&mc, &id)
+				jitter := time.Duration(rand.Intn(20) + 6)
+				time.Sleep(jitter * time.Second)
+			}
 			return nil
 		},
 	}

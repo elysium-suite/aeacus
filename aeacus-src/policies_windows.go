@@ -2,9 +2,9 @@ package main
 
 import ()
 
-var secpolToKey = map[string]string {
+var secpolToKey = map[string]string{
 
-    "LimitBlankPasswordUse": "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\LimitBlankPasswordUse",
+	"LimitBlankPasswordUse":        "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\LimitBlankPasswordUse",
 	"AuditBaseObjects":             "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\AuditBaseObjects",
 	"FullPrivilegeAuditing":        "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\FullPrivilegeAuditing",
 	"SCENoApplyLegacyAuditPolicy":  "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\SCENoApplyLegacyAuditPolicy",

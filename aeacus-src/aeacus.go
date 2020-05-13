@@ -99,7 +99,7 @@ func main() {
 				Usage:   "decrypt lol",
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-                    parseConfig(&mc, readData(&mc))
+					parseConfig(&mc, readData(&mc))
 					scoreImage(&mc, &id)
 					return nil
 				},
