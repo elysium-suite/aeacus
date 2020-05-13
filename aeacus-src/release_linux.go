@@ -6,6 +6,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	}
 	shellCommand("cp " + mc.DirPath + "misc/*.desktop /home/" + mc.Config.User + "/Desktop/")
 	shellCommand("chmod +x /home/" + mc.Config.User + "/Desktop/*.desktop")
+	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
 }
 
 func installService(mc *metaConfig) {
