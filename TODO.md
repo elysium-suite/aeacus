@@ -4,13 +4,12 @@
     - status/time limit actually enforced
 
 - gui
-    teamid and dev gui? (for n00bs)
+    dev gui? (for n00bs)
 
 - info
     create list of admins/users
 
 - helpers
-    - fq creators
     - install script to fetch release from ?web? and put in right place
 
 - linux
