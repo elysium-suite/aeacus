@@ -82,8 +82,6 @@ func FirewallUp() (bool, error) {
 	return FileExists("/proc/net/ip_tables_names")
 }
 
-// For when DirContainsRegex() is ready...
-// func GuestDisabled() (bool, error) {
-// 	return DirContainsRegex("/usr/share/lightdm/lightdm.conf.d/", "allow-guest*=*false")
-// }
-// Also, more restrictive regex would be nice...
+func GuestDisabled() (bool, error) {
+	return DirContainsRegex("/usr/share/lightdm/lightdm.conf.d/", "allow-guest( |)=( |)false")
+}
