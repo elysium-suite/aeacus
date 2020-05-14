@@ -28,7 +28,7 @@ func newEnterEntry() *enterEntry {
 	return entry
 }
 
-func main() {
+func idGUI() {
 	a := app.New()
 	a.Settings().SetTheme(theme.LightTheme())
 	w := a.NewWindow("Enter ID")
