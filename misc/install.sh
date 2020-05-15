@@ -31,7 +31,8 @@ go get "github.com/fatih/color"
 go get "github.com/iamacarpet/go-win64api"
 go get "github.com/go-ole/go-ole"
 go get "golang.org/x/sys/windows"
-go get "fyne.io/fyne/cmd/fyne_demo/"
+go get "fyne.io/fyne"
+go get "github.com/martinlindhe/notify"
 
 # Add convenient aliases for building for Linux
 
