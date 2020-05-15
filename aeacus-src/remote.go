@@ -103,7 +103,7 @@ func reportScore(mc *metaConfig, id *imageData) {
 		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Failed to upload score! Please ensure that your Team ID is correct."
 		id.Connection = false
-		sendNotification(mc.Config.User, "Failed to upload score! Is your Team ID correct?")
+		sendNotification(mc, "Failed to upload score! Is your Team ID correct?")
 		if mc.Config.Local != "yes" {
 			if mc.Cli.Bool("v") {
 				warnPrint("Local is not set to \"yes\". Clearing scoring data.")
@@ -167,13 +167,13 @@ func checkServer(mc *metaConfig, id *imageData) {
 		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Failure! Can't access remote scoring server."
 		failPrint("Can't access remote scoring server!")
-		sendNotification(mc.Config.User, "Score upload failure! Unable to access remote server.")
+		sendNotification(mc, "Score upload failure! Unable to access remote server.")
 		id.Connection = false
 	} else if id.ConnStatus[4] == "ERROR" {
 		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Score upload failure. Can't send scores to remote server."
 		failPrint("Remote server returned an error for its status!")
-		sendNotification(mc.Config.User, "Score upload failure! Remote server returned an error.")
+		sendNotification(mc, "Score upload failure! Remote server returned an error.")
 		id.Connection = false
 	} else {
 		id.ConnStatus[0] = "green"

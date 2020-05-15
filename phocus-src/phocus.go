@@ -59,6 +59,7 @@ func main() {
 				infoPrint("Scoring image...")
 				scoreImage(&mc, &id)
 				jitter := time.Duration(rand.Intn(20) + 6)
+				infoPrint("Scored image, sleeping for a bit...")
 				time.Sleep(jitter * time.Second)
 			}
 			return nil

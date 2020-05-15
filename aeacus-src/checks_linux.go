@@ -29,6 +29,24 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 			return false
 		}
 		return !result
+	case "GuestDisabledLDM":
+		if check.Message == "" {
+			check.Message = "Guest is disabled"
+		}
+		result, err := GuestDisabledLDM()
+		if err != nil {
+			return false
+		}
+		return result
+	case "GuestDisabledLDMNot":
+		if check.Message == "" {
+			check.Message = "Guest is enabled"
+		}
+		result, err := GuestDisabledLDM()
+		if err != nil {
+			return false
+		}
+		return !result
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -79,9 +97,13 @@ func UserInGroup(userName string, groupName string) (bool, error) {
 }
 
 func FirewallUp() (bool, error) {
-	return FileExists("/proc/net/ip_tables_names")
+	return Command("ufw status | grep -q 'Status: active'")
 }
 
-func GuestDisabled() (bool, error) {
-	return DirContainsRegex("/usr/share/lightdm/lightdm.conf.d/", "allow-guest( |)=( |)false")
+func GuestDisabledLDM() (bool, error) {
+	result, err := DirContainsRegex("/usr/share/lightdm/lightdm.conf.d/", "allow-guest( |)=( |)false")
+	if !result && err == nil {
+		result, err = DirContainsRegex("/etc/lightdm/", "allow-guest( |)=( |)false")
+	}
+	return result, err
 }
