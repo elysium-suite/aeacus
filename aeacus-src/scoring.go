@@ -2,10 +2,7 @@ package main
 
 import (
 	"fmt"
-	"path/filepath"
 	"strconv"
-
-	"github.com/martinlindhe/notify"
 )
 
 func scoreImage(mc *metaConfig, id *imageData) {
@@ -30,10 +27,10 @@ func scoreImage(mc *metaConfig, id *imageData) {
 	if err == nil {
 		prevScore, _ := strconv.Atoi(prevPoints)
 		if prevScore < id.Score {
-			notify.Alert("Aeacus SE", "Phocus Client", "You have gained points!", filepath.Join(mc.DirPath, "web/assets/icon.png"))
+			sendNotification(mc, "You gained points!")
 			playAudio(mc.DirPath + "misc/gain.wav")
 		} else if prevScore > id.Score {
-			notify.Alert("Aeacus SE", "Phocus Client", "You have lost points!", filepath.Join(mc.DirPath, "web/assets/icon.png"))
+			sendNotification(mc, "You lost points!")
 			playAudio(mc.DirPath + "misc/alarm.wav")
 		}
 	}
