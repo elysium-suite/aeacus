@@ -13,7 +13,7 @@
     - install script to fetch release from ?web? and put in right place
 
 - linux
-    - fix notifs on newer versions?
+    - nothing 👀 (for now lol)
 
 - windows
     - reading TEAMID fails beacuse it's unicode by default and ioutil/program expects ANSI
