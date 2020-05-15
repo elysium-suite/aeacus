@@ -1,5 +1,7 @@
 # aeacus
 
+<img align="right" style="width: 10rem;" src="web/assets/logo.png"/>
+
 This is a client-side scoring system meant to imitate the functionality of UTSA's CIAS CyberPatriot Scoring System (CSS) with an emphasis on simplicity. Named after the Greek myth of King Aeacus, a judge of the dead.
 
 ## Installation
@@ -202,7 +204,7 @@ Please refer to the following flowchart:
 
 ## Contributing and Disclaimer
 
-Thanks to Akshay, Tanay, Arjun, Pranav and others for help with this project! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
+Thanks to a ton of people (see contributors) for help with this project! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
 
 If you have anything you would like to add or fix, please make a pull request! No improvement or fix is too small, and help is always appreciated.
 
