@@ -24,6 +24,12 @@ yes | add-apt-repository ppa:longsleep/golang-backports
 # Install golang and git (for go get)
 apt install -y golang-go git
 
+<<<<<<< HEAD
+=======
+# Install GL & its dependencies for Fyne ID Prompt
+apt install libgl1-mesa-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
+
+>>>>>>> 893185546c78025d1cfae8aadb617b098d795d90
 # Grab dependencies
 go get "github.com/urfave/cli"
 go get "github.com/BurntSushi/toml/cmd/tomlv"
