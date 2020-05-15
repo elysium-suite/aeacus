@@ -81,7 +81,7 @@ __FirewallUp__: pass if firewall is active
 type="FirewallUp"
 ```
 
-> On Linux, this checks if there are any defined ip tables names. On Window, this passes if all three Windows Firewall profiles are active.
+> __Note__: On Linux, unfortunately uses `ufw` at the moment. On Window, this passes if all three Windows Firewall profiles are active.
 
 <hr>
 
@@ -94,6 +94,10 @@ arg1="ballen"
 arg2="sudo"
 ```
 
+__GuestDisabledLDM__: pass if guest is disabled (for LightDM)
+```
+type="GuestDisabled"
+```
 <hr>
 
 ### Windows-Specific Checks

@@ -28,11 +28,6 @@ func shellCommandOutput(commandGiven string) (string, error) {
 	return string(out), err
 }
 
-func sendNotification(userName string, notifyText string) {
-	commandText := "/sbin/runuser -l " + userName + " -c  '/usr/bin/notify-send -i /opt/aeacus/web/assets/logo.png \"Aeacus Scoring System\" \"" + notifyText + "\"'"
-	shellCommand(commandText)
-}
-
 func playAudio(wavPath string) {
 	commandText := "aplay " + wavPath
 	shellCommand(commandText)
