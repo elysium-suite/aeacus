@@ -15,21 +15,12 @@ EOF
 # Update package list
 apt update
 
-# Install add-apt-respository utility (among others)
-apt install -y software-properties-common
-
-# Add the golang PPA
-yes | add-apt-repository ppa:longsleep/golang-backports
-
 # Install golang and git (for go get)
 apt install -y golang-go git
 
-<<<<<<< HEAD
-=======
 # Install GL & its dependencies for Fyne ID Prompt
-apt install libgl1-mesa-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
+apt install -y libgl1-mesa-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev
 
->>>>>>> 893185546c78025d1cfae8aadb617b098d795d90
 # Grab dependencies
 go get "github.com/urfave/cli"
 go get "github.com/BurntSushi/toml/cmd/tomlv"
@@ -37,8 +28,10 @@ go get "github.com/fatih/color"
 go get "github.com/iamacarpet/go-win64api"
 go get "github.com/go-ole/go-ole"
 go get "golang.org/x/sys/windows"
-go get "fyne.io/fyne"
-go get "github.com/martinlindhe/notify"
+go get "github.com/gen2brain/beeep"
+go get "github.com/AllenDang/giu"
+go get "github.com/go-toast/toast"
+go get "github.com/tadvi/systray"
 
 # Add convenient aliases for building for Linux
 

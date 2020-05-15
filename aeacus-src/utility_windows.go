@@ -40,10 +40,10 @@ func createFQs(mc *metaConfig) {
 	}
 }
 
-func sendNotification(userName string, notifyText string) {
-	cmdText := `Add-Type -AssemblyName System.Windows.Forms; $global:balloon = New-Object System.Windows.Forms.NotifyIcon; $path = (Get-Process -id $pid).Path; $balloon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path); $balloon.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info; $balloon.BalloonTipText = '` + notifyText + `'; $balloon.BalloonTipTitle = 'Aeacus Scoring Engine'; $balloon.Visible = $true; $balloon.ShowBalloonTip(5000)`
-	shellCommand(cmdText)
-}
+//func sendNotification(userName string, notifyText string) {
+//	cmdText := `Add-Type -AssemblyName System.Windows.Forms; $global:balloon = New-Object System.Windows.Forms.NotifyIcon; $path = (Get-Process -id $pid).Path; $balloon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path); $balloon.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info; $balloon.BalloonTipText = '` + notifyText + `'; $balloon.BalloonTipTitle = 'Aeacus Scoring Engine'; $balloon.Visible = $true; $balloon.ShowBalloonTip(5000)`
+//	shellCommand(cmdText)
+//}
 
 func playAudio(wavPath string) {
 	commandText := "(New-Object Media.SoundPlayer '" + wavPath + "').PlaySync();"
@@ -75,5 +75,5 @@ func localUserToSid(userName string) string {
 // getSecedit returns the string value of the secedit.exe /export command
 // which contains security policy options that can't be found in the registry
 func getSecedit() (string, error) {
-	return shellCommandOutput("secedit.exe /export /cfg lol.cfg /log NUL; Get-Content lol.cfg; Remove-Item lol.cfg")
+	return shellCommandOutput("secedit.exe /export /cfg sec.cfg /log NUL; Get-Content sec.cfg; Remove-Item sec.cfg")
 }
