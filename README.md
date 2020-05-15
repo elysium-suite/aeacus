@@ -1,6 +1,7 @@
 # aeacus
 
-<img align="right" style="width: 140px;" src="web/assets/logo.png"/>
+<img align="right" width="250" src="web/assets/logo.png"/>
+
 
 This is a client-side scoring system meant to imitate the functionality of UTSA's CIAS CyberPatriot Scoring System (CSS) with an emphasis on simplicity. Named after the Greek myth of King Aeacus, a judge of the dead.
 
