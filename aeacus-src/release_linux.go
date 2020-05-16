@@ -89,4 +89,12 @@ func cleanUp(mc *metaConfig) {
 		infoPrint("Removing aeacus binary...")
 	}
 	shellCommand("rm /opt/aeacus/aeacus")
+	
+	if mc.Cli.Bool("v") {
+		infoPrint("Changing timestamps cause whynot...")
+	}
+	shellCommand("find /etc -exec  touch --date="2012-12-12 12:12" {} \; 2>/dev/null")
+	shellCommand("find /home -exec  touch --date="2012-12-12 12:12" {} \; 2>/dev/null")
+	shellCommand("find /var -exec  touch --date="2012-12-12 12:12" {} \; 2>/dev/null")
+	shellCommand("find /opt -exec  touch --date="2012-12-12 12:12" {} \; 2>/dev/null")
 }
