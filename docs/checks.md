@@ -75,7 +75,6 @@ type="UserExists"
 arg1="ballen"
 ```
 
-
 __FirewallUp__: pass if firewall is active
 ```
 type="FirewallUp"
@@ -96,7 +95,7 @@ arg2="sudo"
 
 __GuestDisabledLDM__: pass if guest is disabled (for LightDM)
 ```
-type="GuestDisabled"
+type="GuestDisabledLDM"
 ```
 <hr>
 
@@ -111,7 +110,7 @@ arg2="Enforce_password_history"
 arg3=""
 ```
 
-> Docs will be here so you can see what the detail names are
+> Docs will be here so you can see what the detail names are. going to do this by parsing  net user output
 
 __UserRights__: pass if specified user or group has specified privilege
 ```
@@ -128,7 +127,9 @@ type="SecurityPolicy"
 arg1="DisableCAD"
 arg2="0"
 ```
-> TODO: add specific settings for interactive logon/etc that take relative operators (ex. For Password age, should check if value is x or higher)
+
+
+> TODO: add specific settings for interactive logon/etc that take relative operators (ex. For Password age, should check if value is x or higher). going to do this by taking a third variable to specify range (ex arg2=10 and arg3=20). then parsing secedit into pairs with the new function, can strconv and check relativeness
 
 > Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](securitypolicy.md).
 
@@ -141,17 +142,11 @@ arg2="0"
 
 > Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to check that a key was deleted, use `RegistryKeyExistsNot`.
 
+> __Administrative Templates__: There are 4000+ admin template fields. See [this list of registry keys and descriptions](https://docs.google.com/spreadsheets/d/1N7uuke4Jg1R9FBhj8o5dxJQtEntQlea0McYz5upaiTk/edit?usp=sharing), then use the `RegistryKey` or `RegistryKeyExists` check.
+
 __RegistryKeyExists__: pass if key exists
 ```
 type="RegistryKeyExists"
 arg1="HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD"
 ```
 > Note: Make sure to escape your slashes (`\` --> `\\`)
-
-(WORK IN PROGRESS dont use) __AdminTemplate__: pass if specified template item is equal to value
-```
-type="AdminTemplate"
-arg1="Turn off background refresh of Group Policy"
-arg2="1"
-```
-> `AdminTemplate` is still very much a work in progress. However, you can check every administrative template item with registry keys (unlike that nasty secpol.) See https://docs.google.com/spreadsheets/d/1N7uuke4Jg1R9FBhj8o5dxJQtEntQlea0McYz5upaiTk/edit?usp=sharing for the registry keys list
