@@ -40,11 +40,6 @@ func createFQs(mc *metaConfig) {
 	}
 }
 
-//func sendNotification(userName string, notifyText string) {
-//	cmdText := `Add-Type -AssemblyName System.Windows.Forms; $global:balloon = New-Object System.Windows.Forms.NotifyIcon; $path = (Get-Process -id $pid).Path; $balloon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path); $balloon.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info; $balloon.BalloonTipText = '` + notifyText + `'; $balloon.BalloonTipTitle = 'Aeacus Scoring Engine'; $balloon.Visible = $true; $balloon.ShowBalloonTip(5000)`
-//	shellCommand(cmdText)
-//}
-
 func playAudio(wavPath string) {
 	commandText := "(New-Object Media.SoundPlayer '" + wavPath + "').PlaySync();"
 	shellCommand(commandText)
@@ -76,4 +71,18 @@ func localUserToSid(userName string) string {
 // which contains security policy options that can't be found in the registry
 func getSecedit() (string, error) {
 	return shellCommandOutput("secedit.exe /export /cfg sec.cfg /log NUL; Get-Content sec.cfg; Remove-Item sec.cfg")
+}
+
+// parseCmdOutput takes Windows CMD output of keys in the form `Key Value`, `Key = Value,Value,Value`, and `Key = "Value"` and returns a string map of values and keys
+func parseCmdOutput(inputStr string) []string {
+    valuePairs := []string{}
+    // split inputstr on whitespace
+    // parsing loop for each line
+        // trimspace every field
+        // if equal sign, split on that
+            // if comma, split on commas
+            // if quotes, remove those
+        // else no equal sign
+            // assign first to the remainder
+    return valuePairs
 }

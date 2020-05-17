@@ -23,7 +23,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
 	genReport(mc, id)
 
 	// Check if points increased/decreased
-	prevPoints, err := readFile(mc.DirPath + "web/assets/previous.txt")
+	prevPoints, err := readFile(mc.DirPath + "misc/previous.txt")
 	if err == nil {
 		prevScore, _ := strconv.Atoi(prevPoints)
 		if prevScore < id.Score {
@@ -35,7 +35,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
 		}
 	}
 
-	writeFile(mc.DirPath+"web/assets/previous.txt", strconv.Itoa(id.Score))
+	writeFile(mc.DirPath+"misc/previous.txt", strconv.Itoa(id.Score))
 }
 
 func scoreChecks(mc *metaConfig, id *imageData) {
