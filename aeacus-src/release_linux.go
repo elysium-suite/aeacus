@@ -27,18 +27,13 @@ func cleanUp(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing .viminfo files...")
 	}
-	shellCommand("find / -name \".viminfo\" -delete")
+	shellCommand("find / -name '.viminfo' -delete")
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Symlinking .bash_history and .zsh_history to /dev/null...")
 	}
-	shellCommand("find / -name \".bash_history\" -exec ln -sf /dev/null {} \\;")
-	shellCommand("find / -name \".zsh_history\" -exec ln -sf /dev/null {} \\;")
-
-	if mc.Cli.Bool("v") {
-		infoPrint("Removing .swp files")
-	}
-	shellCommand("find / -type f -iname '*.swp' -delete")
+	shellCommand("find / -name '.bash_history' -exec ln -sf /dev/null {} \\;")
+	shellCommand("find / -name '.zsh_history' -exec ln -sf /dev/null {} \\;")
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing .local files")
@@ -53,7 +48,8 @@ func cleanUp(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing swap and temp Desktop files")
 	}
-	shellCommand("rm -rf /home/*/Desktop/*~")
+	shellCommand("find / -type f -iname '*.swp' -delete")
+	shellCommand("rm -rf /root/*~ /home/*/Desktop/*~")
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing crash and VMWare data...")
@@ -66,7 +62,7 @@ func cleanUp(mc *metaConfig) {
 	shellCommand("rm -rf /var/log/apt/* /var/log/dpkg.log")
 
 	if mc.Cli.Bool("v") {
-		infoPrint("Removing auth and syslog")
+		infoPrint("Removing logs (auth and syslog)")
 	}
 	shellCommand("rm -f /var/log/auth.log* /var/log/syslog*")
 
@@ -83,18 +79,18 @@ func cleanUp(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing other setup files...")
 	}
-	shellCommand("rm -rf /opt/aeacus/misc /opt/aeacus/web/assets/previous.txt /opt/aeacus/ReadMe.conf /opt/aeacus/README.md /opt/aeacus/TODO.md")
+	shellCommand("rm -rf /opt/aeacus/misc/LICENSE /opt/aeacus/misc/ReadMe* /opt/aeacus/misc/ScoringReport* /opt/aeacus/misc/TeamID.desktop /opt/aeacus/misc aeacus-client /opt/aeacus/misc/*.sh /opt/aeacus/misc/previous.txt /opt/aeacus/ReadMe.conf /opt/aeacus/README.md /opt/aeacus/TODO.md")
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing aeacus binary...")
 	}
 	shellCommand("rm /opt/aeacus/aeacus")
-	
+
 	if mc.Cli.Bool("v") {
-		infoPrint("Changing timestamps cause whynot...")
+		infoPrint("Overwriting timestamps to obfuscate changes...")
 	}
-	shellCommand("find /etc -exec  touch --date="2012-12-12 12:12" {} \; 2>/dev/null")
-	shellCommand("find /home -exec  touch --date="2012-12-12 12:12" {} \; 2>/dev/null")
-	shellCommand("find /var -exec  touch --date="2012-12-12 12:12" {} \; 2>/dev/null")
-	shellCommand("find /opt -exec  touch --date="2012-12-12 12:12" {} \; 2>/dev/null")
+	shellCommand("find /etc -exec  touch --date='2012-12-12 12:12' {} \\; 2>/dev/null")
+	shellCommand("find /home -exec  touch --date='2012-12-12 12:12' {} \\; 2>/dev/null")
+	shellCommand("find /var -exec  touch --date='2012-12-12 12:12' {} \\; 2>/dev/null")
+	shellCommand("find /opt -exec  touch --date='2012-12-12 12:12' {} \\; 2>/dev/null")
 }
