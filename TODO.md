@@ -2,21 +2,15 @@
 
 - remote
     - status/time limit actually enforced
-
-- gui
-    dev gui? (for n00bs)
-
+- gui for ID and checks
 - info
-    create list of admins/users
-
-- helpers
-    - install script to fetch release from ?web? and put in right place
-
+    - create list of admins/users
+    - other things? esp for windows
+- linux: notifications are busted
 - windows
     - reading TEAMID fails beacuse it's unicode by default and ioutil/program expects ANSI
     - make it a service
         - or at least hide the shell:startup window (https://superuser.com/questions/140047/how-to-run-a-batch-file-without-launching-a-command-window)
-    - notifications
 
 - windows (wrappers/regs)
     - scheduled tasks
@@ -26,4 +20,3 @@
 
  release
  - autologin user
- - put 0 in previous

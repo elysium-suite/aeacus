@@ -186,7 +186,7 @@ func SecurityPolicy(keyName string, keyValue string) (bool, error) {
 		return RegistryKey(regKey, keyValue, false)
 	} else {
 		// Yes, this is jank, but is there a better way? Probably
-		output, err := shellCommandOutput("secedit.exe /export /cfg lol.cfg /log NUL; Get-Content lol.cfg; Remove-Item lol.cfg")
+		output, err := getSecedit()
 		if err != nil {
 			return false, err
 		}
