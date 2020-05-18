@@ -2,18 +2,19 @@
 
 <img align="right" width="250" src="web/assets/logo.png"/>
 
-
 This is a client-side scoring system meant to imitate the functionality of UTSA's CIAS CyberPatriot Scoring System (CSS) with an emphasis on simplicity. Named after the Greek myth of King Aeacus, a judge of the dead.
 
 ## Installation
 
 0. __Extract the release__ into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
+> You should try compiling it yourself! If you don't want to (and you trust me), you can [download the releases here](https://github.com/sourque/aeacus/releases).
+
 1. __Set up the environment.__
     - Put your config in `/opt/aeacus/scoring.conf` or `C:\aeacus\scoring.conf`
 
     > Don't have a config? See the example at the bottom of this README.
 
-    - Put your README html in ReadMe.conf.
+    - Put your README in `ReadMe.conf`.
     - Use `./aeacus forensics` to create Forensic Question files on the Desktop of the main user.
 
 2. __Check that your config is valid.__
@@ -60,11 +61,11 @@ The configuration is written in TOML. See the below example:
 name = "ubuntu-18-supercool" # Image name
 title = "CoolCyberStuff Practice Round" # Round title
 user = "coolUser" # Main user for the image
-os = "Ubuntu 18.04"
+os = "Ubuntu 18.04" # OS, used for README
 
 # If remote is specified, aeacus will report its score
 # and refuse to score if the remote server does not accept
-# its messages and Team ID (unless local_enabled)
+# its messages and Team ID (unless "local" is set to "yes")
 # Make sure to include the scheme (http, https...)
 remote = "https://192.168.1.100"
 
@@ -82,6 +83,7 @@ local = "yes"
 # If valid_until exists, image will self destruct
 # after the time specified. The format is:
 # YEAR/MO/DA HR:MN:SC ZONE
+# NOTE: This is not implemented
 valid_until = "2020/03/21 15:04:05 PDT"
 
 [[check]]
@@ -140,7 +142,7 @@ points = -5 # This check is now a penalty
 
 The `aeacus` binary supports gathering information on the system (especially for Windows) in cases where it's tough to gather what the scoring system can see.
 
-Print information with `./aeacus info type` or `./aeacus info {type}` where `{type}` is one the following:
+Print information with `./aeacus info {type}` where `{type}` is one the following:
 
 ### Linux
 - N/A (atm)
@@ -195,6 +197,10 @@ niceUser
 superCoolDude
 </pre>
 ```
+
+## Compiling
+
+After setting up an environment (sorry, only Linux dev environments supported) with `misc/install.sh`, you can use the janky but handy aliases at the bottom of the file to compile for Linux and Windows.
 
 ## Troubleshooting and Errors
 

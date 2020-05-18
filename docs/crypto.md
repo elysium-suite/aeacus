@@ -2,7 +2,7 @@
 
 ## Adding Crypto
 
-The public releases of `aeacus` ship with very weak crypto. You should compile the binary for yourself after adding stronger crypto. This is not too hard, and most of the work is done for you. See the example in `examples/example-crypto.go`.
+The public releases of `aeacus` ship with very weak crypto. You should compile the binary for yourself after adding stronger crypto. This is not too hard, and most of the work is done for you. __See the example in `examples/example-crypto.go`.__
 
 Essentially, you need to provide the following functions:
 - `func writeCryptoConfig(mc *metaConfig) string {` that reads the scoring config, encrypts it, and returns the encrypted string.
