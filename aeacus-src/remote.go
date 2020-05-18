@@ -39,6 +39,7 @@ func readTeamID(mc *metaConfig, id *imageData) {
 	}
 }
 
+// genChallenge generates a crypto challenge for the CSS endpoint
 func genChallenge(mc *metaConfig) string {
 	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
 	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
@@ -113,13 +114,6 @@ func reportScore(mc *metaConfig, id *imageData) {
 	}
 }
 
-func checkScoring(mc *metaConfig) bool {
-	// hit endpoint with check
-	// get status?
-	// check if over time
-	return true
-}
-
 func checkServer(mc *metaConfig, id *imageData) {
 
 	// Internet check (requisite)
@@ -144,12 +138,12 @@ func checkServer(mc *metaConfig, id *imageData) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Checking for scoring engine connection...")
 	}
-	_, err = client.Get(mc.Config.Remote)
+	resp, err := client.Get(mc.Config.Remote + "/scores/css/status")
 	if err != nil {
 		id.ConnStatus[4] = "red"
 		id.ConnStatus[5] = "FAIL"
 	} else {
-		if checkScoring(mc) {
+		if resp.StatusCode == 200 {
 			id.ConnStatus[4] = "green"
 			id.ConnStatus[5] = "OK"
 		} else {
