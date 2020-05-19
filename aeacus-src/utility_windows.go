@@ -75,14 +75,14 @@ func getSecedit() (string, error) {
 
 // parseCmdOutput takes Windows CMD output of keys in the form `Key Value`, `Key = Value,Value,Value`, and `Key = "Value"` and returns a string map of values and keys
 func parseCmdOutput(inputStr string) []string {
-    valuePairs := []string{}
-    // split inputstr on whitespace
-    // parsing loop for each line
-        // trimspace every field
-        // if equal sign, split on that
-            // if comma, split on commas
-            // if quotes, remove those
-        // else no equal sign
-            // assign first to the remainder
-    return valuePairs
+	valuePairs := []string{}
+	// split inputstr on whitespace
+	// parsing loop for each line
+	// trimspace every field
+	// if equal sign, split on that
+	// if comma, split on commas
+	// if quotes, remove those
+	// else no equal sign
+	// assign first to the remainder
+	return valuePairs
 }

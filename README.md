@@ -27,6 +27,8 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 ```
 ./aeacus --verbose score
 ```
+> The TeamID is read from `/opt/aeacus/misc/TeamID.txt` or `C:\aeacus\misc\TeamID.txt`.
+
 4. __Prepare the image for release.__
 ```
 ./aeacus --verbose release
@@ -211,7 +213,7 @@ Please refer to the following flowchart:
 
 ## Contributing and Disclaimer
 
-Thanks to a ton of people (see contributors) for help with this project! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
+A huge thanks to a few people (see contributors) for help with code and features, and many others for help with feedback, usability, and bug finding! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
 
 If you have anything you would like to add or fix, please make a pull request! No improvement or fix is too small, and help is always appreciated.
 

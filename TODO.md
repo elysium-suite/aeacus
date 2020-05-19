@@ -2,6 +2,7 @@
 
 - remote
     - status/time limit actually enforced
+    - the "yellow" for an error is disgustingly unreadable
 - gui for ID and checks
 - info
     - create list of admins/users
