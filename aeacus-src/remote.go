@@ -16,11 +16,7 @@ import (
 func readTeamID(mc *metaConfig, id *imageData) {
 	fileContent := ""
 	err := error(nil)
-	if runtime.GOOS == "linux" {
-		fileContent, err = readFile(mc.DirPath + "misc/TeamID.txt")
-	} else {
-		fileContent, err = readFile("C:\\Users\\" + mc.Config.User + "\\Desktop\\TeamID.txt")
-	}
+	fileContent, err = readFile(mc.DirPath + "misc/TeamID.txt")
 	if err != nil {
 		failPrint("TeamID.txt does not exist!")
 		id.ConnStatus[0] = "red"

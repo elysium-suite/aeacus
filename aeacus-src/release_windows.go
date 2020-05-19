@@ -2,15 +2,20 @@ package main
 
 func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
-		infoPrint("Writing shortcuts to Desktop...")
+		infoPrint("Writing ScoringReport.html shortcut to Desktop...")
 	}
 	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "C:\Program Files\Mozilla Firefox\firefox.exe C:\aeacus\web\ScoringReport.html"; $Shortcut.Save()`
 	shellCommand(cmdString)
-
 	if mc.Cli.Bool("v") {
-		infoPrint("Creating TeamID.txt file...")
+		infoPrint("Creating or emptying TeamID.txt file...")
 	}
-	shellCommand(`echo 'YOUR-TEAMID-HERE' > C:\Users\` + mc.Config.User + `\Desktop\TeamID.txt`)
+	cmdString := "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\misc\\TeamID.txt"
+	shellCommand(cmdString)
+	if mc.Cli.Bool("v") {
+		infoPrint("Writing TeamID.txt shortcut to Desktop...")
+	}
+	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\misc\TeamID.txt"; $Shortcut.Save()`
+	shellCommand(cmdString)
 }
 
 func installService(mc *metaConfig) {
@@ -41,5 +46,5 @@ func cleanUp(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Clearing recently used...")
 	}
-    shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
+	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
 }
