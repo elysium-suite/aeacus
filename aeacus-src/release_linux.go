@@ -2,6 +2,10 @@ package main
 
 func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
+		infoPrint("Creating or emptying TeamID.txt...")
+	}
+	shellCommand("echo 'YOUR-TEAMID-HERE' > /opt/aeacus/misc/TeamID.txt")
+	if mc.Cli.Bool("v") {
 		infoPrint("Writing shortcuts to Desktop...")
 	}
 	shellCommand("cp " + mc.DirPath + "misc/*.desktop /home/" + mc.Config.User + "/Desktop/")
