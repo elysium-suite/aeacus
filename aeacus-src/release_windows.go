@@ -9,12 +9,12 @@ func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Creating or emptying TeamID.txt file...")
 	}
-	cmdString := "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\misc\\TeamID.txt"
+	cmdString = "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\misc\\TeamID.txt"
 	shellCommand(cmdString)
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing TeamID.txt shortcut to Desktop...")
 	}
-	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\misc\TeamID.txt"; $Shortcut.Save()`
+	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\misc\TeamID.txt"; $Shortcut.Save()`
 	shellCommand(cmdString)
 }
 

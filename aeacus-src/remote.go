@@ -7,7 +7,6 @@ import (
 	"math"
 	"net/http"
 	"net/url"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -51,21 +50,22 @@ func genChallenge(mc *metaConfig) string {
 
 func genVulns(mc *metaConfig, id *imageData) string {
 	var vulnString strings.Builder
+    delimiter := "|-|"
 
 	// Vulns achieved
-	vulnString.WriteString(fmt.Sprintf("%d|", len(id.Points)))
+	vulnString.WriteString(fmt.Sprintf("%d%s", len(id.Points), delimiter))
 	// Total vulns
-	vulnString.WriteString(fmt.Sprintf("%d|", id.ScoredVulns))
+	vulnString.WriteString(fmt.Sprintf("%d%s", id.ScoredVulns, delimiter))
 
 	// Build vuln string
 	for _, penalty := range id.Penalties {
 		vulnString.WriteString(fmt.Sprintf("[PENALTY] %s - %.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
-		vulnString.WriteString("|")
+		vulnString.WriteString(delimiter)
 	}
 
 	for _, point := range id.Points {
 		vulnString.WriteString(fmt.Sprintf("%s - %d pts", point.Message, point.Points))
-		vulnString.WriteString("|")
+		vulnString.WriteString(delimiter)
 	}
 
 	if mc.Config.Password != "" {
