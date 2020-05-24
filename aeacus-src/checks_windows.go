@@ -26,6 +26,114 @@ func adminCheck() bool {
 // handed to it by the processCheckWrapper function
 func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
 	switch checkType {
+	case "UserDetail":
+		if check.Message == "" {
+			check.Message = "User property " + arg2 + " for " + arg1 + " is equal to \"" + arg3 + "\""
+		}
+		result, err := UserDetail(arg1, arg2, arg3)
+		if err != nil {
+			return false
+		}
+		return result
+	case "UserDetailNot":
+		if check.Message == "" {
+			check.Message = "User property " + arg2 + " for " + arg1 + " is not equal to \"" + arg3 + "\""
+		}
+		result, err := UserDetail(arg1, arg2, arg3)
+		if err != nil {
+			return false
+		}
+		return !result
+	case "UserRights":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " has privilege \"" + arg2 + "\""
+		}
+		result, err := UserRights(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return result
+	case "UserRightsNot":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " does not have privilege \"" + arg2 + "\""
+		}
+		result, err := UserRights(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return !result
+	case "ShareExists":
+		if check.Message == "" {
+			check.Message = "Share " + arg1 + " exists"
+		}
+		result, err := ShareExists(arg1)
+		if err != nil {
+			return false
+		}
+		return result
+	case "ShareExistsNot":
+		if check.Message == "" {
+			check.Message = "Share " + arg1 + " doesn't exist"
+		}
+		result, err := ShareExists(arg1)
+		if err != nil {
+			return false
+		}
+		return !result
+	case "ScheduledTaskExists":
+		if check.Message == "" {
+			check.Message = "Scheduled task " + arg1 + " exists"
+		}
+		result, err := ScheduledTaskExists(arg1)
+		if err != nil {
+			return false
+		}
+		return result
+	case "ScheduledTaskExistsNot":
+		if check.Message == "" {
+			check.Message = "Scheduled task " + arg1 + " doesn't exist"
+		}
+		result, err := ScheduledTaskExists(arg1)
+		if err != nil {
+			return false
+		}
+		return !result
+	case "StartupProgramExists":
+		if check.Message == "" {
+			check.Message = "Startup program " + arg1 + " exists"
+		}
+		result, err := StartupProgramExists(arg1)
+		if err != nil {
+			return false
+		}
+		return result
+	case "StartupProgramExistsNot":
+		if check.Message == "" {
+			check.Message = "Startup program " + arg1 + " doesn't exist"
+		}
+		result, err := ScheduledTaskExists(arg1)
+		if err != nil {
+			return false
+		}
+		return !result
+	case "SecurityPolicy":
+		if check.Message == "" {
+			check.Message = "Security policy option " + arg1 + " is \"" + arg2 + "\""
+		}
+		result, err := SecurityPolicy(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return result
+	case "SecurityPolicyNot":
+		if check.Message == "" {
+			check.Message = "Security policy option " + arg1 + " is not \"" + arg2 + "\""
+		}
+		result, err := SecurityPolicy(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return !result
 	case "RegistryKey":
 		if check.Message == "" {
 			check.Message = "Registry key " + arg1 + " matches \"" + arg2 + "\""
@@ -62,42 +170,6 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 			return false
 		}
 		return !result
-	case "UserRights":
-		if check.Message == "" {
-			check.Message = "User " + arg1 + " has privilege \"" + arg2 + "\""
-		}
-		result, err := UserRights(arg1, arg2)
-		if err != nil {
-			return false
-		}
-		return result
-	case "UserRightsNot":
-		if check.Message == "" {
-			check.Message = "User " + arg1 + " does not have privilege \"" + arg2 + "\""
-		}
-		result, err := UserRights(arg1, arg2)
-		if err != nil {
-			return false
-		}
-		return !result
-	case "SecurityPolicy":
-		if check.Message == "" {
-			check.Message = "Security policy option " + arg1 + " is \"" + arg2 + "\""
-		}
-		result, err := SecurityPolicy(arg1, arg2)
-		if err != nil {
-			return false
-		}
-		return result
-	case "SecurityPolicyNot":
-		if check.Message == "" {
-			check.Message = "Security policy option " + arg1 + " is not \"" + arg2 + "\""
-		}
-		result, err := SecurityPolicy(arg1, arg2)
-		if err != nil {
-			return false
-		}
-		return !result
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -105,9 +177,11 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 }
 
 func Command(commandGiven string) (bool, error) {
-	cmd := exec.Command("powershell.exe", "-c", commandGiven)
+	cmd := exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+"; if (!($?)) { Throw 'Error!' } }")
+	//fmt.Println("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ " + commandGiven + " }; if (!($?)) { Throw 'Error!' }")
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
+			//fmt.Println("Exited with", err.(*exec.ExitError))
 			return false, nil
 		}
 	}
@@ -125,13 +199,27 @@ func PackageInstalled(packageName string) (bool, error) {
 }
 
 func ServiceUp(serviceName string) (bool, error) {
-	return Command("(!((Get-Service -Name '" + serviceName + "').Status -eq 'Running')) { Throw 'Service is stopped' }")
+	return Command(fmt.Sprintf("if (!((Get-Service -Name '%s').Status -eq 'Running')) { Throw 'Service is stopped' }", serviceName))
 }
 
 func UserExists(userName string) (bool, error) {
 	// eventually going to not use powershell for everything
 	// but until then...
-	return Command(fmt.Sprintf("Get-LocalUser %s", userName))
+	return Command(fmt.Sprintf("Get-LocalUser '%s'", userName))
+}
+
+func UserInGroup(userName string, groupName string) (bool, error) {
+	userInfo, err := getNetUserInfo(userName)
+	if err != nil {
+		return false, err
+	}
+	re := regexp.MustCompile("(?m)[\r\n]+^.*Group.*$")
+	detailString := strings.TrimSpace(string(re.Find([]byte(userInfo))))
+	if detailString == "" {
+		failPrint("Couldn't parse net user output")
+		return false, errors.New("Error parsing net user output for Group")
+	}
+	return strings.Contains(detailString, groupName), nil
 }
 
 func FirewallUp() (bool, error) {
@@ -145,6 +233,39 @@ func FirewallUp() (bool, error) {
 		}
 	}
 	return true, nil
+}
+
+func UserDetail(userName string, detailName string, detailValue string) (bool, error) {
+	if userName == "" || detailName == "" || detailValue == "" {
+		failPrint("Invalid parameters to UserDetail check")
+		return false, errors.New("Invalid parameters")
+	}
+	userInfo, err := getNetUserInfo(userName)
+	if err != nil {
+		return false, err
+	}
+	re := regexp.MustCompile("(?m)[\r\n]+^.*" + detailName + ".*$")
+	detailString := string(re.Find([]byte(userInfo)))
+	if detailString == "" {
+		return false, errors.New("Invalid user detail name")
+	}
+	re = regexp.MustCompile("[\\s]+")
+	userInfoSlice := re.Split(detailString, -1)
+	if len(userInfoSlice) < 2 {
+		failPrint("Error splitting user detail string into two or more parts")
+		return false, errors.New("Error splitting detail string")
+	}
+	indexValue := len(re.Split(detailName, -1)) + 1
+	if indexValue >= len(userInfoSlice) {
+		failPrint("Error in calculating index for detailValue")
+		return false, errors.New("Error splitting detailName")
+	}
+	userDetailValue := strings.TrimSpace(userInfoSlice[indexValue])
+	//fmt.Println("is", detailValue, "equal to", userDetailValue)
+	if detailValue == userDetailValue {
+		return true, nil
+	}
+	return false, nil
 }
 
 func UserRights(userOrGroup string, privilege string) (bool, error) {
@@ -180,12 +301,25 @@ func UserRights(userOrGroup string, privilege string) (bool, error) {
 	return false, err
 }
 
+func ShareExists(shareName string) (bool, error) {
+	return Command(fmt.Sprintf("Get-SmbShare -Name '%s'", shareName))
+}
+
+func ScheduledTaskExists(taskName string) (bool, error) {
+	return Command(fmt.Sprintf("Get-ScheduledTask -TaskName '%s'", taskName))
+}
+
+func StartupProgramExists(progName string) (bool, error) {
+	// need to work out the implementation on this one too...
+	// multiple startup locations
+	return true, nil
+}
+
 func SecurityPolicy(keyName string, keyValue string) (bool, error) {
 	var desiredString string
 	if regKey, ok := secpolToKey[keyName]; ok {
 		return RegistryKey(regKey, keyValue, false)
 	} else {
-		// Yes, this is jank, but is there a better way? Probably
 		output, err := getSecedit()
 		if err != nil {
 			return false, err
@@ -193,6 +327,36 @@ func SecurityPolicy(keyName string, keyValue string) (bool, error) {
 		if keyName == "NewAdministratorName" || keyName == "NewGuestName" {
 			// These two are strings, not numbers, so they have ""
 			desiredString = fmt.Sprintf("%s = \"%s\"", keyName, keyValue)
+		} else if keyName == "MinimumPasswordAge" ||
+			keyName == "MinimumPasswordAge" ||
+			keyName == "MinimumPasswordLength" ||
+			keyName == "LockoutDuration" ||
+			keyName == "ResetLockoutCount" {
+			// Fields where the arg should be X or higher (up to 999)
+			intKeyValue, err := strconv.Atoi(keyValue)
+			if err != nil {
+				failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
+				return false, errors.New("Invalid keyValue")
+			}
+			for c := intKeyValue; c <= 999; c++ {
+				desiredString = fmt.Sprintf("%s = \"%s\"", keyName, keyValue)
+				if strings.Contains(output, desiredString) {
+					return true, err
+				}
+			}
+		} else if keyName == "MaximumPasswordAge" || keyName == "LockoutBadCount" {
+			// Fields where arg should be X or lower but NOT 0
+			intKeyValue, err := strconv.Atoi(keyValue)
+			if err != nil {
+				failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
+				return false, errors.New("Invalid keyValue")
+			}
+			for c := intKeyValue; c > 0; c-- {
+				desiredString = fmt.Sprintf("%s = \"%s\"", keyName, keyValue)
+				if strings.Contains(output, desiredString) {
+					return true, err
+				}
+			}
 		} else {
 			desiredString = fmt.Sprintf("%s = %s", keyName, keyValue)
 		}
@@ -239,7 +403,7 @@ func RegistryKey(keyName string, keyValue string, existCheck bool) (bool, error)
 		if existCheck {
 			return false, nil
 		} else {
-			failPrint("Registry opening key failed: " + err.Error())
+			warnPrint("Registry opening key failed (and that's probably fine): " + err.Error())
 			return false, err
 		}
 	}
@@ -256,7 +420,7 @@ func RegistryKey(keyName string, keyValue string, existCheck bool) (bool, error)
 		if existCheck {
 			return false, nil
 		} else {
-			failPrint("Registry opening key failed: " + err.Error())
+			warnPrint("Registry opening key failed (and that's probably fine): " + err.Error())
 			return false, err
 		}
 	} else {

@@ -33,7 +33,7 @@ This is a client-side scoring system meant to imitate the functionality of UTSA'
 ```
 ./aeacus --verbose release
 ```
-> WARNING: This will remove `scoring.conf`. Back it up somewhere if you want to save it!
+> WARNING: This will remove `scoring.conf`. Back it up somewhere if you want to save it! It will also remove the `aeacus` executable and other sensitive files.
 
 ## Screenshots
 

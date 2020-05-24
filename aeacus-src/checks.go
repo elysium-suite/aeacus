@@ -180,6 +180,24 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 			return false
 		}
 		return !result
+	case "UserInGroup":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " is in group \"" + arg2 + "\""
+		}
+		result, err := UserInGroup(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return result
+	case "UserInGroupNot":
+		if check.Message == "" {
+			check.Message = "User " + arg1 + " is not in group \"" + arg2 + "\""
+		}
+		result, err := UserInGroup(arg1, arg2)
+		if err != nil {
+			return false
+		}
+		return !result
 	case "FirewallUp":
 		if check.Message == "" {
 			check.Message = "Firewall has been enabled"
@@ -212,11 +230,11 @@ func FileExists(fileName string) (bool, error) {
 
 func FileContains(fileName string, searchString string) (bool, error) {
 	fileContent, err := readFile(fileName)
-	return strings.Contains(fileContent, searchString), err
+	return strings.Contains(strings.TrimSpace(fileContent), searchString), err
 }
 
 func FileContainsRegex(fileName string, expressionString string) (bool, error) {
-	fileContent, _ := readFile(fileName)
+	fileContent, err := readFile(fileName)
 	matched, err := regexp.Match(expressionString, []byte(fileContent))
 	return matched, err
 }

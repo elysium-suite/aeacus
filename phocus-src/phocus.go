@@ -28,6 +28,9 @@ type metaConfig struct {
 	Config  scoringChecks
 }
 
+var teamID string
+var dirPath string
+
 func main() {
 
 	var teamID string
