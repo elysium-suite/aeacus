@@ -11,24 +11,6 @@ import (
 // handed to it by the processCheckWrapper function
 func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
 	switch checkType {
-	case "UserInGroup":
-		if check.Message == "" {
-			check.Message = "User " + arg1 + " is in the " + arg2 + " group"
-		}
-		result, err := UserInGroup(arg1, arg2)
-		if err != nil {
-			return false
-		}
-		return result
-	case "UserInGroupNot":
-		if check.Message == "" {
-			check.Message = "User " + arg1 + " is not in the " + arg2 + " group"
-		}
-		result, err := UserInGroup(arg1, arg2)
-		if err != nil {
-			return false
-		}
-		return !result
 	case "GuestDisabledLDM":
 		if check.Message == "" {
 			check.Message = "Guest is disabled"
@@ -80,20 +62,19 @@ func PackageInstalled(packageName string) (bool, error) {
 	// not super happy with the command implementation
 	// could just keylog sh or replace dpkg binary or something
 	// should use golang dpkg library if it existed and was good
-	return Command(fmt.Sprintf("dpkg -l %s", packageName))
+	return Command(fmt.Sprintf(`dpkg -l "%s"`, packageName))
 }
 
 func ServiceUp(serviceName string) (bool, error) {
-	return Command("systemctl is-active " + serviceName)
+	return Command(fmt.Sprintf(`systemctl is-active "%s"`, serviceName))
 }
 
 func UserExists(userName string) (bool, error) {
-	// see above comment
-	return Command("id -u " + userName)
+	return Command(fmt.Sprintf(`id -u "%s"`, userName))
 }
 
 func UserInGroup(userName string, groupName string) (bool, error) {
-	return Command("groups " + userName + " | grep -q " + groupName)
+	return Command(fmt.Sprintf(`groups "%s" | grep -q "%s"`, userName, groupName))
 }
 
 func FirewallUp() (bool, error) {

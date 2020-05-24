@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"runtime"
 
 	"github.com/urfave/cli"
 )
@@ -23,23 +22,10 @@ type metaConfig struct {
 	Config  scoringChecks
 }
 
+var teamID string
+var dirPath string
+
 func main() {
-
-	var teamID string
-	var dirPath string
-
-	if !adminCheck() {
-		failPrint("You need to run this binary as root or Administrator!")
-		os.Exit(1)
-	}
-	if runtime.GOOS == "linux" {
-		dirPath = "/opt/aeacus/"
-	} else if runtime.GOOS == "windows" {
-		dirPath = "C:\\aeacus\\"
-	} else {
-		failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
-		os.Exit(1)
-	}
 
 	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 
@@ -50,6 +36,7 @@ func main() {
 		Usage:                  "setup and score vulnerabilities in an image",
 		Action: func(c *cli.Context) error {
 			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+			runningPermsCheck()
 			checkConfig(&mc)
 			scoreImage(&mc, &id)
 			return nil
@@ -67,6 +54,7 @@ func main() {
 				Aliases: []string{"s"},
 				Usage:   "(default) Score image with current scoring config",
 				Action: func(c *cli.Context) error {
+					runningPermsCheck()
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					checkConfig(&mc)
 					scoreImage(&mc, &id)
@@ -98,6 +86,7 @@ func main() {
 				Aliases: []string{"f"},
 				Usage:   "Create forensic question files",
 				Action: func(c *cli.Context) error {
+					runningPermsCheck()
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					checkConfig(&mc)
 					createFQs(&mc)
@@ -118,6 +107,7 @@ func main() {
 				Aliases: []string{"i"},
 				Usage:   "Get info about the system",
 				Action: func(c *cli.Context) error {
+					runningPermsCheck()
 					getInfo(c.Args().Get(0))
 					return nil
 				},
@@ -127,6 +117,7 @@ func main() {
 				Aliases: []string{"r"},
 				Usage:   "Prepare the image for release",
 				Action: func(c *cli.Context) error {
+					runningPermsCheck()
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					releaseImage(&mc)
 					return nil
