@@ -50,7 +50,7 @@ func genChallenge(mc *metaConfig) string {
 
 func genVulns(mc *metaConfig, id *imageData) string {
 	var vulnString strings.Builder
-    delimiter := "|-|"
+	delimiter := "|-|"
 
 	// Vulns achieved
 	vulnString.WriteString(fmt.Sprintf("%d%s", len(id.Points), delimiter))
@@ -135,6 +135,12 @@ func checkServer(mc *metaConfig, id *imageData) {
 		infoPrint("Checking for scoring engine connection...")
 	}
 	resp, err := client.Get(mc.Config.Remote + "/scores/css/status")
+
+	// todo enforce status/time limit
+	// grab body or status message from minos
+	// if "DESTROY" due to image elapsed time > time_limit,
+	// destroy image
+
 	if err != nil {
 		id.ConnStatus[4] = "red"
 		id.ConnStatus[5] = "FAIL"
@@ -143,14 +149,14 @@ func checkServer(mc *metaConfig, id *imageData) {
 			id.ConnStatus[4] = "green"
 			id.ConnStatus[5] = "OK"
 		} else {
-			id.ConnStatus[4] = "yellow"
+			id.ConnStatus[4] = "red"
 			id.ConnStatus[5] = "ERROR"
 		}
 	}
 
 	// Overall
 	if id.ConnStatus[3] == "FAIL" && id.ConnStatus[5] == "OK" {
-		id.ConnStatus[0] = "yellow"
+		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Server connection good but no Internet. Assuming you're on an isolated LAN."
 		id.Connection = true
 	} else if id.ConnStatus[5] == "FAIL" {

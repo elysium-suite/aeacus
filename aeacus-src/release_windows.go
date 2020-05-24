@@ -16,6 +16,9 @@ func writeDesktopFiles(mc *metaConfig) {
 	}
 	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\misc\TeamID.txt"; $Shortcut.Save()`
 	shellCommand(cmdString)
+
+	// todo configure autologin user (netplwiz?)
+	// domain compatability? doubt
 }
 
 func installService(mc *metaConfig) {

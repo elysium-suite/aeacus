@@ -14,7 +14,11 @@ func shellCommand(commandGiven string) {
 	cmd := exec.Command("sh", "-c", commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
-			failPrint("Command \"" + commandGiven + "\" errored out (" + err.Error() + ").")
+			if len(commandGiven) > 9 {
+				failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
+			} else {
+				failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
+			}
 		}
 	}
 }
@@ -22,7 +26,11 @@ func shellCommand(commandGiven string) {
 func shellCommandOutput(commandGiven string) (string, error) {
 	out, err := exec.Command("sh", "-c", commandGiven).Output()
 	if err != nil {
-		failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
+		if len(commandGiven) > 9 {
+			failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
+		} else {
+			failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
+		}
 		return "", err
 	}
 	return string(out), err

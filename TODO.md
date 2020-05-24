@@ -2,8 +2,8 @@
 
 - remote
     - status/time limit actually enforced
-    - the "yellow" for an error is disgustingly unreadable
-- gui for ID and checks
+        - see comments in scoring.go and remote.go
+- gui for ID (and checks, stretch goal)
 - info
     - create list of admins/users
     - other things? esp for windows
@@ -19,5 +19,6 @@
     - startup programs
     - account/password policies
 
- release
- - autologin user
+ - release
+    - autologin user
+        - see release_*.go

@@ -7,6 +7,10 @@ import (
 
 func scoreImage(mc *metaConfig, id *imageData) {
 
+	// todo enforce status/time limit
+	// check current time, if later than
+	// time expiration in config, destroy image
+
 	// Check connection and configuration
 	if mc.Config.Remote != "" {
 		checkServer(mc, id)
