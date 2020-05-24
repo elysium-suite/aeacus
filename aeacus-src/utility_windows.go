@@ -11,7 +11,11 @@ func shellCommand(commandGiven string) {
 	cmd := exec.Command("powershell.exe", "-c", commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
-			failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
+			if len(commandGiven) > 9 {
+				failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
+			} else {
+				failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
+			}
 		}
 	}
 }
@@ -19,10 +23,14 @@ func shellCommand(commandGiven string) {
 func shellCommandOutput(commandGiven string) (string, error) {
 	out, err := exec.Command("powershell.exe", "-c", commandGiven).Output()
 	if err != nil {
-		failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
+		if len(commandGiven) > 9 {
+			failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
+		} else {
+			failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
+		}
 		return "", err
 	}
-	return string(out), err
+	return strings.TrimSpace(string(out)), err
 }
 
 func createFQs(mc *metaConfig) {
@@ -46,6 +54,11 @@ func playAudio(wavPath string) {
 }
 
 func destroyImage() {
+	// ideas for destroying windows
+	// nuke registry
+	// rm -rf /
+	// kill all procceses
+	// overwrite system32
 	fmt.Println("cant do that yet. not supported on windows. enjoy ur undestryoed imaeg")
 }
 
@@ -62,9 +75,8 @@ func sidToLocalUser(sid string) string {
 
 // localUserToSid takes a username as a string and returns a string containing
 // its SID. This is the opposite of sidToLocalUser
-func localUserToSid(userName string) string {
-	output, _ := shellCommandOutput(fmt.Sprintf("$objUser = New-Object System.Security.Principal.NTAccount('%s'); $strSID = $objUser.Translate([System.Security.Principal.SecurityIdentifier]); Write-Host $strSID.Value", userName))
-	return output
+func localUserToSid(userName string) (string, error) {
+	return shellCommandOutput(fmt.Sprintf("$objUser = New-Object System.Security.Principal.NTAccount('%s'); $strSID = $objUser.Translate([System.Security.Principal.SecurityIdentifier]); Write-Host $strSID.Value", userName))
 }
 
 // getSecedit returns the string value of the secedit.exe /export command
@@ -73,7 +85,13 @@ func getSecedit() (string, error) {
 	return shellCommandOutput("secedit.exe /export /cfg sec.cfg /log NUL; Get-Content sec.cfg; Remove-Item sec.cfg")
 }
 
+// getNetUserInfo returns the string output from the command `net user {username}` in order to get user properties and details
+func getNetUserInfo(userName string) (string, error) {
+	return shellCommandOutput("net user " + userName)
+}
+
 // parseCmdOutput takes Windows CMD output of keys in the form `Key Value`, `Key = Value,Value,Value`, and `Key = "Value"` and returns a string map of values and keys
+// should really implement this for standardized command output processing
 func parseCmdOutput(inputStr string) []string {
 	valuePairs := []string{}
 	// split inputstr on whitespace
