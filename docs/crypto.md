@@ -2,7 +2,12 @@
 
 ## Adding Crypto
 
-The public releases of `aeacus` ship with very weak crypto. You should compile the binary for yourself after adding stronger crypto. This is not too hard, and most of the work is done for you. __See the example in `examples/example-crypto.go`.__
+The public releases of `aeacus` ship with very weak crypto. You should compile the binary for yourself after adding stronger crypto. This is not too hard, and most of the work is done for you.
+
+__See the example in `examples/example-crypto.go`.__ You can basically copy that file to aeacus-src (`cp examples/example-crypto.go aeacus-src/crypto.go`) and create a symlink for `phocus` (`cd phocus-src && ln -sf ../aeacus-src/crypto.go . && cd ..`), change a few things in `crypto.go`, and be on your merry way. Compiling should work with the aliases created by the install script.
+
+
+### Details
 
 Essentially, you need to provide the following functions:
 - `func writeCryptoConfig(mc *metaConfig) string {` that reads the scoring config, encrypts it, and returns the encrypted string.
