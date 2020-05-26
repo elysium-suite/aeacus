@@ -13,9 +13,7 @@ import (
 )
 
 func readTeamID(mc *metaConfig, id *imageData) {
-	fileContent := ""
-	err := error(nil)
-	fileContent, err = readFile(mc.DirPath + "misc/TeamID.txt")
+	fileContent, err := readFile(mc.DirPath + "misc/TeamID.txt")
 	if err != nil {
 		failPrint("TeamID.txt does not exist!")
 		id.ConnStatus[0] = "red"
@@ -90,8 +88,8 @@ func reportScore(mc *metaConfig, id *imageData) {
 			"vulns": {genVulns(mc, id)},
 			"id":    {"id"}})
 	if err != nil {
-		failPrint("error occured :()")
-		fmt.Println(err)
+		failPrint(err.Error())
+		return
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)

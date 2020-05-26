@@ -18,7 +18,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	shellCommand(cmdString)
 
 	// todo configure autologin user (netplwiz?)
-	// domain compatability? doubt
+	// domain compatibility? doubt
 }
 
 func installService(mc *metaConfig) {
