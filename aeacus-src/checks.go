@@ -235,6 +235,9 @@ func FileContains(fileName string, searchString string) (bool, error) {
 
 func FileContainsRegex(fileName string, expressionString string) (bool, error) {
 	fileContent, err := readFile(fileName)
+	if err != nil {
+		return false, err
+	}
 	matched, err := regexp.Match(expressionString, []byte(fileContent))
 	return matched, err
 }
