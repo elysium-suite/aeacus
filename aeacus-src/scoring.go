@@ -50,10 +50,10 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 	for i, check := range mc.Config.Check {
 		if check.Points == 0 {
 			pointlessChecks = append(pointlessChecks, i)
-			id.ScoredVulns += 1
+			id.ScoredVulns++
 		} else if check.Points > 0 {
 			id.TotalPoints += check.Points
-			id.ScoredVulns += 1
+			id.ScoredVulns++
 		}
 	}
 
@@ -72,7 +72,6 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 
 	for _, check := range mc.Config.Check {
 		status := true
-		failStatus := false
 		for _, condition := range check.Pass {
 			status = processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
 			if status {
@@ -80,7 +79,7 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 			}
 		}
 		for _, condition := range check.Fail {
-			failStatus = processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+			failStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
 			if failStatus {
 				status = false
 				break

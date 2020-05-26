@@ -1,7 +1,5 @@
 package main
 
-import ()
-
 var secpolToKey = map[string]string{
 
 	"LimitBlankPasswordUse":        "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\LimitBlankPasswordUse",
