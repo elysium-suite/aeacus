@@ -8,7 +8,7 @@ import (
 )
 
 func shellCommand(commandGiven string) {
-	cmd := exec.Command("powershell.exe", "-c", commandGiven)
+	cmd := exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
 			if len(commandGiven) > 9 {
@@ -21,7 +21,7 @@ func shellCommand(commandGiven string) {
 }
 
 func shellCommandOutput(commandGiven string) (string, error) {
-	out, err := exec.Command("powershell.exe", "-c", commandGiven).Output()
+	out, err := exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }").Output()
 	if err != nil {
 		if len(commandGiven) > 9 {
 			failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
