@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/urfave/cli"
-	"log"
-	"math/rand"
 	"os"
-	"runtime"
+	"log"
 	"time"
+	"runtime"
+	"math/rand"
+
+	"github.com/urfave/cli"
 )
 
 /////////////////////////////////////////////////////////////////////
@@ -67,7 +68,18 @@ func main() {
 			}
 			return nil
 		},
-	}
+        Commands: []*cli.Command{
+			{
+				Name:    "idprompt",
+				Aliases: []string{"d"},
+				Usage:   "Launch TeamID GUI prompt",
+				Action: func(c *cli.Context) error {
+					launchIDPrompt()
+					return nil
+				},
+			},
+        },
+    }
 
 	err := app.Run(os.Args)
 	if err != nil {
