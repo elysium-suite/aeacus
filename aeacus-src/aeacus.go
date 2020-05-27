@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log"
 	"os"
+	"log"
 
 	"github.com/urfave/cli"
 )
@@ -94,11 +94,11 @@ func main() {
 				},
 			},
 			{
-				Name:    "gui",
-				Aliases: []string{"g"},
-				Usage:   "Launch gui tests",
+				Name:    "idprompt",
+				Aliases: []string{"d"},
+				Usage:   "Launch TeamID GUI prompt",
 				Action: func(c *cli.Context) error {
-					launchGui()
+					launchIDPrompt()
 					return nil
 				},
 			},

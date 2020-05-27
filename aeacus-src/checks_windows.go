@@ -177,6 +177,7 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 }
 
 func Command(commandGiven string) (bool, error) {
+    // This looks really ugly but it works haha
 	cmd := exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+"; if (!($?)) { Throw 'Error!' } }")
 	//fmt.Println("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ " + commandGiven + " }; if (!($?)) { Throw 'Error!' }")
 	if err := cmd.Run(); err != nil {
