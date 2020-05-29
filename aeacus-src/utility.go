@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gen2brain/beeep"
 	"os"
-	"runtime"
 )
 
 func sendNotification(mc *metaConfig, messageString string) {
@@ -18,14 +17,6 @@ func sendNotification(mc *metaConfig, messageString string) {
 func runningPermsCheck() {
 	if !adminCheck() {
 		failPrint("You need to run this binary as root or Administrator!")
-		os.Exit(1)
-	}
-	if runtime.GOOS == "linux" {
-		dirPath = "/opt/aeacus/"
-	} else if runtime.GOOS == "windows" {
-		dirPath = "C:\\aeacus\\"
-	} else {
-		failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
 		os.Exit(1)
 	}
 }

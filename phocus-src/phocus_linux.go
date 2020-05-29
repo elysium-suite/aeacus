@@ -1,11 +1,11 @@
 package main
 
 import (
-	"os"
 	"log"
-	"time"
-	"runtime"
 	"math/rand"
+	"os"
+	"runtime"
+	"time"
 
 	"github.com/urfave/cli"
 )
@@ -68,7 +68,7 @@ func main() {
 			}
 			return nil
 		},
-        Commands: []*cli.Command{
+		Commands: []*cli.Command{
 			{
 				Name:    "idprompt",
 				Aliases: []string{"d"},
@@ -78,8 +78,8 @@ func main() {
 					return nil
 				},
 			},
-        },
-    }
+		},
+	}
 
 	err := app.Run(os.Args)
 	if err != nil {
