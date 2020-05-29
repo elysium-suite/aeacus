@@ -1,7 +1,7 @@
 package main
 
 func launchIDPrompt() {
-    powerShellPrompt := `
+	powerShellPrompt := `
         Add-Type -AssemblyName System.Windows.Forms
         [System.Windows.Forms.Application]::EnableVisualStyles()
 
@@ -43,5 +43,5 @@ func launchIDPrompt() {
 
         [void]$Form.ShowDialog()
     `
-    shellCommand(powerShellPrompt)
+	shellCommand(powerShellPrompt)
 }
