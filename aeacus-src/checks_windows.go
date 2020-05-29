@@ -177,7 +177,7 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 }
 
 func Command(commandGiven string) (bool, error) {
-    // This looks really ugly but it works haha
+	// This looks really ugly but it works haha
 	cmd := exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+"; if (!($?)) { Throw 'Error!' } }")
 	//fmt.Println("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ " + commandGiven + " }; if (!($?)) { Throw 'Error!' }")
 	if err := cmd.Run(); err != nil {
@@ -217,7 +217,8 @@ func UserInGroup(userName string, groupName string) (bool, error) {
 	re := regexp.MustCompile("(?m)[\r\n]+^.*Group.*$")
 	detailString := strings.TrimSpace(string(re.Find([]byte(userInfo))))
 	if detailString == "" {
-		failPrint("Couldn't parse net user output")
+		// This is likely because an invalid user was tested.
+		failPrint("Group check output empty-- please ensure you entered a valid user.")
 		return false, errors.New("Error parsing net user output for Group")
 	}
 	return strings.Contains(detailString, groupName), nil

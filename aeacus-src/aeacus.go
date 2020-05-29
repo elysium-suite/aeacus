@@ -1,8 +1,9 @@
 package main
 
 import (
-	"os"
 	"log"
+	"os"
+	"runtime"
 
 	"github.com/urfave/cli"
 )
@@ -28,6 +29,15 @@ var dirPath string
 func main() {
 
 	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
+
+	if runtime.GOOS == "linux" {
+		dirPath = "/opt/aeacus/"
+	} else if runtime.GOOS == "windows" {
+		dirPath = "C:\\aeacus\\"
+	} else {
+		failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
+		os.Exit(1)
+	}
 
 	app := &cli.App{
 		UseShortOptionHandling: true,
@@ -78,6 +88,17 @@ func main() {
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					writeConfig(&mc)
+					return nil
+				},
+			},
+			{
+				Name:    "decrypt",
+				Aliases: []string{"d"},
+				Usage:   "Check that scoring.dat is valid",
+				Action: func(c *cli.Context) error {
+					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					parseConfig(&mc, readData(&mc))
+					infoPrint("Config looks good! Decryption successful.")
 					return nil
 				},
 			},
