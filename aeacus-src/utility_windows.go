@@ -53,13 +53,18 @@ func playAudio(wavPath string) {
 	shellCommand(commandText)
 }
 
-func destroyImage() {
-	// ideas for destroying windows
-	// nuke registry
-	// rm -rf /
-	// kill all procceses
-	// overwrite system32
-	fmt.Println("cant do that yet. not supported on windows. enjoy ur undestryoed imaeg")
+func destroyImage(mc *metaConfig) {
+	failPrint("Destroying the image!")
+	if mc.Cli.Bool("v") {
+		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
+	} else {
+		// ideas for destroying windows
+		// nuke registry
+		// rm -rf /
+		// kill all procceses
+		// overwrite system32
+
+	}
 }
 
 // sidToLocalUser takes an SID as a string and returns a string containing

@@ -12,9 +12,9 @@ func writeDesktopFiles(mc *metaConfig) {
 	cmdString = "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\misc\\TeamID.txt"
 	shellCommand(cmdString)
 	if mc.Cli.Bool("v") {
-		infoPrint("Writing TeamID.txt shortcut to Desktop...")
+		infoPrint("Writing TeamID shortcut to Desktop...")
 	}
-	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\misc\TeamID.txt"; $Shortcut.Save()`
+	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Arguments = "idgui"; $Shortcut.Save()`
 	shellCommand(cmdString)
 
 	// todo configure autologin user (netplwiz?)
@@ -23,25 +23,27 @@ func writeDesktopFiles(mc *metaConfig) {
 
 func installService(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
-		infoPrint("Throwing shortcut into the startup folder...")
+		infoPrint("Installing service with sc.exe...")
 	}
-	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\aeacus-client.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Save()`
+	cmdString := `sc.exe create CSSClient binPath= "C:\aeacus\phocus.exe" start= "auto" DisplayName= "CSSClient"`
+	shellCommand(cmdString)
+	if mc.Cli.Bool("v") {
+		infoPrint("Setting service description...")
+	}
+	cmdString = `sc.exe description CSSClient "This is Aeacus's Competition Scoring System client. Don't stop or mess with this unless you want to not get points, and maybe have your registry deleted."`
 	shellCommand(cmdString)
 }
 
 func cleanUp(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
-		infoPrint("Removing scoring.conf...")
+		infoPrint("Removing scoring.conf and ReadMe.conf...")
 	}
-	shellCommand("Remove-Item C:\\aeacus\\misc\\previous.txt")
+	shellCommand("Remove-Item -Force C:\\aeacus\\scoring.conf")
+	shellCommand("Remove-Item -Force C:\\aeacus\\ReadMe.conf")
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing previous.txt...")
 	}
-	shellCommand("Remove-Item C:\\aeacus\\web.conf")
-	if mc.Cli.Bool("v") {
-		infoPrint("Removing aeacus.exe...")
-	}
-	shellCommand("Remove-Item C:\\aeacus\\aeacus.exe")
+	shellCommand("Remove-Item -Force C:\\aeacus\\misc\\previous.txt")
 	if mc.Cli.Bool("v") {
 		infoPrint("Emptying recycle bin...")
 	}
@@ -50,4 +52,8 @@ func cleanUp(mc *metaConfig) {
 		infoPrint("Clearing recently used...")
 	}
 	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
+	if mc.Cli.Bool("v") {
+		infoPrint("Removing aeacus.exe...")
+	}
+	shellCommand("Remove-Item -Force C:\\aeacus\\aeacus.exe")
 }
