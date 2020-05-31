@@ -133,7 +133,7 @@ type='ShareExists'
 arg1='ADMIN$'
 ```
 
-> __Note!__ Don't use any single quotes (`'`) in your parameters for Windows options like this, unless you escape them (`'` --> `''`).
+> __Note!__ Don't use any single quotes (`'`) in your parameters for Windows options like this. If you need to, use a double-quoted string instead (ex. `"Admin's files"`)
 
 __ScheduledTaskExists__: pass if scheduled task exists
 ```

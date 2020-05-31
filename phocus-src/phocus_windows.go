@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"log"
 	"math/rand"
@@ -26,11 +27,7 @@ import (
 /////////////////////////////////////////////////////////////////////
 
 // grab idgui flag
-var idgui string
-
-func init() {
-	flag.StringVar(&idgui, "i", "yes", "Spawn TeamID gui")
-}
+var idgui *string = flag.String("i", "", "Spawn TeamID gui")
 
 // program implements svc.Service
 type program struct {
@@ -39,6 +36,7 @@ type program struct {
 }
 
 func main() {
+	flag.Parse()
 	prg := &program{}
 
 	// Call svc.Run to start your program/service.
@@ -48,13 +46,17 @@ func main() {
 }
 
 func (p *program) Init(env svc.Environment) error {
+	//if ! env.IsWindowsService() && *idgui != "yes" {
+	//    failPrint("Sorry! You need to run this as a Windows service.")
+	//    os.Exit(1)
+	//}
 	return nil
 }
 
 func (p *program) Start() error {
 	p.quit = make(chan struct{})
 	p.wg.Add(1)
-	if idgui != "" {
+	if *idgui == "yes" {
 		go launchIDPromptWrapper(p.quit)
 	} else {
 		go phocusStart(p.quit)
@@ -112,21 +114,25 @@ func phocusStart(quit chan struct{}) {
 		Usage: "score vulnerabilities",
 		Action: func(c *cli.Context) error {
 			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-			parseConfig(&mc, readData(&mc))
+			decryptedData, err := tryDecodeString(readData(&mc))
+			if err != nil {
+				return errors.New("Error in reading scoring.dat!")
+			}
+			parseConfig(&mc, decryptedData)
 			rand.Seed(time.Now().UnixNano())
 			for {
 				id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 				infoPrint("Scoring image...")
 				scoreImage(&mc, &id)
-				jitter := rand.Intn(12) + 6
+				jitter := rand.Intn(6) + 6
 				infoPrint("Scored image, sleeping for a bit...")
 				for s := 0; s < jitter; s++ {
-					// Check every second if Windows wants us to die
 					time.Sleep(1 * time.Second)
-					select {
-					case <-quit:
-						break
-					}
+					// Todo: Check every second if Windows wants us to die
+					//select {
+					//case <-quit:
+					//	break
+					//}
 				}
 			}
 			return nil
