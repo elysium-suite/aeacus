@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/urfave/cli"
 )
@@ -97,7 +99,11 @@ func main() {
 				Usage:   "Check that scoring.dat is valid",
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					parseConfig(&mc, readData(&mc))
+					decryptedData, err := tryDecodeString(readData(&mc))
+					if err != nil {
+						return errors.New("Error in reading scoring.dat!")
+					}
+					parseConfig(&mc, decryptedData)
 					infoPrint("Config looks good! Decryption successful.")
 					return nil
 				},
@@ -108,9 +114,13 @@ func main() {
 				Usage:   "Create forensic question files",
 				Action: func(c *cli.Context) error {
 					runningPermsCheck()
+					numFqs, err := strconv.Atoi(c.Args().First())
+					if err != nil {
+						return errors.New("Invalid or missing number passed to forensics")
+					}
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					checkConfig(&mc)
-					createFQs(&mc)
+					createFQs(&mc, numFqs)
 					return nil
 				},
 			},
