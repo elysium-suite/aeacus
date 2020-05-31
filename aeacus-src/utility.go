@@ -1,9 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gen2brain/beeep"
+	"io/ioutil"
 	"os"
 )
+
+func writeFile(fileName string, fileContent string) {
+	err := ioutil.WriteFile(fileName, []byte(fileContent), 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
 
 func sendNotification(mc *metaConfig, messageString string) {
 	// does NOT work for linux --> run as root, doesnt send notify
