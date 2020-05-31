@@ -284,6 +284,10 @@ func UserRights(userOrGroup string, privilege string) (bool, error) {
 	if privilegeString == "" {
 		return false, errors.New("Invalid privilege")
 	}
+	if strings.Contains(privilegeString, userOrGroup) {
+		// Sometimes, Windows just puts their user or group name instead of the SID. Real cool
+		return true, nil
+	}
 	privStringSplit := strings.Split(privilegeString, " ")
 	if len(privStringSplit) != 3 {
 		return false, errors.New("Error splitting privilege")
@@ -341,7 +345,7 @@ func SecurityPolicy(keyName string, keyValue string) (bool, error) {
 				return false, errors.New("Invalid keyValue")
 			}
 			for c := intKeyValue; c <= 999; c++ {
-				desiredString = fmt.Sprintf("%s = \"%s\"", keyName, keyValue)
+				desiredString = fmt.Sprintf("%s = %d", keyName, c)
 				if strings.Contains(output, desiredString) {
 					return true, err
 				}
@@ -354,7 +358,7 @@ func SecurityPolicy(keyName string, keyValue string) (bool, error) {
 				return false, errors.New("Invalid keyValue")
 			}
 			for c := intKeyValue; c > 0; c-- {
-				desiredString = fmt.Sprintf("%s = \"%s\"", keyName, keyValue)
+				desiredString = fmt.Sprintf("%s = %d", keyName, c)
 				if strings.Contains(output, desiredString) {
 					return true, err
 				}

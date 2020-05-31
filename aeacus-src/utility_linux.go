@@ -2,13 +2,24 @@ package main
 
 import (
 	"crypto/md5"
-	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
 	"unicode/utf8"
 )
+
+func readFile(fileName string) (string, error) {
+	fileContent, err := ioutil.ReadFile(fileName)
+	return string(fileContent), err
+}
+
+func tryDecodeString(fileContent string) (string, error) {
+	// For compatability with Windows ANSI/UNICODE/etcetc
+	// and if Linux ever decides to use weird encoding
+	return fileContent, nil
+}
 
 func shellCommand(commandGiven string) {
 	cmd := exec.Command("sh", "-c", commandGiven)
@@ -86,12 +97,8 @@ func verifyBinary(binName string) bool {
 	return false
 }
 
-func createFQs(mc *metaConfig) {
-	var numFQ int
-	printerPrompt("How many FQs do you want to create? ")
-	fmt.Scanln(&numFQ)
-
-	for i := 1; i <= numFQ; i++ {
+func createFQs(mc *metaConfig, numFqs int) {
+	for i := 1; i <= numFqs; i++ {
 		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
 		shellCommand("echo 'QUESTION:' > /home/" + mc.Config.User + "/Desktop/" + fileName)
 		shellCommand("echo 'ANSWER:' >> /home/" + mc.Config.User + "/Desktop/" + fileName)

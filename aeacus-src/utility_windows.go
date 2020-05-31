@@ -1,11 +1,62 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
+
+// Similar to ioutil.ReadFile() but decodes UTF-16.  Useful when
+// reading data from MS-Windows systems that generate UTF-16BE files,
+// but will do the right thing if other BOMs are found.
+func readFile(filename string) (string, error) {
+	// Read the file into a []byte
+	raw, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return "", err
+	}
+
+	return tryDecodeString(string(raw))
+
+}
+
+func tryDecodeString(fileContent string) (string, error) {
+	// If contains ~>40% null bytes, we're gonna assume its Unicode
+	raw := []byte(fileContent)
+	index := bytes.IndexByte(raw, 0)
+	if index >= 0 {
+		nullCount := 0
+		for _, byteChar := range raw {
+			if byteChar == 0 {
+				nullCount++
+			}
+		}
+		percentNull := float32(nullCount) / float32(len(raw))
+		if percentNull < 0.40 {
+			return string(raw), nil
+		}
+	} else {
+		return string(raw), nil
+	}
+
+	// Make an tranformer that converts MS-Win default to UTF8:
+	win16be := unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM)
+	// Make a transformer that is like win16be, but abides by BOM:
+	utf16bom := unicode.BOMOverride(win16be.NewDecoder())
+
+	// Make a Reader that uses utf16bom:
+	unicodeReader := transform.NewReader(bytes.NewReader(raw), utf16bom)
+
+	// decode and print:
+	decoded, err := ioutil.ReadAll(unicodeReader)
+	return string(decoded), err
+}
 
 func shellCommand(commandGiven string) {
 	cmd := exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
@@ -33,12 +84,8 @@ func shellCommandOutput(commandGiven string) (string, error) {
 	return strings.TrimSpace(string(out)), err
 }
 
-func createFQs(mc *metaConfig) {
-	var numFQ int
-	printerPrompt("How many FQs do you want to create? ")
-	fmt.Scanln(&numFQ)
-
-	for i := 1; i <= numFQ; i++ {
+func createFQs(mc *metaConfig, numFqs int) {
+	for i := 1; i <= numFqs; i++ {
 		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
 		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
 		shellCommand("echo 'ANSWER:' >> C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)

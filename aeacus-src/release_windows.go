@@ -1,10 +1,16 @@
 package main
 
 func writeDesktopFiles(mc *metaConfig) {
+	firefoxBinary := `C:\Program Files (x86)\Mozilla Firefox\firefox.exe`
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing ScoringReport.html shortcut to Desktop...")
 	}
-	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "C:\Program Files\Mozilla Firefox\firefox.exe C:\aeacus\web\ScoringReport.html"; $Shortcut.Save()`
+	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\web\ScoringReport.html"; $Shortcut.Save()`
+	shellCommand(cmdString)
+	if mc.Cli.Bool("v") {
+		infoPrint("Writing ReadMe.html shortcut to Desktop...")
+	}
+	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ReadMe.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\web\ReadMe.html"; $Shortcut.Save()`
 	shellCommand(cmdString)
 	if mc.Cli.Bool("v") {
 		infoPrint("Creating or emptying TeamID.txt file...")
@@ -14,7 +20,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing TeamID shortcut to Desktop...")
 	}
-	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Arguments = "idgui"; $Shortcut.Save()`
+	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Arguments = "-i yes"; $Shortcut.Save()`
 	shellCommand(cmdString)
 
 	// todo configure autologin user (netplwiz?)
@@ -53,7 +59,6 @@ func cleanUp(mc *metaConfig) {
 	}
 	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
 	if mc.Cli.Bool("v") {
-		infoPrint("Removing aeacus.exe...")
+		warnPrint("Done cleaning up! You need to remove aeacus.exe manually.")
 	}
-	shellCommand("Remove-Item -Force C:\\aeacus\\aeacus.exe")
 }
