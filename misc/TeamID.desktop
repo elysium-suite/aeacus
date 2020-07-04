@@ -3,6 +3,6 @@ Encoding=UTF-8
 Version=1.0
 Type=Application
 Terminal=false
-Exec=/usr/bin/gedit /opt/aeacus/desktop/TeamID.txt
+Exec=/usr/bin/gedit /opt/aeacus/TeamID.txt
 Name=Team ID
 Icon=/opt/aeacus/web/assets/logo.png

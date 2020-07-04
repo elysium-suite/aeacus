@@ -7,7 +7,8 @@
 - info
     - create list of admins/users
     - other things? esp for windows
-- linux: notifications are busted?
+- linux:
+    - notifications and sound are busted when running as a service? pls fix
 - windows
     - reading TEAMID fails beacuse it's unicode by default and ioutil/program expects ANSI
     - as above, this is for FQs too. add ability to detect, or run through pruning function to remove null terms
@@ -30,3 +31,5 @@
         - make owner of TeamID.txt the main user of the system, otherwise phocus posh gui wont write to the file
     - autologin user
         - see release_*.go
+    - linux
+        - clear ff history?

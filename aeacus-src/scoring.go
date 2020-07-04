@@ -27,19 +27,19 @@ func scoreImage(mc *metaConfig, id *imageData) {
 	genReport(mc, id)
 
 	// Check if points increased/decreased
-	prevPoints, err := readFile(mc.DirPath + "misc/previous.txt")
+	prevPoints, err := readFile(mc.DirPath + "/previous.txt")
 	if err == nil {
 		prevScore, _ := strconv.Atoi(prevPoints)
 		if prevScore < id.Score {
 			sendNotification(mc, "You gained points!")
-			playAudio(mc.DirPath + "misc/gain.wav")
+			playAudio(mc.DirPath + "web/assets/gain.wav")
 		} else if prevScore > id.Score {
 			sendNotification(mc, "You lost points!")
-			playAudio(mc.DirPath + "misc/alarm.wav")
+			playAudio(mc.DirPath + "web/assets/alarm.wav")
 		}
 	}
 
-	writeFile(mc.DirPath+"misc/previous.txt", strconv.Itoa(id.Score))
+	writeFile(mc.DirPath+"/previous.txt", strconv.Itoa(id.Score))
 }
 
 func scoreChecks(mc *metaConfig, id *imageData) {
