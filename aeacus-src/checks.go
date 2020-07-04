@@ -128,7 +128,7 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 		return !result
 	case "PackageInstalled":
 		if check.Message == "" {
-			check.Message = "File \"" + arg1 + "\" is installed"
+			check.Message = "Package \"" + arg1 + "\" is installed"
 		}
 		result, err := PackageInstalled(arg1)
 		if err != nil {
@@ -239,6 +239,9 @@ func FileContainsRegex(fileName string, expressionString string) (bool, error) {
 		return false, err
 	}
 	matched, err := regexp.Match(expressionString, []byte(fileContent))
+	if err != nil {
+		failPrint("There's an error with your regular expression for FileContainsRegex: " + err.Error())
+	}
 	return matched, err
 }
 

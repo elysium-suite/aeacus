@@ -15,7 +15,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Creating or emptying TeamID.txt file...")
 	}
-	cmdString = "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\misc\\TeamID.txt"
+	cmdString = "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\TeamID.txt"
 	shellCommand(cmdString)
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing TeamID shortcut to Desktop...")
@@ -49,7 +49,7 @@ func cleanUp(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Removing previous.txt...")
 	}
-	shellCommand("Remove-Item -Force C:\\aeacus\\misc\\previous.txt")
+	shellCommand("Remove-Item -Force C:\\aeacus\\previous.txt")
 	if mc.Cli.Bool("v") {
 		infoPrint("Emptying recycle bin...")
 	}
@@ -59,6 +59,6 @@ func cleanUp(mc *metaConfig) {
 	}
 	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
 	if mc.Cli.Bool("v") {
-		warnPrint("Done cleaning up! You need to remove aeacus.exe manually.")
+		warnPrint("Done cleaning up! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the web directory (previous.txt will recreate itself).")
 	}
 }

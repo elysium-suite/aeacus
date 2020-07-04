@@ -64,11 +64,76 @@ func genReport(mc *metaConfig, id *imageData) {
 
 func genReadMe(mc *metaConfig) {
 
-	header := `<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Aeacus README</title><link rel="stylesheet" type="text/css" href="./assets/bootstrap3.min.css"><link rel="stylesheet" type="text/css" href="./assets/bootstrap3-custom.min.css"><link rel="stylesheet" type="text/css" href="./assets/style.css"><style>body{background-image:url("./assets/background.png");background-size:cover}</style><div style="height: 100%; width: 100%"><div id="centerarea" class="container"><div id="MainRow" class="row"><div class="col-sm-12" style="min-height:725px;">s<div id="DeltaPlaceHolderMain"><div class="row"><div class="col-md-12"><div class="mod-wrap"><div class="article article-body"><div class="article-content"><div><div id="MSOZoneCell_WebPartctl00_ctl48_g_8c02beb0_d06b_46f1_9ba2_95bef95154c8" class="s4-wpcell-plain ms-webpartzone-cell ms-webpart-cell-vertical ms-fullWidth "><div class="ms-webpart-chrome ms-webpart-chrome-vertical ms-webpart-chrome-fullWidth "><style type="text/css">h1{text-align:center;font-family:Helvetica,Arial,sans-serif;font-size:36px;margin:10px;padding:30px 14px 10px 0px;width:100%;height:100%;color:#0D2E5B !important}h2{font-family:Helvetica,Arial,sans-serif;font-size:18px;margin:30px 0 10px 0;padding:0;width:100%;height:100%;color:#0D2E5B !important}body{font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;padding:0;width:100%;height:100%;background-color:#0D2E5B}pre{font-family:Helvetica,Arial,sans-serif;font-size:16px}.main{margin-top:25px;margin-bottom:10px;margin-left:auto;margin-right:auto;padding:0px;background-color:white;max-width:100%}.text{padding-top:12px;padding-bottom:12px;padding-left:40px;padding-right:40px}.center{text-align:center}</style><div class="main"><div class="text"><p align="center"> <img src="./assets/logo.png" height="210" width="230"></p>`
+	header := `
+<!DOCTYPE html>
+<html>
 
-	footer := `<h2>Competition Guidelines</h2><ul><li> In order to provide a better competition experience, you are <b>NOT</b> required to change the password of the primary, auto-login, user account. Changing the password of a user that is set to automatically log in may lock you out of your computer.</li><li> Authorized administrator passwords were correct the last time you did a password audit, but are not guaranteed to be currently accurate.</li><li> Do not stop or disable the CSSClient or aeacus-client service or process.</li><li> Do not remove any authorized users or their home directories.</li><li> The time zone of this image is set to UTC. Please do not change the time zone, date, or time on this image.</li><li> You can view your current scoring report by double-clicking the "Aeacus Scoring Report" desktop icon.</li><li> JavaScript is required for some error messages that appear on the "Aeacus Scoring Report." To ensure that you only receive correct error messages, please do not disable JavaScript.</li><li> Some security settings may prevent the Stop Scoring application from running. If this happens, the safest way to stop scoring is to suspend the virtual machine. You should <b>NOT</b> power on the VM again before deleting.</li></ul><p align="center" style="text-align:center"> The Aeacus Project is in no way affiliated or endorsed by the Air Force Association or the University of Texas at San Antonio.</p></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="footer"><div class="footer-copyright-wrap"><div class="container"><div class="footer-copyright-content"><ul><li>Copyright Never &copy;</li><li>No rights reserved</li></ul></div></div></div></div></body></html>  `
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Aeacus README</title>
+	<style>
+        body {
+            background-image: url("./assets/background.png");
+            background-size: cover;
+            font-family: Helvetica, Arial, sans-serif;
+        }
 
-	headerTheSequel := `<p> Please read the entire README thoroughly before modifying anything on this computer.</p><h2>Unique Identifier</h2><p> If you have not yet entered a valid Team ID, please do so immediately by double clicking on the "Aeacus Set Team ID" icon on the desktop. If you do not enter a valid Team ID this VM may stop functioning after a short period of time.</p><h2>Forensics Questions</h2><p> If there are "Forensics Questions" on your Desktop, you will receive points for answering these questions correctly. Valid (scored) "Forensics Questions" will only be located directly on your Desktop. Please read all "Forensics Questions" thoroughly before modifying this computer, as you may change something that prevents you from answering the question correctly.</p><h2>Competition Scenario</h2><p> This company's security policies require that all user accounts be password protected. Employees are required to choose secure passwords, however this policy may not be currently enforced on this computer. The presence of any non-work related media files and "hacking tools" on any computers is strictly prohibited. This company currently does not use any centralized maintenance or polling tools to manage their IT equipment. This computer is for official business use only by authorized users. This is a critical computer in a production environment. Please do <b>NOT</b> attempt to upgrade the operating system on this machine.</p>`
+        h1 {
+	        text-align: center;
+	        font-size: 36px;
+	        margin: 10px;
+	        padding: 0 14px 10px 0px;
+	        width: 100%;
+	        height: 100%;
+	        color: #0D2E5B !important
+        }
+
+        h2 {
+	        font-size: 18px;
+	        margin: 30px 0 10px 0;
+	        padding: 0;
+	        width: 100%;
+	        height: 100%;
+	        color: #0D2E5B !important
+        }
+
+        pre {
+	        font-size: 16px
+        }
+
+        .main {
+	        margin-top: 25px;
+	        margin-bottom: 10px;
+	        margin-left: auto;
+	        margin-right: auto;
+	        padding: 0px;
+	        background-color: white;
+	        max-width: 100%
+        }
+
+        .text {
+	        padding-top: 12px;
+	        padding-bottom: 12px;
+	        padding-left: 40px;
+	        padding-right: 40px
+        }
+
+        .center {
+	        text-align: center
+        }
+	</style>
+        <div style="width: 80%; margin-left: auto; margin-right: auto; display: block" >
+			<div class="main">
+				<div class="text">
+					<p align="center">
+						<img src="./assets/logo.png "width="180">
+					</p>
+`
+
+	footer := `<h2>Competition Guidelines</h2><ul><li> In order to provide a better competition experience, you are <b>NOT</b> required to change the password of the primary, auto-login, user account. Changing the password of a user that is set to automatically log in may lock you out of your computer.</li><li> Authorized administrator passwords were correct the last time you did a password audit, but are not guaranteed to be currently accurate.</li><li> Do not stop or disable the CSSClient or aeacus-client service or process.</li><li> Do not remove any authorized users or their home directories.</li><li> The time zone of this image is set to UTC. Please do not change the time zone, date, or time on this image.</li><li> You can view your current scoring report by double-clicking the "Scoring Report" desktop icon.</li><li> JavaScript is required for some error messages that appear on the "Scoring Report." To ensure that you only receive correct error messages, please do not disable JavaScript.</li><li> Some security settings may prevent the Stop Scoring application from running. If this happens, the safest way to stop scoring is to suspend the virtual machine. You should <b>NOT</b> power on the VM again before deleting.</li></ul><p align="center" style="text-align:center"> The Aeacus Project is in no way affiliated or endorsed by the Air Force Association or the University of Texas at San Antonio.</p></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="footer"><div class="footer-copyright-wrap"><div class="container"><div class="footer-copyright-content"><ul><li>Copyright Never &copy;</li><li>No rights reserved</li></ul></div></div></div></div></body></html>  `
+
+	headerTheSequel := `<p> Please read the entire README thoroughly before modifying anything on this computer.</p><h2>Unique Identifier</h2><p> If you have not yet entered a valid Team ID, please do so immediately by double clicking on the "Team ID" icon on the desktop. If you do not enter a valid Team ID this VM may stop functioning after a short period of time.</p><h2>Forensics Questions</h2><p> If there are "Forensics Questions" on your Desktop, you will receive points for answering these questions correctly. Valid (scored) "Forensics Questions" will only be located directly on your Desktop. Please read all "Forensics Questions" thoroughly before modifying this computer, as you may change something that prevents you from answering the question correctly.</p><h2>Competition Scenario</h2><p> This company's security policies require that all user accounts be password protected. Employees are required to choose secure passwords, however this policy may not be currently enforced on this computer. The presence of any non-work related media files and "hacking tools" on any computers is strictly prohibited. This company currently does not use any centralized maintenance or polling tools to manage their IT equipment. This computer is for official business use only by authorized users. This is a critical computer in a production environment. Please do <b>NOT</b> attempt to upgrade the operating system on this machine.</p>`
 
 	var htmlFile strings.Builder
 	htmlFile.WriteString(header)
