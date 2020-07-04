@@ -13,7 +13,7 @@ import (
 )
 
 func readTeamID(mc *metaConfig, id *imageData) {
-	fileContent, err := readFile(mc.DirPath + "misc/TeamID.txt")
+	fileContent, err := readFile(mc.DirPath + "TeamID.txt")
 	if err != nil {
 		failPrint("TeamID.txt does not exist!")
 		id.ConnStatus[0] = "red"
@@ -34,6 +34,7 @@ func readTeamID(mc *metaConfig, id *imageData) {
 
 // genChallenge generates a crypto challenge for the CSS endpoint
 func genChallenge(mc *metaConfig) string {
+	// I'm aware this is sus, but right now there's no implemented way to generate a key between aeacus and minos on the fly. Stretch goal
 	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
 	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
 	chalString := hexEncode(xor(randomHash1, randomHash2))
@@ -48,6 +49,7 @@ func genChallenge(mc *metaConfig) string {
 
 func genVulns(mc *metaConfig, id *imageData) string {
 	var vulnString strings.Builder
+	// This could be an unprintable character and be more reliable
 	delimiter := "|-|"
 
 	// Vulns achieved
