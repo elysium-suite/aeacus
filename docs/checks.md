@@ -2,7 +2,7 @@
 
 ## Checks
 
-This is a list of vulnerability checks that can be used in the configuration for `aeacus`.
+This is a list of vulnerability checks that can be used in the configuration for `aeacus`. The notes on this page contain a lot of important information, please be sure to read them.
 
 > __Note!__ Each of the commands here can check for the opposite by appending 'Not' to the check type. For example, `FileExistsNot` to pass if a file does not exist.
 
@@ -38,6 +38,21 @@ arg2='ANSWER:\sCool[a-zA-Z]+VariedAnswer'
 ```
 
 > __Note!__ A check passes by default. This means that you can use two failing conditions to simulate two conditions that should pass only if they're _BOTH_ true. That's confusing, so here's an example: you want a check to pass only if this file AND that file contain a string. So, instead of two pass conditions (pass if FileContains, pass if FileContains) (where the check will pass if either pass), you can code two fail conditions where the check will pass only if _BOTH_ fail conditions do not pass (fail if FileContainsNot, fail if FileContainsNot).
+
+_Example of a check with two mutually inclusive pass conditions (User1 must be Group1 and Group2):_
+```
+[[check]]
+message = "User1 is in Group1 and Group2"
+[[check.fail]]
+type="UserInGroupNot"
+arg1="User1"
+arg2="Group1"
+[[check.fail]]
+type="UserInGroupNot"
+arg1="User1"
+arg2="Group2"
+```
+
 
 __DirContainsRegex__: pass if directory contains regex string
 ```
