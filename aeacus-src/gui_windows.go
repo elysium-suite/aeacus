@@ -37,7 +37,7 @@ func launchIDPrompt() {
 
         function setID {
             $global:id=$TextBox1.Text
-            echo $id > C:\aeacus\misc\TeamID.txt
+            echo $id > C:\aeacus\TeamID.txt
             $form.Close()
         }
 

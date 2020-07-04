@@ -62,7 +62,8 @@ func PackageInstalled(packageName string) (bool, error) {
 	// not super happy with the command implementation
 	// could just keylog sh or replace dpkg binary or something
 	// should use golang dpkg library if it existed and was good
-	return Command(fmt.Sprintf(`dpkg -l "%s"`, packageName))
+	// note: dpkg -l does not always return proper error code
+	return Command(fmt.Sprintf(`dpkg -s "%s"`, packageName))
 }
 
 func ServiceUp(serviceName string) (bool, error) {

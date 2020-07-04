@@ -2,19 +2,19 @@
 
 <img align="right" width="250" src="web/assets/logo.png"/>
 
-This is a client-side scoring system meant to imitate the functionality of UTSA's CIAS CyberPatriot Scoring System (CSS) with an emphasis on simplicity. Named after the Greek myth of King Aeacus, a judge of the dead.
+`aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 
 ## Installation
 
 0. __Extract the release__ into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
-> You should try compiling it yourself! If you don't want to (and you trust me), you can [download the releases here](https://github.com/sourque/aeacus/releases).
+> You should try compiling it yourself! If not, you can [download the releases here](https://github.com/sourque/aeacus/releases).
 
 1. __Set up the environment.__
     - Put your config in `/opt/aeacus/scoring.conf` or `C:\aeacus\scoring.conf`
 
     > Don't have a config? See the example at the bottom of this README.
 
-    - Put your README in `ReadMe.conf`.
+    - Put your README data in `ReadMe.conf`.
     - Use `./aeacus forensics {number}` to create Forensic Question files on the Desktop of the main user.
 
 2. __Check that your config is valid.__
@@ -142,12 +142,12 @@ points = -5 # This check is now a penalty
 
 ## Information Gathering
 
-The `aeacus` binary supports gathering information on the system (especially for Windows) in cases where it's tough to gather what the scoring system can see.
+The `aeacus` binary supports gathering information on Windows in cases where it's tough to gather what the scoring system can see.
 
 Print information with `./aeacus info {type}` where `{type}` is one the following:
 
 ### Linux
-- N/A (atm)
+- N/A (There are always better, easy command line options.)
 
 ### Windows
 - packages
@@ -204,16 +204,11 @@ superCoolDude
 
 After setting up an environment (sorry, only Linux dev environments supported) with `misc/install.sh`, you can use the janky but handy aliases at the bottom of the file to compile for Linux and Windows.
 
-## Troubleshooting and Errors
-
-Please refer to the following flowchart:
-
-![Troubleshooting Flowchart](docs/troubleshooting.png)
-
-
 ## Contributing and Disclaimer
 
-A huge thanks to a few people (see contributors) for help with code and features, and many others for help with feedback, usability, and bug finding! Thanks to the AFA and UTSA for putting together such a cool competition, and for the inspiration and samples to make this project.
+A huge thanks to the project contributors for help adding code and features, and to many others for help with feedback, usability, and finding bugs!
+
+Thanks to the CyberPatriot program for putting together such a cool competition, and for the inspiration to make this project.
 
 If you have anything you would like to add or fix, please make a pull request! No improvement or fix is too small, and help is always appreciated.
 
