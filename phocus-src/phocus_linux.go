@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"fmt"
 	"math/rand"
 	"os"
 	"runtime"
@@ -75,6 +76,16 @@ func main() {
 				Usage:   "Launch TeamID GUI prompt",
 				Action: func(c *cli.Context) error {
 					launchIDPrompt()
+					return nil
+				},
+			},
+			{
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "Print the current version of phocus",
+				Action: func(c *cli.Context) error {
+					fmt.Println("=== phocus (linux) ===")
+					fmt.Println("version", aeacusVersion)
 					return nil
 				},
 			},

@@ -202,7 +202,13 @@ superCoolDude
 
 ## Compiling
 
-After setting up an environment (sorry, only Linux dev environments supported) with `misc/install.sh`, you can use the janky but handy aliases at the bottom of the file to compile for Linux and Windows.
+After setting up an environment (sorry, only Linux dev environments supported) with `misc/install.sh`, you can use these janky but handy aliases:
+
+- `aeacus-build-linux`: builds aeacus and phocus for linux
+- `aeacus-build-linux-production`: stripped version of the above, to make reverse engineering a bit harder
+- `aeacus-build-windows`: builds aeacus and phocus for windows
+- `aeacus-build-windows-production`: stripped version
+
 
 ## Contributing and Disclaimer
 
