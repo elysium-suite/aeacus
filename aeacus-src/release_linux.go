@@ -4,6 +4,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		infoPrint("Creating or emptying TeamID.txt...")
 	}
+	shellCommand("touch /opt/aeacus/TeamID.txt")
 	shellCommand("echo 'YOUR-TEAMID-HERE' > /opt/aeacus/TeamID.txt")
 	if mc.Cli.Bool("v") {
 		infoPrint("Writing shortcuts to Desktop...")

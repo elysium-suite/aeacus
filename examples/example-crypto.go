@@ -63,7 +63,7 @@ func readCryptoConfig(mc *metaConfig) string {
 	reader, err := zlib.NewReader(bytes.NewReader([]byte(dataFile)))
 	if err != nil {
 		failPrint("Error decrypting scoring.dat. You naughty little competitor. Commencing self destruct...")
-		destroyImage()
+		destroyImage(mc)
 		os.Exit(1)
 	}
 	defer reader.Close()
