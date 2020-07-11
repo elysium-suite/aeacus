@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -140,6 +141,17 @@ func main() {
 				Action: func(c *cli.Context) error {
 					runningPermsCheck()
 					getInfo(c.Args().Get(0))
+					return nil
+				},
+			},
+			{
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "Print the current version of aeacus",
+				Action: func(c *cli.Context) error {
+					fmt.Println("=== aeacus ===")
+					fmt.Println("version", aeacusVersion)
+					return nil
 					return nil
 				},
 			},

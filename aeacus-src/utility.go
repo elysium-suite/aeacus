@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+var aeacusVersion = "1.1.0"
+
 func writeFile(fileName string, fileContent string) {
 	err := ioutil.WriteFile(fileName, []byte(fileContent), 0644)
 	if err != nil {

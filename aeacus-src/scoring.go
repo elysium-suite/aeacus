@@ -64,8 +64,14 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 			mc.Config.Check[check].Points = pointsEach
 		}
 		id.TotalPoints += (pointsEach * len(pointlessChecks))
-		if id.TotalPoints != 100 {
-			mc.Config.Check[pointlessChecks[0]].Points += (100 - id.TotalPoints)
+		if id.TotalPoints < 100 {
+			for i := 0; id.TotalPoints < 100; id.TotalPoints++ {
+				mc.Config.Check[pointlessChecks[i]].Points++
+				i++
+				if i > len(pointlessChecks) - 1 {
+					i = 0
+				}
+			}
 			id.TotalPoints += (100 - id.TotalPoints)
 		}
 	}
