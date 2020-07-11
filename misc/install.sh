@@ -16,14 +16,38 @@ EOF
 apt update
 
 # Install golang and git (for go get)
+echo "[+] Installing go and git..."
 apt install -y golang-go git
 
 # Grab dependencies
+echo "[+] Getting general dependencies..."
 go get "github.com/urfave/cli"
 go get "github.com/BurntSushi/toml/cmd/tomlv"
 go get "github.com/fatih/color"
 
-# Windows dependencies
+# Add convenient aliases for building
+if ! grep -q "aeacus-build" /etc/bash.bashrc; then
+    echo "[+] Adding aliases..."
+
+    # aeacus-build-linux --> build aeacus and phocus
+    echo "alias aeacus-build-linux=\"cd aeacus-src; go build -o ../aeacus .; cd ..; cd phocus-src; go build -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
+
+    # aeacus-build-linux-production --> build aeacus and phocus, stripped
+    echo "alias aeacus-build-linux-production=\"cd aeacus-src; go build -ldflags '-s -w' -o ../aeacus .; cd ..; cd phocus-src; go build -ldflags '-s -w' -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
+
+    # aeacus-build-windows --> build aeacus and phocus (for windows)
+    echo "alias aeacus-build-windows=\"cd aeacus-src; GOOS=windows go build -o ../aeacus.exe .; cd ..; cd phocus-src; GOOS=windows go build -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
+
+    # aeacus-build-windows-production --> build aeacus and phocus, stripped
+    echo "alias aeacus-build-windows-production=\"cd aeacus-src; GOOS=windows go build -ldflags '-s -w' -o ../aeacus.exe .; cd ..; cd phocus-src; GOOS=windows go build -ldflags '-s -w' -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
+
+fi
+
+# Source aliases from /etc/bash.bashrc
+source /etc/bash.bashrc
+
+# Windows dependencies (will cause errors on Linux systems due to build constraints)
+echo "[+] Getting Windows-specific dependencies..."
 go get "github.com/iamacarpet/go-win64api"
 go get "github.com/go-ole/go-ole"
 go get "golang.org/x/sys/windows"
@@ -31,22 +55,3 @@ go get "github.com/gen2brain/beeep"
 go get "github.com/go-toast/toast"
 go get "github.com/tadvi/systray"
 go get "github.com/judwhite/go-svc/svc"
-
-# Add convenient aliases for building
-
-    # builda --> build aeacus, buildp --> build phocus
-    echo "alias builda=\"cd aeacus-src; go build -o ../aeacus .; cd ..\"; alias buildp=\"cd phocus-src; go build -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
-
-    # pbuilda --> builda aeacus for production, pbuildp --> build production phocus
-    echo "alias pbuilda=\"cd aeacus-src; go build -ldflags '-s -w' -o ../aeacus .; cd ..\"; alias pbuildp=\"cd phocus-src; go build -ldflags '-s -w' -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
-
-# Add convenient aliases for building for Windows
-
-    # builda --> build aeacus, buildp --> build phocus
-    echo "alias wbuilda=\"cd aeacus-src; GOOS=windows go build -o ../aeacus.exe .; cd ..\"; alias wbuildp=\"cd phocus-src; GOOS=windows go build -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
-
-    # pbuilda --> builda aeacus for production, pbuildp --> build production phocus
-    echo "alias wpbuilda=\"cd aeacus-src; GOOS=windows go build -ldflags '-s -w' -o ../aeacus.exe .; cd ..\"; alias wpbuildp=\"cd phocus-src; GOOS=windows go build -ldflags '-s -w' -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
-
-# Source aliases from /etc/bash.bashrc
-source /etc/bash.bashrc

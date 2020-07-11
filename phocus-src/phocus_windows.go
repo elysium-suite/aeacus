@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -86,8 +87,9 @@ var dirPath string
 
 func launchIDPromptWrapper(quit chan struct{}) {
 	launchIDPrompt()
-	os.Exit(0) // Kind of ghetto-- would prefer actually
+	// Kind of ghetto-- would prefer actually
 	// using the quit struct
+	os.Exit(0)
 }
 
 func phocusStart(quit chan struct{}) {
@@ -108,7 +110,7 @@ func phocusStart(quit chan struct{}) {
 		os.Exit(1)
 	}
 
-	cli.AppHelpTemplate = "" // No help! >:(
+	// cli.AppHelpTemplate = "" // No help! >:(
 	app := &cli.App{
 		Name:  "phocus",
 		Usage: "score vulnerabilities",
@@ -136,6 +138,18 @@ func phocusStart(quit chan struct{}) {
 				}
 			}
 			return nil
+		},
+		Commands: []*cli.Command{
+			{
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "Print the current version of phocus",
+				Action: func(c *cli.Context) error {
+					fmt.Println("=== phocus (windows) ===")
+					fmt.Println("version", aeacusVersion)
+					return nil
+				},
+			},
 		},
 	}
 
