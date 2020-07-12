@@ -102,7 +102,7 @@ func main() {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					decryptedData, err := tryDecodeString(readData(&mc))
 					if err != nil {
-						return errors.New("Error in reading scoring.dat!")
+						return errors.New("error in reading scoring.dat")
 					}
 					parseConfig(&mc, decryptedData)
 					infoPrint("Config looks good! Decryption successful.")
@@ -151,7 +151,6 @@ func main() {
 				Action: func(c *cli.Context) error {
 					fmt.Println("=== aeacus ===")
 					fmt.Println("version", aeacusVersion)
-					return nil
 					return nil
 				},
 			},

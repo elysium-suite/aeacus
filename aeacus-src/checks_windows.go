@@ -275,7 +275,9 @@ func UserRights(userOrGroup string, privilege string) (bool, error) {
 	// domain support is untested, it should be easy to add a domain
 	// flag in the config though. then just make sure you're not getting
 	// invalid local policies instead of gpo
+
 	seceditOutput, err := getSecedit()
+	// TODO: only get section of users -- this can also falsely score correct for other secedit fields (like LegalNoticeText)
 	if err != nil {
 		return false, err
 	}
