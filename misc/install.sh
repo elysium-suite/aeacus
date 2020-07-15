@@ -12,12 +12,25 @@ EOF
 
 # This script sets up the development environment on a Linux (Debian-based) box.
 
+# Force script to be run as root
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit 1
+fi
+
 # Update package list
 apt update
 
-# Install golang and git (for go get)
-echo "[+] Installing go and git..."
-apt install -y golang-go git
+# Install golang
+echo "[+] Installing golang..."
+wget -O ~/go1.14.5.linux-amd64.tar.gz https://golang.org/dl/go1.14.5.linux-amd64.tar.gz
+tar -C /usr/local -xzf ~/go1.14.5.linux-amd64.tar.gz
+echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+source /etc/profile
+
+# Install git (for go get)
+echo "[+] Installing git..."
+apt install -y git
 
 # Grab dependencies
 echo "[+] Getting general dependencies..."
