@@ -16,18 +16,17 @@ func readTeamID(mc *metaConfig, id *imageData) {
 	fileContent, err := readFile(mc.DirPath + "TeamID.txt")
 	if err != nil {
 		failPrint("TeamID.txt does not exist!")
+		sendNotification(mc, "TeamID.txt does not exist!")
 		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Your TeamID files does not exist! Failed to upload scores."
 		id.Connection = false
 	} else if fileContent == "" {
 		failPrint("TeamID.txt is empty!")
+		sendNotification(mc, "TeamID.txt is empty!")
 		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Your TeamID is empty! Failed to upload scores."
 		id.Connection = false
 	} else {
-		// teamid validity checks here
-		// todo... what does that even look like?
-		// should there be a standard format? :thinking;
 		mc.TeamID = fileContent
 	}
 }

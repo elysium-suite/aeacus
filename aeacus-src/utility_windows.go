@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 
+	"github.com/gen2brain/beeep"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -56,6 +58,13 @@ func tryDecodeString(fileContent string) (string, error) {
 	// decode and print:
 	decoded, err := ioutil.ReadAll(unicodeReader)
 	return string(decoded), err
+}
+
+func sendNotification(mc *metaConfig, messageString string) {
+	err := beeep.Notify("Aeacus SE", messageString, mc.DirPath+"web/assets/logo.png")
+	if err != nil {
+		failPrint("Notification error: " + err.Error())
+	}
 }
 
 func shellCommand(commandGiven string) {
