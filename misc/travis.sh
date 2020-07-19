@@ -1,3 +1,5 @@
+## DO NOT RUN THIS ON YOUR VM, THIS IS FOR TRAVIS ##
+
 # Grab dependencies
 echo "[+] Getting general dependencies..."
 go get "github.com/urfave/cli"
@@ -6,16 +8,6 @@ go get "github.com/fatih/color"
 
 # Add convenient aliases for building
 echo "[+] Adding aliases..."
-
-# aeacus-build-linux --> build aeacus and phocus
-aeacus_build_linux() {
-  cd aeacus-src
-  go build -o ../aeacus .
-  cd ..
-  cd phocus-src
-  go build -o ../phocus .
-  cd ..
-}
 
 # aeacus-build-linux-production --> build aeacus and phocus, stripped
 aeacus_build_linux_production() {
@@ -27,13 +19,13 @@ aeacus_build_linux_production() {
   cd ..
 }
 
-# aeacus-build-windows --> build aeacus and phocus (for windows)
-aeacus_build_windows() {
+# aeacus-build-windows-production --> build aeacus and phocus, stripped (for windows)
+aeacus_build_windows_production() {
   cd aeacus-src
-  GOOS=windows go build -o ../aeacus.exe .
+  GOOS=windows go build -ldflags '-s -w' -o ../aeacus.exe .
   cd ..
   cd phocus-src
-  GOOS=windows go build -o ../phocus.exe .
+  GOOS=windows go build -ldflags '-s -w' -o ../phocus.exe .
   cd ..
 }
 
@@ -48,3 +40,4 @@ go get "github.com/tadvi/systray"
 go get "github.com/judwhite/go-svc/svc"
 
 aeacus_build_linux_production
+aeacus_build_windows_production
