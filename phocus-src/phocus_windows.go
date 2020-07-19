@@ -123,18 +123,14 @@ func phocusStart(quit chan struct{}) {
 			parseConfig(&mc, decryptedData)
 			rand.Seed(time.Now().UnixNano())
 			for {
+				timeCheck(&mc)
 				id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 				infoPrint("Scoring image...")
 				scoreImage(&mc, &id)
-				jitter := rand.Intn(6) + 6
+				jitter := rand.Intn(8) + 8
 				infoPrint("Scored image, sleeping for a bit...")
 				for s := 0; s < jitter; s++ {
 					time.Sleep(1 * time.Second)
-					// Todo: Check every second if Windows wants us to die
-					//select {
-					//case <-quit:
-					//	break
-					//}
 				}
 			}
 			return nil

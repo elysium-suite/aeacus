@@ -30,7 +30,6 @@ var teamID string
 var dirPath string
 
 func main() {
-
 	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 
 	if runtime.GOOS == "linux" {
@@ -105,7 +104,9 @@ func main() {
 						return errors.New("error in reading scoring.dat")
 					}
 					parseConfig(&mc, decryptedData)
-					infoPrint("Config looks good! Decryption successful.")
+					if c.Bool("v") {
+						infoPrint("Config looks good! Decryption successful.")
+					}
 					return nil
 				},
 			},
