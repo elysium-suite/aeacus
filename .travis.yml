@@ -1,0 +1,4 @@
+os: linux
+dist: xenial
+language: go
+script: sh misc/travis.sh

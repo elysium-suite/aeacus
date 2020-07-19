@@ -1,4 +1,4 @@
-# aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/sourque/aeacus)](https://goreportcard.com/report/github.com/sourque/aeacus)
+# aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/sourque/aeacus)](https://goreportcard.com/report/github.com/sourque/aeacus) [![Build Status](https://travis-ci.com/sourque/aeacus.svg?branch=master)](https://travis-ci.com/sourque/aeacus)
 
 <img align="right" width="250" src="web/assets/logo.png"/>
 
