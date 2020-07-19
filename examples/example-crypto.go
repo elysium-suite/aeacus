@@ -51,6 +51,10 @@ func writeCryptoConfig(mc *metaConfig) string {
 	configBuffer := make([]byte, size)
 	buffer := bufio.NewReader(configFile)
 	_, err = buffer.Read(configBuffer)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	if mc.Cli.Bool("v") {
 		infoPrint("Encrypting configuration...")
@@ -152,7 +156,8 @@ func encryptString(password, plaintext string) string {
 	return string(ciphertext)
 }
 
-// decryptString takes a password and a ciphertext and returns a decrypted byte sequence (as a string). The function uses typical AES-GCM.
+// decryptString takes a password and a ciphertext and returns a decrypted
+// byte sequence (as a string). The function uses typical AES-GCM.
 func decryptString(password, ciphertext string) string {
 
 	// Create a sha256sum hash of the password provided.

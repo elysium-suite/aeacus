@@ -82,11 +82,15 @@ password = "HackersArentReal"
 # remote scoring is working
 local = "yes"
 
-# If valid_until exists, image will self destruct
+# If enddate exists, image will self destruct
 # after the time specified. The format is:
 # YEAR/MO/DA HR:MN:SC ZONE
-# NOTE: This is not implemented
-valid_until = "2020/03/21 15:04:05 PDT"
+enddate = "2020/03/21 15:04:05 PDT"
+
+# If nodestroy is set to yes, then the image will not
+# self destruct, only the aeacus folder will be deleted
+nodestroy = "yes"
+
 
 [[check]]
 message = "Removed insecure sudoers rule"
