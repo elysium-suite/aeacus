@@ -1,4 +1,5 @@
-// example-crypto.go provides basic cryptography functions for aeacus
+// crypto.go is an example to provides basic cryptographical functions
+// for aeacus.
 //
 // This file is not a shining example for cryptographically secure operations.
 //
