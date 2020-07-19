@@ -23,6 +23,7 @@ func installService(mc *metaConfig) {
 	shellCommand("cp /opt/aeacus/misc/aeacus-client /etc/init.d/")
 	shellCommand("chmod +x /etc/init.d/aeacus-client")
 	shellCommand("systemctl enable aeacus-client")
+	shellCommand("systemctl start aeacus-client")
 }
 
 func cleanUp(mc *metaConfig) {
