@@ -48,7 +48,6 @@ func main() {
 		Usage:                  "setup and score vulnerabilities in an image",
 		Action: func(c *cli.Context) error {
 			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-			timeCheck(&mc)
 			runningPermsCheck()
 			checkConfig(&mc)
 			scoreImage(&mc, &id)
@@ -69,7 +68,6 @@ func main() {
 				Action: func(c *cli.Context) error {
 					runningPermsCheck()
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					timeCheck(&mc)
 					checkConfig(&mc)
 					scoreImage(&mc, &id)
 					return nil
@@ -81,7 +79,6 @@ func main() {
 				Usage:   "Check that the scoring config is valid",
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					timeCheck(&mc)
 					checkConfig(&mc)
 					return nil
 				},
@@ -92,7 +89,6 @@ func main() {
 				Usage:   "Encrypt scoring.conf to scoring.dat",
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					timeCheck(&mc)
 					writeConfig(&mc)
 					return nil
 				},
@@ -103,13 +99,14 @@ func main() {
 				Usage:   "Check that scoring.dat is valid",
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					timeCheck(&mc)
 					decryptedData, err := tryDecodeString(readData(&mc))
 					if err != nil {
 						return errors.New("error in reading scoring.dat")
 					}
 					parseConfig(&mc, decryptedData)
-					infoPrint("Config looks good! Decryption successful.")
+					if c.Bool("v") {
+						infoPrint("Config looks good! Decryption successful.")
+					}
 					return nil
 				},
 			},
@@ -165,7 +162,6 @@ func main() {
 				Action: func(c *cli.Context) error {
 					runningPermsCheck()
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					timeCheck(&mc)
 					releaseImage(&mc)
 					return nil
 				},

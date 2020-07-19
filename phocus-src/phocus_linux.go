@@ -60,6 +60,7 @@ func main() {
 			parseConfig(&mc, readData(&mc))
 			rand.Seed(time.Now().UnixNano())
 			for {
+				timeCheck(&mc)
 				id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 				infoPrint("Scoring image...")
 				scoreImage(&mc, &id)

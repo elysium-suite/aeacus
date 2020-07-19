@@ -105,12 +105,16 @@ func destroyImage(mc *metaConfig) {
 	if mc.Cli.Bool("v") {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
 	} else {
-		// ideas for destroying windows
-		// nuke registry
-		// rm -rf /
-		// kill all procceses
-		// overwrite system32
-
+		shellCommand("del /s /q C:\\aeacus")
+		if !(mc.Config.NoDestroy == "yes") {
+			// nuke registry
+			// other destructive commands
+			// rm -rf /
+			// kill all procceses
+			// overwrite system32
+			shellCommand("shutdown /r /t 0")
+		}
+		os.Exit(1)
 	}
 }
 
