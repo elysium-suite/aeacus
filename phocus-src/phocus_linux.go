@@ -64,7 +64,7 @@ func main() {
 				id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 				infoPrint("Scoring image...")
 				scoreImage(&mc, &id)
-				jitter := time.Duration(rand.Intn(6) + 6)
+				jitter := time.Duration(rand.Intn(8) + 10)
 				infoPrint("Scored image, sleeping for a bit...")
 				time.Sleep(jitter * time.Second)
 			}
