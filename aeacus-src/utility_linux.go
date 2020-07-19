@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"time"
 	"unicode/utf8"
 )
 
@@ -108,11 +109,18 @@ func createFQs(mc *metaConfig, numFqs int) {
 	}
 }
 
+func timeCheck(mc *metaConfig) {
+	if time.Now().Unix() >= mc.Config.EndDate {
+		destroyImage(&mc)
+	}
+}
+
 func destroyImage(mc *metaConfig) {
 	failPrint("Destroying the image!")
 	if mc.Cli.Bool("v") {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
 	} else {
-		// destroying ideas: start a classic rm -rf in the background, delete /etc/passwd, start a rm -rf in foreground for /etc/, then /bin/, then /home/, then kill -9 all processes, then rm -rf foreground everything else
+		shellCommand("rm -rf /opt/aeacus/scoring.dat")
+		os.Exit(1)
 	}
 }
