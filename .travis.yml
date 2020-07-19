@@ -1,0 +1,10 @@
+os: linux
+dist: xenial
+language: go
+
+before_script:
+  - mv ./examples/example-crypto.go ./aeacus-src/crypto.go
+  - cd ./phocus-src
+  - ln -s ../aeacus-src/crypto.go .
+
+script: sh misc/travis.sh
