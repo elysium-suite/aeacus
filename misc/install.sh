@@ -40,24 +40,20 @@ go get "github.com/fatih/color"
 
 # Add convenient aliases for building
 if ! grep -q "aeacus-build" /etc/bash.bashrc; then
-    echo "[+] Adding aliases..."
+  echo "[+] Adding aliases..."
 
-    # aeacus-build-linux --> build aeacus and phocus
-    echo "alias aeacus-build-linux=\"cd aeacus-src; go build -o ../aeacus .; cd ..; cd phocus-src; go build -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
+  # aeacus-build-linux --> build aeacus and phocus
+  echo "alias aeacus-build-linux=\"cd aeacus-src; go build -o ../aeacus .; cd ..; cd phocus-src; go build -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
 
-    # aeacus-build-linux-production --> build aeacus and phocus, stripped
-    echo "alias aeacus-build-linux-production=\"cd aeacus-src; go build -ldflags '-s -w' -o ../aeacus .; cd ..; cd phocus-src; go build -ldflags '-s -w' -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
+  # aeacus-build-linux-production --> build aeacus and phocus, stripped
+  echo "alias aeacus-build-linux-production=\"cd aeacus-src; go build -ldflags '-s -w' -o ../aeacus .; cd ..; cd phocus-src; go build -ldflags '-s -w' -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
 
-    # aeacus-build-windows --> build aeacus and phocus (for windows)
-    echo "alias aeacus-build-windows=\"cd aeacus-src; GOOS=windows go build -o ../aeacus.exe .; cd ..; cd phocus-src; GOOS=windows go build -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
+  # aeacus-build-windows --> build aeacus and phocus (for windows)
+  echo "alias aeacus-build-windows=\"cd aeacus-src; GOOS=windows go build -o ../aeacus.exe .; cd ..; cd phocus-src; GOOS=windows go build -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
 
-    # aeacus-build-windows-production --> build aeacus and phocus, stripped
-    echo "alias aeacus-build-windows-production=\"cd aeacus-src; GOOS=windows go build -ldflags '-s -w' -o ../aeacus.exe .; cd ..; cd phocus-src; GOOS=windows go build -ldflags '-s -w' -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
-
+  # aeacus-build-windows-production --> build aeacus and phocus, stripped
+  echo "alias aeacus-build-windows-production=\"cd aeacus-src; GOOS=windows go build -ldflags '-s -w' -o ../aeacus.exe .; cd ..; cd phocus-src; GOOS=windows go build -ldflags '-s -w' -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
 fi
-
-# Source aliases from /etc/bash.bashrc
-source /etc/bash.bashrc
 
 # Windows dependencies (will cause errors on Linux systems due to build constraints)
 echo "[+] Getting Windows-specific dependencies..."
@@ -68,3 +64,6 @@ go get "github.com/gen2brain/beeep"
 go get "github.com/go-toast/toast"
 go get "github.com/tadvi/systray"
 go get "github.com/judwhite/go-svc/svc"
+
+echo "Please manually run: source /etc/bash.bashrc"
+echo "To enable aliases"
