@@ -12,6 +12,10 @@ EOF
 
 # This script sets up the development environment on a Linux (Debian-based) box.
 
+shopt -s globstar
+dos2unix **
+
+
 # Force script to be run as root
 if [ "$EUID" -ne 0 ]
   then echo "Please run as root"
