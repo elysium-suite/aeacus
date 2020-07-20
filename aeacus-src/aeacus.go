@@ -19,13 +19,6 @@ import (
 // `Y888""8o `Y8bod8P' `Y888""8o `Y8bod8P'  `V88V"V8P' 8""888P' //
 //////////////////////////////////////////////////////////////////
 
-type metaConfig struct {
-	Cli     *cli.Context
-	TeamID  string
-	DirPath string
-	Config  scoringChecks
-}
-
 var teamID string
 var dirPath string
 

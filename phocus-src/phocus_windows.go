@@ -110,7 +110,6 @@ func phocusStart(quit chan struct{}) {
 		os.Exit(1)
 	}
 
-	// cli.AppHelpTemplate = "" // No help! >:(
 	app := &cli.App{
 		Name:  "phocus",
 		Usage: "score vulnerabilities",
