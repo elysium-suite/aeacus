@@ -92,7 +92,7 @@ func main() {
 				Usage:   "Check that scoring.dat is valid",
 				Action: func(c *cli.Context) error {
 					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-					decryptedData, err := tryDecodeString(readData(&mc))
+					decryptedData, err := decodeString(readData(&mc))
 					if err != nil {
 						return errors.New("error in reading scoring.dat")
 					}

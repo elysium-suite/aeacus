@@ -24,11 +24,10 @@ func readFile(filename string) (string, error) {
 		return "", err
 	}
 
-	return tryDecodeString(string(raw))
-
+	return decodeString(string(raw))
 }
 
-func tryDecodeString(fileContent string) (string, error) {
+func decodeString(fileContent string) (string, error) {
 	// If contains ~>40% null bytes, we're gonna assume its Unicode
 	raw := []byte(fileContent)
 	index := bytes.IndexByte(raw, 0)

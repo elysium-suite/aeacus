@@ -7,6 +7,24 @@ import (
 	"time"
 )
 
+// For compatibility with Windows ANSI/UNICODE/etcetc
+// and if Linux ever decides to use weird encoding
+// Usage: newString, err := decodeString("bruhhh")
+//        if err != nil { [handler] }
+//        [do something with newString]
+func decodeString(fileContent string) (string, error) {
+	return fileContent, nil
+}
+
+// Read a file into a string
+// Usage: contents, err := readFile("/etc/test")
+//        if err != nil { [handler] }
+//        [do something with contents]
+func readFile(fileName string) (string, error) {
+	fileContent, err := ioutil.ReadFile(fileName)
+	return string(fileContent), err
+}
+
 var aeacusVersion = "1.1.1"
 
 func writeFile(fileName string, fileContent string) {

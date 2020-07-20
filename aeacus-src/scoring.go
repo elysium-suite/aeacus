@@ -38,7 +38,6 @@ func scoreImage(mc *metaConfig, id *imageData) {
 }
 
 func scoreChecks(mc *metaConfig, id *imageData) {
-
 	clearImageData(id)
 	pointlessChecks := []int{}
 

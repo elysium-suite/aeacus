@@ -115,7 +115,7 @@ func phocusStart(quit chan struct{}) {
 		Usage: "score vulnerabilities",
 		Action: func(c *cli.Context) error {
 			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-			decryptedData, err := tryDecodeString(readData(&mc))
+			decryptedData, err := decodeString(readData(&mc))
 			if err != nil {
 				return errors.New("Error in reading scoring.dat!")
 			}
