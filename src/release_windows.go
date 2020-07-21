@@ -5,12 +5,12 @@ func writeDesktopFiles(mc *metaConfig) {
 	if verboseEnabled {
 		infoPrint("Writing ScoringReport.html shortcut to Desktop...")
 	}
-	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\web\ScoringReport.html"; $Shortcut.Save()`
+	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\assets\ScoringReport.html"; $Shortcut.Save()`
 	shellCommand(cmdString)
 	if verboseEnabled {
 		infoPrint("Writing ReadMe.html shortcut to Desktop...")
 	}
-	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ReadMe.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\web\ReadMe.html"; $Shortcut.Save()`
+	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ReadMe.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\assets\ReadMe.html"; $Shortcut.Save()`
 	shellCommand(cmdString)
 	if verboseEnabled {
 		infoPrint("Creating or emptying TeamID.txt file...")
@@ -62,6 +62,6 @@ func cleanUp() {
 	}
 	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
 	if verboseEnabled {
-		warnPrint("Done cleaning up! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the web directory.")
+		warnPrint("Done cleaning up! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the assets directory.")
 	}
 }

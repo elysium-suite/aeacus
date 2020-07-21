@@ -61,7 +61,7 @@ func decodeString(fileContent string) (string, error) {
 // sendNotification (Windows) employes the beeep library to send notifications
 // to the end user.
 func sendNotification(mc *metaConfig, messageString string) {
-	err := beeep.Notify("Aeacus SE", messageString, mc.DirPath+"web/assets/logo.png")
+	err := beeep.Notify("Aeacus SE", messageString, mc.DirPath+"assets/logo.png")
 	if err != nil {
 		failPrint("Notification error: " + err.Error())
 	}
