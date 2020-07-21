@@ -156,7 +156,7 @@ func localUserToSid(userName string) (string, error) {
 }
 
 // getSecedit returns the string value of the secedit.exe command:
-//     secedit.exe /export` command,
+//     secedit.exe /export
 // which contains security policy options that can't be found in the registry.
 func getSecedit() (string, error) {
 	return shellCommandOutput("secedit.exe /export /cfg sec.cfg /log NUL; Get-Content sec.cfg; Remove-Item sec.cfg")

@@ -26,9 +26,11 @@ func writeDesktopFiles(mc *metaConfig) {
 	// domain compatibility? doubt
 }
 
+/*
 func configureAutologin(mc *metaConfig) {
 	// set up user autologin
 }
+*/
 
 func installService() {
 	if verboseEnabled {

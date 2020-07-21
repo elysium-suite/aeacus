@@ -14,9 +14,11 @@ func writeDesktopFiles(mc *metaConfig) {
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
 }
 
+/*
 func configureAutologin(mc *metaConfig) {
 	// set up user autologin
 }
+*/
 
 func installService() {
 	if verboseEnabled {
