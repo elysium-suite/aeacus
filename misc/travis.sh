@@ -12,7 +12,7 @@ echo "[+] Adding functions..."
 # aeacus-build-linux-production --> build aeacus and phocus, stripped
 ablp() {
   echo "Building aeacus..."
-  go build -ldflags '-s -w' -tags aeacus -o ./aeacus ./src
+  go build -ldflags '-s -w' -o ./aeacus ./src
   echo "Linux aeacus build successful!"
 
   echo "Building phocus..."
@@ -23,11 +23,11 @@ ablp() {
 # aeacus-build-windows-production --> build aeacus and phocus, stripped (for windows)
 abwp() {
   echo "Building aeacus..."
-  GOOS=windows go build -ldflags '-s -w' -tags aeacus -o ./aeacus ./src
+  GOOS=windows go build -ldflags '-s -w' -o ./aeacus.exe ./src
   echo "Windows aeacus build successful!"
 
   echo "Building phocus..."
-  GOOS=windows go build -ldflags '-s -w' -tags phocus -o ./phocus ./src
+  GOOS=windows go build -ldflags '-s -w' -tags phocus -o ./phocus.exe ./src
   echo "Windows phocus build successful!"
 }
 

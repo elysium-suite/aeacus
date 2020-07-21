@@ -1,4 +1,4 @@
-// +build aeacus
+// +build !phocus
 
 package main
 
