@@ -1,7 +1,8 @@
+// policies_windows.go contains a large mapping onf securityPolicy names or
+// keys to registry locations.
 package main
 
 var secpolToKey = map[string]string{
-
 	"LimitBlankPasswordUse":        "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\LimitBlankPasswordUse",
 	"AuditBaseObjects":             "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\AuditBaseObjects",
 	"FullPrivilegeAuditing":        "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\FullPrivilegeAuditing",
