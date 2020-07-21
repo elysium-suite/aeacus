@@ -8,7 +8,7 @@ import (
 )
 
 var verboseEnabled = false
-var aeacusVersion = "1.1.1"
+var aeacusVersion = "1.2.0"
 
 // writeFile wraps ioutil's WriteFule function, and prints
 // the error the screen if one occurs.

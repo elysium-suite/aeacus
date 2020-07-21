@@ -14,7 +14,7 @@ EOF
 
 # Force script to be run as root
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
+  then echo "Please run this script as root!"
   exit 1
 fi
 
@@ -43,16 +43,16 @@ if ! grep -q "aeacus-build" /etc/bash.bashrc; then
   echo "[+] Adding aliases..."
 
   # aeacus-build-linux --> build aeacus and phocus
-  echo "alias aeacus-build-linux=\"cd aeacus-src; go build -o ../aeacus .; cd ..; cd phocus-src; go build -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-linux=\"go build -o ./aeacus ./src; go build -o -tags phocus ./phocus ./src\"" >> /etc/bash.bashrc
 
   # aeacus-build-linux-production --> build aeacus and phocus, stripped
-  echo "alias aeacus-build-linux-production=\"cd aeacus-src; go build -ldflags '-s -w' -o ../aeacus .; cd ..; cd phocus-src; go build -ldflags '-s -w' -o ../phocus .; cd ..\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-linux-production=\"go build -ldflags '-s -w ' -o ./aeacus ./src; go build -ldflags '-w -s' -o -tags phocus ./phocus ./src\"" >> /etc/bash.bashrc
 
   # aeacus-build-windows --> build aeacus and phocus (for windows)
-  echo "alias aeacus-build-windows=\"cd aeacus-src; GOOS=windows go build -o ../aeacus.exe .; cd ..; cd phocus-src; GOOS=windows go build -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-windows=\"GOOS=windows go build -o ./aeacus.exe ./src; GOOS=windows go build -o -tags phocus ./phocus.exe ./src\"" >> /etc/bash.bashrc
 
   # aeacus-build-windows-production --> build aeacus and phocus, stripped
-  echo "alias aeacus-build-windows-production=\"cd aeacus-src; GOOS=windows go build -ldflags '-s -w' -o ../aeacus.exe .; cd ..; cd phocus-src; GOOS=windows go build -ldflags '-s -w' -o ../phocus.exe .; cd ..\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-windows-production=\"GOOS=windows go build -ldflags '-s -w ' -o ./aeacus.exe ./src; GOOS=windows go build -ldflags '-w -s' -o -tags phocus ./phocus.exe ./src\"" >> /etc/bash.bashrc
 fi
 
 # Windows dependencies (will cause errors on Linux systems due to build constraints)
@@ -63,6 +63,7 @@ go get "golang.org/x/sys/windows"
 go get "github.com/gen2brain/beeep"
 go get "github.com/go-toast/toast"
 go get "github.com/tadvi/systray"
+go get "golang.org/x/text/unicode"
 go get "github.com/judwhite/go-svc/svc"
 
 echo "Please manually run: source /etc/bash.bashrc"
