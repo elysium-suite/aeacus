@@ -22,6 +22,9 @@ arg1='C:\importantprogram.exe'
 > __Note!__ You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `''' like this! that's neat! '''`).
 
 __FileContains__: pass if file contains string
+
+> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for FileExistsNot, for example, if you want to score that a file does not contain a line OR it doesn't exist.
+
 ```
 type='FileContains'
 arg1='/home/coolUser/Desktop/Forensic Question 1.txt'
