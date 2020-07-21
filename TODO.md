@@ -7,9 +7,8 @@
 - info
     - create list of admins/users
     - other things? esp for windows
-- linux:
-    - notifications and sound are busted when running as a service? pls fix
 - windows
+    - fix windows service quit WaitGroup (phocus_windows.go)
     - reading TEAMID fails beacuse it's unicode by default and ioutil/program expects ANSI
     - as above, this is for FQs too. add ability to detect, or run through pruning function to remove null terms
     - ^^ THIS IS LARGELY FIXED. I count null bytes to detect unicode vs ansi. However, when the text read is only one character (for example, `b`), it will fail if unicode
@@ -33,3 +32,7 @@
         - see release_*.go
     - linux
         - clear ff history?
+
+- hard/long term
+    - verify binary
+    - replace shell checks with lower-level more reliable things, winAPI, whatever

@@ -1,9 +1,6 @@
 package main
 
-import "github.com/urfave/cli"
-
 type metaConfig struct {
-	Cli     *cli.Context
 	TeamID  string
 	DirPath string
 	Config  scoringChecks

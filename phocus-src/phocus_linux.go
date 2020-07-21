@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -23,16 +22,6 @@ import (
 // o888o                                                           //
 /////////////////////////////////////////////////////////////////////
 
-type metaConfig struct {
-	Cli     *cli.Context
-	TeamID  string
-	DirPath string
-	Config  scoringChecks
-}
-
-var teamID string
-var dirPath string
-
 func main() {
 
 	var teamID string
@@ -51,17 +40,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	cli.AppHelpTemplate = "" // No help! >:(
+	id := newImageData()
+	mc := metaConfig{teamID, dirPath, scoringChecks{}}
+
 	app := &cli.App{
 		Name:  "phocus",
 		Usage: "score vulnerabilities",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 			parseConfig(&mc, readData(&mc))
 			rand.Seed(time.Now().UnixNano())
 			for {
 				timeCheck(&mc)
-				id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 				infoPrint("Scoring image...")
 				scoreImage(&mc, &id)
 				jitter := time.Duration(rand.Intn(8) + 10)
@@ -85,8 +74,8 @@ func main() {
 				Aliases: []string{"v"},
 				Usage:   "Print the current version of phocus",
 				Action: func(c *cli.Context) error {
-					fmt.Println("=== phocus (linux) ===")
-					fmt.Println("version", aeacusVersion)
+					infoPrint("=== phocus (linux) ===")
+					infoPrint("version " + aeacusVersion)
 					return nil
 				},
 			},

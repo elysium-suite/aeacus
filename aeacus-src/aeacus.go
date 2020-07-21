@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -19,12 +18,10 @@ import (
 // `Y888""8o `Y8bod8P' `Y888""8o `Y8bod8P'  `V88V"V8P' 8""888P' //
 //////////////////////////////////////////////////////////////////
 
-var teamID string
-var dirPath string
-
 func main() {
-	id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
 
+	var teamID string
+	var dirPath string
 	if runtime.GOOS == "linux" {
 		dirPath = "/opt/aeacus/"
 	} else if runtime.GOOS == "windows" {
@@ -34,13 +31,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	id := newImageData()
+	mc := metaConfig{teamID, dirPath, scoringChecks{}}
+
 	app := &cli.App{
 		UseShortOptionHandling: true,
 		EnableBashCompletion:   true,
 		Name:                   "aeacus",
 		Usage:                  "setup and score vulnerabilities in an image",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+			parseFlags(c)
 			runningPermsCheck()
 			checkConfig(&mc)
 			scoreImage(&mc, &id)
@@ -57,10 +57,10 @@ func main() {
 			{
 				Name:    "score",
 				Aliases: []string{"s"},
-				Usage:   "(default) Score image with current scoring config",
+				Usage:   "Score image with current scoring config",
 				Action: func(c *cli.Context) error {
+					parseFlags(c)
 					runningPermsCheck()
-					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
 					checkConfig(&mc)
 					scoreImage(&mc, &id)
 					return nil
@@ -71,7 +71,7 @@ func main() {
 				Aliases: []string{"c"},
 				Usage:   "Check that the scoring config is valid",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					parseFlags(c)
 					checkConfig(&mc)
 					return nil
 				},
@@ -81,7 +81,7 @@ func main() {
 				Aliases: []string{"e"},
 				Usage:   "Encrypt scoring.conf to scoring.dat",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					parseFlags(c)
 					writeConfig(&mc)
 					return nil
 				},
@@ -91,13 +91,13 @@ func main() {
 				Aliases: []string{"d"},
 				Usage:   "Check that scoring.dat is valid",
 				Action: func(c *cli.Context) error {
-					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					parseFlags(c)
 					decryptedData, err := decodeString(readData(&mc))
 					if err != nil {
 						return errors.New("error in reading scoring.dat")
 					}
 					parseConfig(&mc, decryptedData)
-					if c.Bool("v") {
+					if verboseEnabled {
 						infoPrint("Config looks good! Decryption successful.")
 					}
 					return nil
@@ -113,7 +113,7 @@ func main() {
 					if err != nil {
 						return errors.New("Invalid or missing number passed to forensics")
 					}
-					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					parseFlags(c)
 					checkConfig(&mc)
 					createFQs(&mc, numFqs)
 					return nil
@@ -143,8 +143,8 @@ func main() {
 				Aliases: []string{"v"},
 				Usage:   "Print the current version of aeacus",
 				Action: func(c *cli.Context) error {
-					fmt.Println("=== aeacus ===")
-					fmt.Println("version", aeacusVersion)
+					infoPrint("=== aeacus ===")
+					infoPrint("version " + aeacusVersion)
 					return nil
 				},
 			},
@@ -154,7 +154,7 @@ func main() {
 				Usage:   "Prepare the image for release",
 				Action: func(c *cli.Context) error {
 					runningPermsCheck()
-					mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
+					parseFlags(c)
 					releaseImage(&mc)
 					return nil
 				},
@@ -168,10 +168,16 @@ func main() {
 	}
 }
 
-///////////////////////
-// CONTROL FUNCTIONS //
-///////////////////////
+// parseFlags sets the global variable values, for example,
+// verboseEnabled.
+func parseFlags(c *cli.Context) {
+	if c.Bool("v") {
+		verboseEnabled = true
+	}
+}
 
+// checkConfig parses and checks the validity of the current
+// `scoring.conf` file.
 func checkConfig(mc *metaConfig) {
 	fileContent, err := readFile(mc.DirPath + "scoring.conf")
 	if err != nil {
@@ -179,16 +185,20 @@ func checkConfig(mc *metaConfig) {
 		os.Exit(1)
 	}
 	parseConfig(mc, fileContent)
-	if mc.Cli.Bool("v") {
+	if verboseEnabled {
 		printConfig(mc)
 	}
 }
 
+// releaseImage goes through the process of checking the config,
+// writing the ReadMe/Desktop Files, installing the system service,
+// and cleaning the image for release.
 func releaseImage(mc *metaConfig) {
 	checkConfig(mc)
 	writeConfig(mc)
 	genReadMe(mc)
 	writeDesktopFiles(mc)
-	installService(mc)
-	cleanUp(mc)
+	configureAutologin(mc)
+	installService()
+	cleanUp()
 }
