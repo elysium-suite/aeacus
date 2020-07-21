@@ -43,16 +43,16 @@ if ! grep -q "aeacus-build" /etc/bash.bashrc; then
   echo "[+] Adding aliases..."
 
   # aeacus-build-linux --> build aeacus and phocus
-  echo "alias aeacus-build-linux=\"go build -o ./aeacus ./src; go build -o -tags phocus ./phocus ./src\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-linux=\"go build -o ./aeacus ./src; go build -tags phocus -o ./phocus ./src\"" >> /etc/bash.bashrc
 
   # aeacus-build-linux-production --> build aeacus and phocus, stripped
-  echo "alias aeacus-build-linux-production=\"go build -ldflags '-s -w ' -o ./aeacus ./src; go build -ldflags '-w -s' -o -tags phocus ./phocus ./src\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-linux-production=\"go build -ldflags '-s -w ' -o ./aeacus ./src; go build -ldflags '-w -s' -tags phocus -o  ./phocus ./src\"" >> /etc/bash.bashrc
 
   # aeacus-build-windows --> build aeacus and phocus (for windows)
-  echo "alias aeacus-build-windows=\"GOOS=windows go build -o ./aeacus.exe ./src; GOOS=windows go build -o -tags phocus ./phocus.exe ./src\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-windows=\"GOOS=windows go build -o ./aeacus.exe ./src; GOOS=windows go build -tags phocus -o ./phocus.exe ./src\"" >> /etc/bash.bashrc
 
   # aeacus-build-windows-production --> build aeacus and phocus, stripped
-  echo "alias aeacus-build-windows-production=\"GOOS=windows go build -ldflags '-s -w ' -o ./aeacus.exe ./src; GOOS=windows go build -ldflags '-w -s' -o -tags phocus ./phocus.exe ./src\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-windows-production=\"GOOS=windows go build -ldflags '-s -w ' -o ./aeacus.exe ./src; GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe ./src\"" >> /etc/bash.bashrc
 fi
 
 # Windows dependencies (will cause errors on Linux systems due to build constraints)
@@ -66,5 +66,4 @@ go get "github.com/tadvi/systray"
 go get "golang.org/x/text/unicode"
 go get "github.com/judwhite/go-svc/svc"
 
-echo "Please manually run: source /etc/bash.bashrc"
-echo "To enable aliases"
+source /etc/bash.bashrc

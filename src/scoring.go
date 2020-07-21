@@ -27,10 +27,10 @@ func scoreImage(mc *metaConfig, id *imageData) {
 		prevScore, _ := strconv.Atoi(prevPoints)
 		if prevScore < id.Score {
 			sendNotification(mc, "You gained points!")
-			playAudio(mc.DirPath + "web/assets/gain.wav")
+			playAudio(mc.DirPath + "assets/gain.wav")
 		} else if prevScore > id.Score {
 			sendNotification(mc, "You lost points!")
-			playAudio(mc.DirPath + "web/assets/alarm.wav")
+			playAudio(mc.DirPath + "assets/alarm.wav")
 		}
 	}
 

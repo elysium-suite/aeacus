@@ -1,6 +1,6 @@
 # aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/sourque/aeacus)](https://goreportcard.com/report/github.com/sourque/aeacus) [![Build Status](https://travis-ci.com/sourque/aeacus.svg?branch=master)](https://travis-ci.com/sourque/aeacus)
 
-<img align="right" width="250" src="web/assets/logo.png"/>
+<img align="right" width="250" src="assets/logo.png"/>
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 

@@ -24,7 +24,7 @@ func decodeString(fileContent string) (string, error) {
 
 // sendNotification sends a notification to the end user.
 func sendNotification(mc *metaConfig, messageString string) {
-	shellCommand(`l_display=":$(ls /tmp/.X11-unix/* | sed 's#/tmp/.X11-unix/X##' | head -n 1)"; l_user=$(who | grep '('$display')' | awk '{print $1}' | head -n 1); if [ -z "$l_user" ]; then l_user="` + mc.Config.User + `"; fi; l_uid=$(id -u $l_user); sudo -u $l_user DISPLAY=$l_display DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$l_uid/bus notify-send -i /opt/aeacus/web/assets/logo.png "Aeacus SE" "` + messageString + `"`)
+	shellCommand(`l_display=":$(ls /tmp/.X11-unix/* | sed 's#/tmp/.X11-unix/X##' | head -n 1)"; l_user=$(who | grep '('$display')' | awk '{print $1}' | head -n 1); if [ -z "$l_user" ]; then l_user="` + mc.Config.User + `"; fi; l_uid=$(id -u $l_user); sudo -u $l_user DISPLAY=$l_display DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$l_uid/bus notify-send -i /opt/aeacus/assets/logo.png "Aeacus SE" "` + messageString + `"`)
 }
 
 // shellCommand executes a given command in a sh environment, and prints an
