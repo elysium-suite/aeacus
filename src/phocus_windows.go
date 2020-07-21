@@ -1,9 +1,10 @@
+// +build phocus
+
 package main
 
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -27,10 +28,11 @@ import (
 // o888o                                                           //
 /////////////////////////////////////////////////////////////////////
 
-// grab idgui flag
-var idgui *string = flag.String("i", "", "Spawn TeamID gui")
+// idgui is set using the flag package in order to grab its value before
+// the Windows service is initialized.
+var idgui *bool = flag.Bool("i", false, "Spawn TeamID gui")
 
-// program implements svc.Service
+// Program implements svc.Service, for Windows Services.
 type program struct {
 	wg   sync.WaitGroup
 	quit chan struct{}
@@ -39,25 +41,25 @@ type program struct {
 func main() {
 	flag.Parse()
 	prg := &program{}
-
-	// Call svc.Run to start your program/service.
 	if err := svc.Run(prg); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func (p *program) Init(env svc.Environment) error {
-	//if ! env.IsWindowsService() && *idgui != "yes" {
-	//    failPrint("Sorry! You need to run this as a Windows service.")
-	//    os.Exit(1)
-	//}
+	/*
+		if ! env.IsWindowsService() && *idgui != "yes" {
+		    failPrint("Sorry! You need to run this as a Windows service.")
+		    os.Exit(1)
+		}
+	*/
 	return nil
 }
 
 func (p *program) Start() error {
 	p.quit = make(chan struct{})
 	p.wg.Add(1)
-	if *idgui == "yes" {
+	if *idgui {
 		go launchIDPromptWrapper(p.quit)
 	} else {
 		go phocusStart(p.quit)
@@ -68,28 +70,19 @@ func (p *program) Start() error {
 func (p *program) Stop() error {
 	log.Println("Stopping...")
 	close(p.quit)
-	os.Exit(1) // Causes windows stopping error, but it stops
-	// Quit struct doesn't work... todo
-	p.wg.Wait()
-	log.Println("Stopped.")
+	os.Exit(1)
+	/*
+		Causes windows service stopping error (but it works)
+		Quit struct doesn't work... todo
+		p.wg.Wait()
+		log.Println("Stopped.")
+	*/
 	return nil
 }
 
-type metaConfig struct {
-	Cli     *cli.Context
-	TeamID  string
-	DirPath string
-	Config  scoringChecks
-}
-
-var teamID string
-var dirPath string
-
 func launchIDPromptWrapper(quit chan struct{}) {
 	launchIDPrompt()
-	// Kind of ghetto-- would prefer actually
-	// using the quit struct
-	os.Exit(0)
+	os.Exit(0) // This is temporary solution
 }
 
 func phocusStart(quit chan struct{}) {
@@ -110,13 +103,13 @@ func phocusStart(quit chan struct{}) {
 		os.Exit(1)
 	}
 
-	// cli.AppHelpTemplate = "" // No help! >:(
+	mc := metaConfig{teamID, dirPath, scoringChecks{}}
+
 	app := &cli.App{
 		Name:  "phocus",
 		Usage: "score vulnerabilities",
 		Action: func(c *cli.Context) error {
-			mc := metaConfig{c, teamID, dirPath, scoringChecks{}}
-			decryptedData, err := tryDecodeString(readData(&mc))
+			decryptedData, err := decodeString(readData(&mc))
 			if err != nil {
 				return errors.New("Error in reading scoring.dat!")
 			}
@@ -124,14 +117,12 @@ func phocusStart(quit chan struct{}) {
 			rand.Seed(time.Now().UnixNano())
 			for {
 				timeCheck(&mc)
-				id := imageData{0, 0, 0, []scoreItem{}, 0, []scoreItem{}, 0, 0, []string{"green", "OK", "green", "OK", "green", "OK"}, false}
+				id := newImageData()
 				infoPrint("Scoring image...")
 				scoreImage(&mc, &id)
-				jitter := rand.Intn(8) + 8
+				jitter := time.Duration(rand.Intn(8) + 8)
 				infoPrint("Scored image, sleeping for a bit...")
-				for s := 0; s < jitter; s++ {
-					time.Sleep(1 * time.Second)
-				}
+				time.Sleep(jitter * time.Second)
 			}
 			return nil
 		},
@@ -141,8 +132,8 @@ func phocusStart(quit chan struct{}) {
 				Aliases: []string{"v"},
 				Usage:   "Print the current version of phocus",
 				Action: func(c *cli.Context) error {
-					fmt.Println("=== phocus (windows) ===")
-					fmt.Println("version", aeacusVersion)
+					infoPrint("=== phocus (windows) ===")
+					infoPrint("version " + aeacusVersion)
 					return nil
 				},
 			},

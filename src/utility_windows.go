@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/gen2brain/beeep"
@@ -14,21 +13,20 @@ import (
 	"golang.org/x/text/transform"
 )
 
-// Similar to ioutil.ReadFile() but decodes UTF-16.  Useful when
-// reading data from MS-Windows systems that generate UTF-16BE files,
-// but will do the right thing if other BOMs are found.
+// readFile (Windows) uses ioutil's ReadFile function and passes the returned
+// byte sequence to decodeString.
 func readFile(filename string) (string, error) {
-	// Read the file into a []byte
 	raw, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return "", err
 	}
-
-	return tryDecodeString(string(raw))
-
+	return decodeString(string(raw))
 }
 
-func tryDecodeString(fileContent string) (string, error) {
+// decodeString (Windows) attempts to determine the file encoding type
+// (typically, UTF-8, UTF-16, or ANSI) and return the appropriately
+// encoded string.
+func decodeString(fileContent string) (string, error) {
 	// If contains ~>40% null bytes, we're gonna assume its Unicode
 	raw := []byte(fileContent)
 	index := bytes.IndexByte(raw, 0)
@@ -47,28 +45,41 @@ func tryDecodeString(fileContent string) (string, error) {
 		return string(raw), nil
 	}
 
-	// Make an tranformer that converts MS-Win default to UTF8:
+	// Make an tranformer that converts MS-Win default to UTF8
 	win16be := unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM)
-	// Make a transformer that is like win16be, but abides by BOM:
+	// Make a transformer that is like win16be, but abides by BOM
 	utf16bom := unicode.BOMOverride(win16be.NewDecoder())
 
-	// Make a Reader that uses utf16bom:
+	// Make a Reader that uses utf16bom
 	unicodeReader := transform.NewReader(bytes.NewReader(raw), utf16bom)
 
-	// decode and print:
+	// Decode and print
 	decoded, err := ioutil.ReadAll(unicodeReader)
 	return string(decoded), err
 }
 
+// sendNotification (Windows) employes the beeep library to send notifications
+// to the end user.
 func sendNotification(mc *metaConfig, messageString string) {
-	err := beeep.Notify("Aeacus SE", messageString, mc.DirPath+"web/assets/logo.png")
+	err := beeep.Notify("Aeacus SE", messageString, mc.DirPath+"assets/logo.png")
 	if err != nil {
 		failPrint("Notification error: " + err.Error())
 	}
 }
 
+// rawCmd returns a exec.Command object with the correct PowerShell flags.
+//
+// rawCmd uses PowerShell's ScriptBlock feature (along with -NoProfile to
+// speed things up, as well as some other flags) to run commands on the host
+// system and retrieve the return value.
+func rawCmd(commandGiven string) *exec.Cmd {
+	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
+}
+
+// shellCommand (Windows) executes a given command in a PowerShell environment
+// and prints an error if one occurred.
 func shellCommand(commandGiven string) {
-	cmd := exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
+	cmd := rawCmd(commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
 			if len(commandGiven) > 9 {
@@ -80,8 +91,10 @@ func shellCommand(commandGiven string) {
 	}
 }
 
+// shellCommand (Windows) executes a given command in a PowerShell environment
+// and returns the commands output and its error (if one occurred).
 func shellCommandOutput(commandGiven string) (string, error) {
-	out, err := exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }").Output()
+	out, err := rawCmd(commandGiven).Output()
 	if err != nil {
 		if len(commandGiven) > 9 {
 			failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
@@ -93,25 +106,23 @@ func shellCommandOutput(commandGiven string) (string, error) {
 	return strings.TrimSpace(string(out)), err
 }
 
-func createFQs(mc *metaConfig, numFqs int) {
-	for i := 1; i <= numFqs; i++ {
-		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
-		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
-		shellCommand("echo 'ANSWER:' >> C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
-		if mc.Cli.Bool("v") {
-			infoPrint("Wrote " + fileName + " to Desktop")
-		}
-	}
-}
-
 func playAudio(wavPath string) {
 	commandText := "(New-Object Media.SoundPlayer '" + wavPath + "').PlaySync();"
 	shellCommand(commandText)
 }
 
+// adminCheck (Windows) will attempt to open:
+//     \\.\PHYSICALDRIVE0
+// and will return true if this succeeds, which means the process is running
+// as Administrator.
+func adminCheck() bool {
+	_, err := os.Open("\\\\.\\PHYSICALDRIVE0")
+	return err == nil
+}
+
 func destroyImage(mc *metaConfig) {
 	failPrint("Destroying the image!")
-	if mc.Cli.Bool("v") {
+	if verboseEnabled {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
 	} else {
 		shellCommand("del /s /q C:\\aeacus")
@@ -128,7 +139,7 @@ func destroyImage(mc *metaConfig) {
 }
 
 // sidToLocalUser takes an SID as a string and returns a string containing
-// the username of the Local User (NTAccount) that it belongs to
+// the username of the Local User (NTAccount) that it belongs to.
 func sidToLocalUser(sid string) string {
 	cmdText := "$objSID = New-Object System.Security.Principal.SecurityIdentifier('" + sid + "'); $objUser = $objSID.Translate([System.Security.Principal.NTAccount]); Write-Host $objUser.Value"
 	output, err := shellCommandOutput(cmdText)
@@ -139,33 +150,21 @@ func sidToLocalUser(sid string) string {
 }
 
 // localUserToSid takes a username as a string and returns a string containing
-// its SID. This is the opposite of sidToLocalUser
+// its SID. This is the opposite of sidToLocalUser.
 func localUserToSid(userName string) (string, error) {
 	return shellCommandOutput(fmt.Sprintf("$objUser = New-Object System.Security.Principal.NTAccount('%s'); $strSID = $objUser.Translate([System.Security.Principal.SecurityIdentifier]); Write-Host $strSID.Value", userName))
 }
 
-// getSecedit returns the string value of the secedit.exe /export command
-// which contains security policy options that can't be found in the registry
+// getSecedit returns the string value of the secedit.exe command:
+//     secedit.exe /export
+// which contains security policy options that can't be found in the registry.
 func getSecedit() (string, error) {
 	return shellCommandOutput("secedit.exe /export /cfg sec.cfg /log NUL; Get-Content sec.cfg; Remove-Item sec.cfg")
 }
 
-// getNetUserInfo returns the string output from the command `net user {username}` in order to get user properties and details
+// getNetUserInfo returns the string output from the command:
+//     net user {username}
+// in order to get user properties and details.
 func getNetUserInfo(userName string) (string, error) {
 	return shellCommandOutput("net user " + userName)
-}
-
-// parseCmdOutput takes Windows CMD output of keys in the form `Key Value`, `Key = Value,Value,Value`, and `Key = "Value"` and returns a string map of values and keys
-// should really implement this for standardized command output processing
-func parseCmdOutput(inputStr string) []string {
-	valuePairs := []string{}
-	// split inputstr on whitespace
-	// parsing loop for each line
-	// trimspace every field
-	// if equal sign, split on that
-	// if comma, split on commas
-	// if quotes, remove those
-	// else no equal sign
-	// assign first to the remainder
-	return valuePairs
 }

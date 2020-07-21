@@ -6,11 +6,6 @@ import (
 )
 
 func scoreImage(mc *metaConfig, id *imageData) {
-
-	// todo enforce status/time limit
-	// check current time, if later than
-	// time expiration in config, destroy image
-
 	// Check connection and configuration
 	if mc.Config.Remote != "" {
 		checkServer(mc, id)
@@ -32,10 +27,10 @@ func scoreImage(mc *metaConfig, id *imageData) {
 		prevScore, _ := strconv.Atoi(prevPoints)
 		if prevScore < id.Score {
 			sendNotification(mc, "You gained points!")
-			playAudio(mc.DirPath + "web/assets/gain.wav")
+			playAudio(mc.DirPath + "assets/gain.wav")
 		} else if prevScore > id.Score {
 			sendNotification(mc, "You lost points!")
-			playAudio(mc.DirPath + "web/assets/alarm.wav")
+			playAudio(mc.DirPath + "assets/alarm.wav")
 		}
 	}
 
@@ -43,7 +38,6 @@ func scoreImage(mc *metaConfig, id *imageData) {
 }
 
 func scoreChecks(mc *metaConfig, id *imageData) {
-
 	clearImageData(id)
 	pointlessChecks := []int{}
 
@@ -58,7 +52,14 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 	}
 
 	pointsLeft := 100 - id.TotalPoints
-	if pointsLeft > 0 && len(pointlessChecks) > 0 {
+	if pointsLeft < 0 && len(pointlessChecks) > 0 {
+		// If the specified points already value over 100, yet there are
+		// checks without points assigned, we assign the default point value
+		// of 3 (arbitrarily chosen).
+		for _, check := range pointlessChecks {
+			mc.Config.Check[check].Points = 3
+		}
+	} else if pointsLeft > 0 && len(pointlessChecks) > 0 {
 		pointsEach := pointsLeft / len(pointlessChecks)
 		for _, check := range pointlessChecks {
 			mc.Config.Check[check].Points = pointsEach
@@ -93,7 +94,7 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 		}
 		if check.Points >= 0 {
 			if status {
-				if mc.Cli.Bool("v") {
+				if verboseEnabled {
 					passPrint("")
 					fmt.Printf("Check passed: %s - %d pts\n", check.Message, check.Points)
 				}
@@ -103,7 +104,7 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 			}
 		} else {
 			if status {
-				if mc.Cli.Bool("v") {
+				if verboseEnabled {
 					failPrint("")
 					fmt.Printf("Penalty triggered: %s - %d pts\n", check.Message, check.Points)
 				}
@@ -113,18 +114,7 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 			}
 		}
 	}
-	if mc.Cli.Bool("v") {
-		infoPrint("")
-		fmt.Printf("Score: %d\n", id.Score)
+	if verboseEnabled {
+		infoPrint(fmt.Sprintf("Score: %d\n", id.Score))
 	}
-}
-
-func clearImageData(id *imageData) {
-	id.Score = 0
-	id.ScoredVulns = 0
-	id.TotalPoints = 0
-	id.Contribs = 0
-	id.Detracts = 0
-	id.Points = []scoreItem{}
-	id.Penalties = []scoreItem{}
 }

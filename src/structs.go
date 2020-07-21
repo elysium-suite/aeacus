@@ -1,5 +1,11 @@
 package main
 
+type metaConfig struct {
+	TeamID  string
+	DirPath string
+	Config  scoringChecks
+}
+
 type imageData struct {
 	RunningTime int // change to time or smth idk
 	Score       int

@@ -18,35 +18,23 @@ func parseConfig(mc *metaConfig, configContent string) {
 	mc.Config.Local = strings.ToLower(mc.Config.Local)
 }
 
-////////////////////
-// ENCRYPT CONFIG //
-////////////////////
-
 func writeConfig(mc *metaConfig) {
-	if mc.Cli.Bool("v") {
+	if verboseEnabled {
 		infoPrint("Reading configuration from " + mc.DirPath + "scoring.conf" + "...")
 	}
 	encryptedConfig := writeCryptoConfig(mc)
-	if mc.Cli.Bool("v") {
+	if verboseEnabled {
 		infoPrint("Writing data to " + mc.DirPath + "...")
 	}
 	writeFile(mc.DirPath+"scoring.dat", encryptedConfig)
 }
 
-////////////////////
-// DECRYPT CONFIG //
-////////////////////
-
 func readData(mc *metaConfig) string {
-	if mc.Cli.Bool("v") {
+	if verboseEnabled {
 		infoPrint("Decrypting data from " + mc.DirPath + "scoring.dat...")
 	}
 	return readCryptoConfig(mc)
 }
-
-//////////////////////
-// HELPER FUNCTIONS //
-//////////////////////
 
 func printConfig(mc *metaConfig) {
 	passPrint("Configuration " + mc.DirPath + "scoring.conf" + " check passed!")
