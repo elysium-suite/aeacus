@@ -6,27 +6,29 @@ go get "github.com/urfave/cli"
 go get "github.com/BurntSushi/toml/cmd/tomlv"
 go get "github.com/fatih/color"
 
-# Add convenient aliases for building
-echo "[+] Adding aliases..."
+# Add convenient functions for building
+echo "[+] Adding functions..."
 
 # aeacus-build-linux-production --> build aeacus and phocus, stripped
-aeacus_build_linux_production() {
-  cd aeacus-src
-  go build -ldflags '-s -w' -o ../aeacus .
-  cd ..
-  cd phocus-src
-  go build -ldflags '-s -w' -o ../phocus .
-  cd ..
+ablp() {
+  echo "Building aeacus..."
+  go build -ldflags '-s -w' -tags aeacus -o ./aeacus ./src
+  echo "Linux aeacus build successful!"
+
+  echo "Building phocus..."
+  go build -ldflags '-s -w' -tags phocus -o ./phocus ./src
+  echo "Linux phocus build successful!"
 }
 
 # aeacus-build-windows-production --> build aeacus and phocus, stripped (for windows)
-aeacus_build_windows_production() {
-  cd aeacus-src
-  GOOS=windows go build -ldflags '-s -w' -o ../aeacus.exe .
-  cd ..
-  cd phocus-src
-  GOOS=windows go build -ldflags '-s -w' -o ../phocus.exe .
-  cd ..
+abwp() {
+  echo "Building aeacus..."
+  GOOS=windows go build -ldflags '-s -w' -tags aeacus -o ./aeacus ./src
+  echo "Windows aeacus build successful!"
+
+  echo "Building phocus..."
+  GOOS=windows go build -ldflags '-s -w' -tags phocus -o ./phocus ./src
+  echo "Windows phocus build successful!"
 }
 
 # Windows dependencies (will cause errors on Linux systems due to build constraints)
@@ -39,5 +41,5 @@ go get "github.com/go-toast/toast"
 go get "github.com/tadvi/systray"
 go get "github.com/judwhite/go-svc/svc"
 
-aeacus_build_linux_production
-aeacus_build_windows_production
+ablp
+abwp
