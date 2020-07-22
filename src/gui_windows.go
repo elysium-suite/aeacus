@@ -45,3 +45,7 @@ func launchIDPrompt() {
     `
 	shellCommand(powerShellPrompt)
 }
+
+func launchConfigGui() {
+    warnPrint("This feature is not supported yet on Windows :(")
+}
