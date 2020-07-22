@@ -122,6 +122,15 @@ func main() {
 				},
 			},
 			{
+				Name:    "configure",
+				Aliases: []string{"g"},
+				Usage:   "Launch configuration GUI",
+				Action: func(c *cli.Context) error {
+					launchConfigGui()
+					return nil
+				},
+			},
+			{
 				Name:    "idprompt",
 				Aliases: []string{"d"},
 				Usage:   "Launch TeamID GUI prompt",
