@@ -2,6 +2,7 @@
 
 global=$(zenity --forms \
 				--add-entry="Round Name" \
+				--text="AeacusSE Round Information" \
 				--add-entry="Round Title" \
 				--add-entry="Main User" \
 				--add-entry="OS" \
