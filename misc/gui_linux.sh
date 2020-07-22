@@ -1,6 +1,4 @@
 #!/bin/bash
-
-
 global=$(zenity --forms --add-entry="Round Name" --add-entry="Round Title" --add-entry="Main User" --add-entry="OS" --add-entry="Remote" --add-entry="Local" --add-entry="EndDate" --add-entry="NoDestroy" --separator=$'\034' --title=AeacusSE)
 
 IFS=$'\034' read -r name title user os remote local end destroy <<< "$global"
