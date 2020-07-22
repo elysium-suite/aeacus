@@ -150,4 +150,4 @@ echo "local = \"$local\"" >> /opt/aeacus/scoring.conf
 echo "enddate = \"$end\"" >> /opt/aeacus/scoring.conf
 echo "nodestory = \"$destroy\"" >> /opt/aeacus/scoring.conf
 
-printf "$vulns" >> /opt/aeacus/scoring.conf
+echo -e "$vulns" >> /opt/aeacus/scoring.conf
