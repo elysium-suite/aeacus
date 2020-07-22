@@ -1,6 +1,6 @@
 # aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/sourque/aeacus)](https://goreportcard.com/report/github.com/sourque/aeacus) [![Build Status](https://travis-ci.com/sourque/aeacus.svg?branch=master)](https://travis-ci.com/sourque/aeacus)
 
-<img align="right" width="250" src="assets/logo.png"/>
+<img align="right" width="200" src="assets/logo.png"/>
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 
@@ -11,7 +11,6 @@
 
 1. __Set up the environment.__
     - Put your config in `/opt/aeacus/scoring.conf` or `C:\aeacus\scoring.conf`
-
     > Don't have a config? See the example at the bottom of this README.
 
     - Put your README data in `ReadMe.conf`.
