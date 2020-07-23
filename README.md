@@ -14,8 +14,6 @@
 
    - Put your **config** in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
 
-     > Or run `./aeacus configure` to launch GUI tool for configuring vulnerabilities (Linux only)
-
      - _Don't have a config? See the example at the bottom of this README._
 
    - Put your **README data** in `ReadMe.conf`.
@@ -216,6 +214,10 @@ niceUser
 superCoolDude
 </pre>
 ```
+
+## Tips and Tricks
+
+- On Linux, you can run `./aeacus configure` to launch GUI tool for configuring vulnerabilities
 
 ## Compiling
 
