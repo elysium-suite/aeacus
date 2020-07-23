@@ -10,31 +10,31 @@
 ### END INIT INFO
 
 start() {
-    start-stop-daemon -S -m -p /run/aeacus-client.pid -b -C -x "/opt/aeacus/phocus"
+   start-stop-daemon -S -m -p /run/aeacus-client.pid -b -C -x "/opt/aeacus/phocus"
 }
 
 stop() {
-    start-stop-daemon -K --remove-pidfile -q -p /run/aeacus-client.pid
+   start-stop-daemon -K --remove-pidfile -q -p /run/aeacus-client.pid
 }
 
 case "$1" in
-    start)
-       start $@
-       ;;
-    stop)
-       echo "Why are you trying to stop the engine? :thinking:"
-       ;;
-    restart)
-      stop
-      start $@
-      ;;
-    status)
-       start-stop-daemon -T -p /run/aeacus-client.pid && engine="running" || engine="stopped"
-       echo "aeacus is $engine"
-       ;;
-    *)
-       echo "Usage: $0 {start|stop|status}"
-       ;;
+start)
+   start $@
+   ;;
+stop)
+   echo "Why are you trying to stop the engine? :thinking:"
+   ;;
+restart)
+   stop
+   start $@
+   ;;
+status)
+   start-stop-daemon -T -p /run/aeacus-client.pid && engine="running" || engine="stopped"
+   echo "aeacus is $engine"
+   ;;
+*)
+   echo "Usage: $0 {start|stop|status}"
+   ;;
 esac
 
 exit 0
