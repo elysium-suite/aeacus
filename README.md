@@ -11,7 +11,7 @@
 
 1. __Set up the environment.__
     - Put your __config__ in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
-    - Run `./aeacus configure` to configure Vulns, Only for Linux :( 
+    - Run `./aeacus configure` to configure vulns, only for Linux :( 
         - _Don't have a config? See the example at the bottom of this README._
 
     - Put your __README data__ in `ReadMe.conf`.
