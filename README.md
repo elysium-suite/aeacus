@@ -6,41 +6,51 @@
 
 ## Installation
 
-0. __Extract the release__ into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
-> You should try compiling it yourself! If not, you can [download the releases here](https://github.com/sourque/aeacus/releases).
+0. **Extract the release** into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
 
-1. __Set up the environment.__
-    - Put your __config__ in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
-    - Run `./aeacus configure` to launch GUI tool for configuring vulnerabilities (Linux only)
-        - _Don't have a config? See the example at the bottom of this README._
+   > You should try compiling it yourself! If not, you can [download the releases here](https://github.com/sourque/aeacus/releases).
 
-    - Put your __README data__ in `ReadMe.conf`.
-    - Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
+1. **Set up the environment.**
 
-2. __Check that your config is valid.__
+   - Put your **config** in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
+
+     - _Don't have a config? See the example at the bottom of this README._
+
+   - Put your **README data** in `ReadMe.conf`.
+   - Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
+
+2. **Check that your config is valid.**
+
 ```
 ./aeacus --verbose check
 ```
+
 > Check out what you can do with `aeacus` with `./aeacus --help`!
 
-3. __Score the image with the current config to verify your checks work as expected.__
+3. **Score the image with the current config to verify your checks work as expected.**
+
 ```
 ./aeacus --verbose score
 ```
+
 > The TeamID is read from `/opt/aeacus/misc/TeamID.txt` or `C:\aeacus\misc\TeamID.txt`.
 
-4. __Prepare the image for release.__
+4. **Prepare the image for release.**
+
 ```
 ./aeacus --verbose release
 ```
+
 > WARNING: This will remove `scoring.conf`. Back it up somewhere if you want to save it! It will also remove the `aeacus` executable and other sensitive files.
 
 ## Screenshots
 
 #### Scoring Report:
+
 ![Scoring Report](misc/ScoringReport.png)
 
 #### ReadMe:
+
 ![ReadMe](misc/ReadMe.png)
 
 ## Features
@@ -151,11 +161,12 @@ The `aeacus` binary supports gathering information on Windows in cases where it'
 Print information with `./aeacus info {type}` where `{type}` is one the following:
 
 ### Linux
+
 - N/A (There are always better, easy command line options.)
 
 ### Windows
-- packages
 
+- packages
 
 ## ReadMe Configuration
 
@@ -204,6 +215,10 @@ superCoolDude
 </pre>
 ```
 
+## Tips and Tricks
+
+- On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities
+
 ## Compiling
 
 After setting up an environment (sorry, only Linux dev environments supported) with `misc/install.sh`, you can use these janky but handy aliases:
@@ -212,7 +227,6 @@ After setting up an environment (sorry, only Linux dev environments supported) w
 - `aeacus-build-linux-production`: stripped version of the above, to make reverse engineering a bit harder
 - `aeacus-build-windows`: builds aeacus and phocus for windows
 - `aeacus-build-windows-production`: stripped version
-
 
 ## Contributing and Disclaimer
 
