@@ -30,7 +30,6 @@
   - windows
     - Detect if firefox.exe is in x86 Program Files or just Program Files
     - clear run and command history
-    - make owner of TeamID.txt the main user of the system, otherwise phocus posh gui wont write to the file
   - autologin user
     - see release\_\*.go
   - linux
