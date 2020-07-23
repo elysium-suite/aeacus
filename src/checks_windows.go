@@ -288,7 +288,7 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 				return false, errors.New("Invalid keyValue")
 			}
 			for c := intKeyValue; c <= 999; c++ {
-				desiredString = keyName + " = " + c
+				desiredString = keyName + " = " + string(c)
 				if strings.Contains(output, desiredString) {
 					return true, err
 				}
@@ -301,7 +301,7 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 				return false, errors.New("Invalid keyValue")
 			}
 			for c := intKeyValue; c > 0; c-- {
-				desiredString = keyName + " = " + c
+				desiredString = keyName + " = " + string(c)
 				if strings.Contains(output, desiredString) {
 					return true, err
 				}
