@@ -23,6 +23,13 @@ import (
 	"os"
 )
 
+// This key is used as a backup for remote encryption when there is no password
+// specified in the configuration.
+//
+// This must be the same value specified in Minos (or any other reporting
+// endpoint) as a backup password.
+var remoteBackupKey = "ThisIsAReallyCoolAndSecureKeyLol"
+
 // These hashes are used for XORing the plaintext. Again-- not
 // cryptographically genius.
 var randomHashOne = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
