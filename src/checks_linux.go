@@ -35,6 +35,18 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		return err == nil && !result
 	default:
 		failPrint("No check type " + checkType)
+	case "PackageVersion":
+		if check.Message == "" {
+			check.Message = "Package " + arg1 + " has been updated to version " + arg2
+		}
+		result, err := packageVersion(arg1, arg2)
+		return err == nil && result
+	case "PackageVersionNot":
+		if check.Message == "" {
+			check.Message = "Package " + arg1 + " has not been updated to version " + arg2
+		}
+		result, err := packageVersion(arg1, arg2)
+		return err == nil && !result
 	}
 	return false
 }
@@ -80,4 +92,8 @@ func guestDisabledLDM() (bool, error) {
 		result, err = dirContainsRegex("/etc/lightdm/", "allow-guest( |)=( |)false")
 	}
 	return result, err
+}
+
+func packageVersion(packageName string, versionNumber string) (bool, error) {
+	return command(`dpkg -l | awk '$2=="` + packageName + `" { print $3 }' | grep -q "` + versionNumber + `"`)
 }
