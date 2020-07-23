@@ -36,25 +36,25 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		failPrint("No check type " + checkType)
 	case "PackageVersion":
 		if check.Message == "" {
-			check.Message = "Package " + arg1 + " has been updated to version " + arg2
+			check.Message = "Package " + arg1 + " is version " + arg2
 		}
 		result, err := packageVersion(arg1, arg2)
 		return err == nil && result
 	case "PackageVersionNot":
 		if check.Message == "" {
-			check.Message = "Package " + arg1 + " has not been updated to version " + arg2
+			check.Message = "Package " + arg1 + " is version " + arg2
 		}
 		result, err := packageVersion(arg1, arg2)
 		return err == nil && !result
 	case "KernelVersion":
 		if check.Message == "" {
-			check.Message = "Kernel has been updated to version " + arg1
+			check.Message = "Kernel is version " + arg1
 		}
 		result, err := kernelVersion(arg1)
 		return err == nil && result
 	case "KernelVersionNot":
 		if check.Message == "" {
-			check.Message = "Kernel has not been updated to version " + arg1
+			check.Message = "Kernel is not version " + arg1
 		}
 		result, err := kernelVersion(arg1)
 		return err == nil && !result
