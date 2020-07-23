@@ -20,6 +20,16 @@ func writeDesktopFiles(mc *metaConfig) {
 	if verboseEnabled {
 		infoPrint("Writing TeamID shortcut to Desktop...")
 	}
+	powershellPermission := `
+	$ACL = Get-ACL C:\aeacus\TeamID.txt
+	$ACL.SetOwner([System.Security.Principal.NTAccount] $env:USERNAME)
+	Set-Acl -Path C:\aeacus\TeamID.txt -AclObject $ACL
+	`
+	shellCommand(powershellPermission)
+	if verboseEnabled {
+		infoPrint("Changing Permissions of TeamID")
+	}
+
 	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Arguments = "-i yes"; $Shortcut.Save()`
 	shellCommand(cmdString)
 
