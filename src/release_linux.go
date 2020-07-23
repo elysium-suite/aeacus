@@ -1,8 +1,6 @@
 package main
 
-import (
-	"os"
-)
+import "os"
 
 func writeDesktopFiles(mc *metaConfig) {
 	if verboseEnabled {
