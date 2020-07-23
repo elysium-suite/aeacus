@@ -124,7 +124,7 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		if check.Message == "" {
 			check.Message = "Password for " + arg1 + " has not been changed"
 		}
-		result, err := PasswordChanged(arg1,arg2)
+		!result, err := PasswordChanged(arg1,arg2)
 		return err == nil && result
 	
 	default:
