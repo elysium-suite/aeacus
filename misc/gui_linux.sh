@@ -84,6 +84,8 @@ while [[ "$next" != "None" ]] && [[ -n "$next" ]]; do
 			FALSE "UserInGroupNot" \
 			FALSE "GuestDisabledLDM" \
 			FALSE "PasswordChanged" \
+			FALSE "PackageVersion" \
+			FALSE "PackageVersionNot" \
 			FALSE "None" \
 			--height=700 \
 			--width=600 \
@@ -269,6 +271,18 @@ while [[ "$next" != "None" ]] && [[ -n "$next" ]]; do
 		data=$(zenity --forms --text="Pass if user's password has changed" --add-entry "Message" --add-entry="Points" --add-entry="User" --add-entry="Hash" --separator=$'\034')
 		read -r mess pts arg1 arg2 <<<"$data"
 		vulns="type='PasswordChanged'\narg1='${arg1}'\narg2='${arg2}'"
+		write_check "$mess" "$pts" "$vulns"
+		;;
+	"PackageVersion")
+		data=$(zenity --forms --text="Pass if package version is equal to specified" --add-entry "Message" --add-entry="Points" --add-entry="Package Name" --add-entry="Package Version" --separator=$'\034')
+		read -r mess pts arg1 arg2 <<<"$data"
+		vulns="type='PackageVersion'\narg1='${arg1}'\narg2='${arg2}'"
+		write_check "$mess" "$pts" "$vulns"
+		;;
+	"PackageVersionNot")
+		data=$(zenity --forms --text="Pass if package version is not equal to specified" --add-entry "Message" --add-entry="Points" --add-entry="Package Name" --add-entry="Package Version" --separator=$'\034')
+		read -r mess pts arg1 arg2 <<<"$data"
+		vulns="type='PackageVersionNot'\narg1='${arg1}'\narg2='${arg2}'"
 		write_check "$mess" "$pts" "$vulns"
 		;;
 	esac

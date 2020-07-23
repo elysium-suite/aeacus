@@ -142,6 +142,14 @@ arg1='user'
 arg2='password-hash-here'
 ```
 
+**PackageVersion**: pass if package version is equal to specified
+
+```
+type='PackageVersion'
+arg1='git'
+arg2='1:2.17.1-1ubuntu0.4'
+```
+
 <hr>
 
 ### Windows-Specific Checks
