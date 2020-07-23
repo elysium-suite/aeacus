@@ -4,7 +4,6 @@
 
 > A note on using `secedit.exe` and just parsing it... even [more reputable projects](https://github.com/dsccommunity/SecurityPolicyDsc/blob/8c318e43171cd32b14fe914b9c18c307093ba964/Modules/SecurityPolicyResourceHelper/SecurityPolicyResourceHelper.psm1) found it to be usable solution.
 
-
 > List is sourced from `secedit.exe` and [this god-awful spreadsheet from Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=25250).
 
 ### Account Policies
@@ -18,7 +17,7 @@
 - `MinimumPasswordLength`
 - `PasswordComplexity`
 - `ClearTextPassword`
-> Also known as "Store passwords using reversible encryption".
+  > Also known as "Store passwords using reversible encryption".
 - `PasswordHistorySize`
 
 ### Account Lockout Policies
@@ -29,7 +28,6 @@
 - `LockoutDuration`
 - `LockoutBadCount`
 - `ResetLockoutCount`
-
 
 ## Local Policies
 

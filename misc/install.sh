@@ -1,5 +1,5 @@
 ############################################################
-cat << EOF
+cat <<EOF
 
  .oooo.    .ooooo.   .oooo.    .ooooo.  oooo  oooo   .oooo.o
 \`P  )88b  d88' \`88b \`P  )88b  d88' \`"Y8 \`888  \`888  d88(  "8
@@ -13,8 +13,8 @@ EOF
 # This script sets up the development environment on a Linux (Debian-based) box.
 
 # Force script to be run as root
-if [ "$EUID" -ne 0 ]
-  then echo "Please run this script as root!"
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run this script as root!"
   exit 1
 fi
 
@@ -25,7 +25,7 @@ apt update
 echo "[+] Installing golang..."
 wget -O ~/go1.14.5.linux-amd64.tar.gz https://golang.org/dl/go1.14.5.linux-amd64.tar.gz
 tar -C /usr/local -xzf ~/go1.14.5.linux-amd64.tar.gz
-echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
+echo "export PATH=$PATH:/usr/local/go/bin" >>/etc/profile
 source /etc/profile
 
 # Install git (for go get)
@@ -43,16 +43,16 @@ if ! grep -q "aeacus-build" /etc/bash.bashrc; then
   echo "[+] Adding aliases..."
 
   # aeacus-build-linux --> build aeacus and phocus
-  echo "alias aeacus-build-linux=\"go build -o ./aeacus ./src; go build -tags phocus -o ./phocus ./src\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-linux=\"go build -o ./aeacus ./src; go build -tags phocus -o ./phocus ./src\"" >>/etc/bash.bashrc
 
   # aeacus-build-linux-production --> build aeacus and phocus, stripped
-  echo "alias aeacus-build-linux-production=\"go build -ldflags '-s -w ' -o ./aeacus ./src; go build -ldflags '-w -s' -tags phocus -o  ./phocus ./src\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-linux-production=\"go build -ldflags '-s -w ' -o ./aeacus ./src; go build -ldflags '-w -s' -tags phocus -o  ./phocus ./src\"" >>/etc/bash.bashrc
 
   # aeacus-build-windows --> build aeacus and phocus (for windows)
-  echo "alias aeacus-build-windows=\"GOOS=windows go build -o ./aeacus.exe ./src; GOOS=windows go build -tags phocus -o ./phocus.exe ./src\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-windows=\"GOOS=windows go build -o ./aeacus.exe ./src; GOOS=windows go build -tags phocus -o ./phocus.exe ./src\"" >>/etc/bash.bashrc
 
   # aeacus-build-windows-production --> build aeacus and phocus, stripped
-  echo "alias aeacus-build-windows-production=\"GOOS=windows go build -ldflags '-s -w ' -o ./aeacus.exe ./src; GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe ./src\"" >> /etc/bash.bashrc
+  echo "alias aeacus-build-windows-production=\"GOOS=windows go build -ldflags '-s -w ' -o ./aeacus.exe ./src; GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe ./src\"" >>/etc/bash.bashrc
 fi
 
 # Windows dependencies (will cause errors on Linux systems due to build constraints)
