@@ -18,7 +18,7 @@ func writeDesktopFiles(mc *metaConfig) {
 }
 
 func configureAutologin(mc *metaConfig) {
-	if _, err := os.Stat("/usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf"); err == nil {
+	if _, err := os.Stat("/usr/share/lightdm"); err == nil {
 		shellCommand("echo autologin-user=" + mc.Config.User + " > /usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf")
 	} else if  _, err := os.Stat("/etc/gdm/custom.conf"); err == nil {
 		shellCommand("echo AutomaticLogin=True > /etc/gdm/custom.conf")
