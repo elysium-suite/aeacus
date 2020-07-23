@@ -3,6 +3,6 @@ Encoding=UTF-8
 Version=1.0
 Type=Application
 Terminal=false
-Exec=/bin/sh /opt/aeacus/misc/id_linux.sh
+Exec=/bin/bash /opt/aeacus/misc/id_linux.sh
 Name=Team ID
 Icon=/opt/aeacus/assets/logo.png
