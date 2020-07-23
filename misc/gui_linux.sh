@@ -81,6 +81,7 @@ while [[ "$next" != "None" ]] && [[ -n "$next" ]]; do
 				FALSE "UserInGroup" \
 				FALSE "UserInGroupNot" \
 				FALSE "GuestDisabledLDM" \
+				FALSE "PasswordChanged" \
 				FALSE "None" \
 				--height=700 \
 				--width=600 \
@@ -259,6 +260,11 @@ while [[ "$next" != "None" ]] && [[ -n "$next" ]]; do
 			write_check "$mess" "$pts" "$vulns"
 			;;
 
+		"PasswordChanged")
+			data=$(zenity --forms --text="Pass if user's password has changed" --add-entry "Message" --add-entry="Points" --add-entry="Hash" --separator=$'\034')
+			read -r mess pts arg1  <<< "$data"
+			vulns="type='PasswordChanged'\narg1='${arg1}'"
+			write_check "$mess" "$pts" "$vulns"
+			;;
 	esac
-
 done
