@@ -7,5 +7,5 @@ teamid=$(
 if [[ ${#teamid} > 0 ]]; then
 	echo $teamid >/opt/aeacus/TeamID.txt
 else
-	notify-send -i /opt/aeacus/assets/logo.png "Aeacus SE" "No ID specified!"
+	notify-send -i /opt/aeacus/web/assets/logo.png "Aeacus SE" "No ID specified!"
 fi
