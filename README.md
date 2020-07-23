@@ -10,11 +10,11 @@
 > You should try compiling it yourself! If not, you can [download the releases here](https://github.com/sourque/aeacus/releases).
 
 1. __Set up the environment.__
-    - Put your config in `/opt/aeacus/scoring.conf` or `C:\aeacus\scoring.conf`
-    > Don't have a config? See the example at the bottom of this README.
+    - Put your __config__ in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
+        - _Don't have a config? See the example at the bottom of this README._
 
-    - Put your README data in `ReadMe.conf`.
-    - Use `./aeacus forensics {number}` to create Forensic Question files on the Desktop of the main user.
+    - Put your __README data__ in `ReadMe.conf`.
+    - Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
 
 2. __Check that your config is valid.__
 ```
