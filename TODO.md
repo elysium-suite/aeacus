@@ -17,8 +17,8 @@
 - checks to implement
 
   - windows startup programs
-  - windows updates and auto-updating status
-  - windows password changes of users
+  - windows and linux updates and auto-updating status (apt only for linux)
+  - windows and linux password changes of users
   - windows and linux firefox checks
   - service-specific hardening and checks
     - do we implement this for linux or just let people use filecontains?
