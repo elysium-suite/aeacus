@@ -138,8 +138,16 @@ type='GuestDisabledLDM'
 
 ```
 type='PasswordChanged'
-arg1='password-hash-here'
-arg2='user'
+arg1='user'
+arg2='password-hash-here'
+```
+
+**PasswordChangedNot**: pass if users' hashed password is in /etc/shadow
+
+```
+type='PasswordChangedNot'
+arg1='user'
+arg2='password-hash-here'
 ```
 
 <hr>
