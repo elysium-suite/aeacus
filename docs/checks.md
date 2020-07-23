@@ -134,18 +134,10 @@ type='FirewallUp'
 type='GuestDisabledLDM'
 ```
 
-**PasswordChanged**: pass if users' hashed password is not in /etc/shadow
+**PasswordChanged**: pass if user's hashed password is not in /etc/shadow
 
 ```
 type='PasswordChanged'
-arg1='user'
-arg2='password-hash-here'
-```
-
-**PasswordChangedNot**: pass if users' hashed password is in /etc/shadow
-
-```
-type='PasswordChangedNot'
 arg1='user'
 arg2='password-hash-here'
 ```
