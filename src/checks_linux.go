@@ -95,5 +95,5 @@ func guestDisabledLDM() (bool, error) {
 }
 
 func packageVersion(packageName string, versionNumber string) (bool, error) {
-	return command(fmt.Sprintf(`dpkg -l | awk '$2=="%s" { print $3 }' | grep -q "%s"`, packageName, versionNumber))
+	return command(`dpkg -l | awk '$2=="` + packageName + `" { print $3 }' | grep -q "` + versionNumber + `"`)
 }
