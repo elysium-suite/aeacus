@@ -17,26 +17,22 @@ func genReport(mc *metaConfig, id *imageData) {
 	var htmlFile strings.Builder
 	htmlFile.WriteString(header)
 	genTime := time.Now()
-	htmlFile.WriteString(fmt.Sprintf("<h1>%s</h1>", mc.Config.Title))
-	htmlFile.WriteString(fmt.Sprintf("<h2>Report Generated At: %s </h2>", genTime.Format("2006/01/02 15:04:05 MST")))
-	htmlFile.WriteString(`<script language="Javascript"> var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(4096).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CCS Scoring service may not be running</h2></span>'); } </script>`)
-
-	// Who needs timers, am I right
-	//htmlFile.WriteString(`<h3 class="center">Approximate Image Running Time: 00:00:00</h3>`)
-	//htmlFile.WriteString(`<h3 class="center">Approximate Team Running Time: 00:00:00</h3>`)
+	htmlFile.WriteString("<h1>" + mc.Config.Title + "</h1>")
+	htmlFile.WriteString("<h2>Report Generated At: " + genTime.Format("2006/01/02 15:04:05 MST") + " </h2>")
+	htmlFile.WriteString(`<script>var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(4096).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CCS Scoring service may not be running</h2></span>'); } </script>`)
 
 	if mc.Config.Remote != "" {
-		htmlFile.WriteString(fmt.Sprintf(`<h3 class="center">Current Team ID: %s</h3>`, mc.TeamID))
+		htmlFile.WriteString(`<h3 class="center">Current Team ID: ` + mc.TeamID + `</h3>`)
 	}
 
 	htmlFile.WriteString(fmt.Sprintf(`<h2> %d out of %d points received</h2>`, id.Score, id.TotalPoints))
 
 	if mc.Config.Remote != "" {
-		htmlFile.WriteString(fmt.Sprintf(`<a href="%s/scores/css">Click here to view the public scoreboard</a><br>`, mc.Config.Remote))
+		htmlFile.WriteString(`<a href="` + mc.Config.Remote + `">Click here to view the public scoreboard</a><br>`)
 
-		htmlFile.WriteString(fmt.Sprintf(`<p><h3>Connection Status: <span style="color:%s">%s<span></h3>`, id.ConnStatus[0], id.ConnStatus[1]))
-		htmlFile.WriteString(fmt.Sprintf(`Internet Connectivity Check: <span style="color:%s">%s</span><br>`, id.ConnStatus[2], id.ConnStatus[3]))
-		htmlFile.WriteString(fmt.Sprintf(`Aeacus Server Connection Status: <span style="color:%s">%s</span></p>`, id.ConnStatus[4], id.ConnStatus[5]))
+		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + id.ConnStatus[0] + `">` + id.ConnStatus[1] + `<span></h3>`)
+		htmlFile.WriteString(`Internet Connectivity Check: <span style="color:` + id.ConnStatus[2] + `">` + id.ConnStatus[3] + `</span><br>`)
+		htmlFile.WriteString(`Aeacus Server Connection Status: <span style="color:` + id.ConnStatus[4] + `">` + id.ConnStatus[5] + `</span></p>`)
 	}
 
 	htmlFile.WriteString(fmt.Sprintf(`<h3> %d penalties assessed, for a loss of %.0f points: </h3> <p> <span style="color:red">`, len(id.Penalties), math.Abs(float64(id.Detracts))))
@@ -136,19 +132,19 @@ func genReadMe(mc *metaConfig) {
 
 	var htmlFile strings.Builder
 	htmlFile.WriteString(header)
-	htmlFile.WriteString(fmt.Sprintf("<h1><b>%s %s README</b></h1>", mc.Config.OS, mc.Config.Title))
+	htmlFile.WriteString("<h1><b>" + mc.Config.OS + " " + mc.Config.Title + " README</b></h1>")
 	htmlFile.WriteString(headerTheSequel)
 
-	htmlFile.WriteString(fmt.Sprintf("<h2><b>%s</b></h2>", mc.Config.OS))
+	htmlFile.WriteString("<h2><b>" + mc.Config.OS + "</b></h2>")
 
-	htmlFile.WriteString(fmt.Sprintf(`<p>
-    It is company policy to use only %s on this
+	htmlFile.WriteString(`<p>
+    It is company policy to use only ` + mc.Config.OS + ` on this
     computer. It is also company policy to use only the
-    latest, official, stable %s packages available
+    latest, official, stable ` + mc.Config.OS + ` packages available
     for required software and services on this computer.
     Management has decided that the default web browser for
     all users on this computer should be the latest stable
-    version of Firefox.`, mc.Config.OS, mc.Config.OS))
+    version of Firefox.`)
 
 	if runtime.GOOS == "linux" {
 		htmlFile.WriteString(` Company policy is to never let users log in as root. If administrators need to run commands as root, they are required to use the "sudo" command.`)
