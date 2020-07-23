@@ -12,5 +12,5 @@ if [[ $? -eq 0 ]]; then
     rm -rf /opt/aeacus/scoring.dat
     shutdown now
 else
-    notify-send -i /opt/aeacus/web/assets/logo.png "Confirmation failed!"
+    notify-send -i /opt/aeacus/assets/logo.png "Confirmation failed!"
 fi
