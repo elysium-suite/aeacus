@@ -285,5 +285,27 @@ while [[ "$next" != "None" ]] && [[ -n "$next" ]]; do
 		vulns="type='PackageVersionNot'\narg1='${arg1}'\narg2='${arg2}'"
 		write_check "$mess" "$pts" "$vulns"
 		;;
+	"KernelVersion")
+		data=$(zenity --forms --text="Pass if kernel version is equal to specified" --add-entry "Message" --add-entry="Points" --add-entry="Version" --separator=$'\034')
+		read -r mess pts arg1 <<<"$data"
+		vulns="type='KernelVersion'\narg1='${arg1}'"
+		write_check "$mess" "$pts" "$vulns"
+		;;
+	"KernelVersion")
+		data=$(zenity --forms --text="Pass if kernel version is not equal to specified" --add-entry "Message" --add-entry="Points" --add-entry="Version" --separator=$'\034')
+		read -r mess pts arg1 <<<"$data"
+		vulns="type='KernelVersionNot'\narg1='${arg1}'"
+		write_check "$mess" "$pts" "$vulns"
+		;;
+	"AutoCheckUpdatesEnabled")
+		data=$(zenity --forms --text="Pass if the system is configured to automatically check for updates" --separator=$'\034')
+		vulns="type='AutoCheckUpdatesEnabled'"
+		write_check "$mess" "$pts" "$vulns"
+		;;
+	"AutoCheckUpdatesEnabledNot")
+		data=$(zenity --forms --text="Pass if the system is not configured to automatically check for updates" --separator=$'\034')
+		vulns="type='AutoCheckUpdatesEnabledNot'"
+		write_check "$mess" "$pts" "$vulns"
+		;;
 	esac
 done
