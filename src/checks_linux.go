@@ -58,6 +58,18 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		}
 		result, err := kernelVersion(arg1)
 		return err == nil && !result
+	case "AutoCheckUpdatesEnabled":
+		if check.Message == "" {
+			check.Message = "The system automatically checks for updates daily"
+		}
+		result, err := autoCheckUpdatesEnabled()
+		return err == nil && result
+	case "AutoCheckUpdatesEnabledNot":
+		if check.Message == "" {
+			check.Message = "The system does not automatically checks for updates daily"
+		}
+		result, err := autoCheckUpdatesEnabled()
+		return err == nil && !result
 	}
 	return false
 }
@@ -111,4 +123,8 @@ func packageVersion(packageName string, versionNumber string) (bool, error) {
 
 func kernelVersion(version string) (bool, error) {
 	return command("uname -r | grep -q " + version)
+}
+
+func autoCheckUpdatesEnabled() (bool, error) {
+	return fileContainsRegex("/etc/apt/apt.conf.d/20auto-upgrades", `APT::Periodic::Update-Package-Lists( |)"1";`)
 }
