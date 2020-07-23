@@ -217,7 +217,7 @@ superCoolDude
 
 ## Tips and Tricks
 
-- On Linux, you can run `./aeacus configure` to launch GUI tool for configuring vulnerabilities
+- On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities
 
 ## Compiling
 
