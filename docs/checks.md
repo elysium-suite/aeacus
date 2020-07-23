@@ -160,6 +160,12 @@ arg1='5.4.0-42-generic'
 ```
 > `KernelVersion` checks `dpkg -l | awk '$2=="<PACKAGENAME>" { print $3 }'`.
 
+**AutoCheckUpdatesEnabled**: pass if the system is configured to automatically check for updates
+
+```
+type='AutoCheckUpdatesEnabled'
+```
+
 <hr>
 
 ### Windows-Specific Checks
