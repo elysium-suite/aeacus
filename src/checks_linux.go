@@ -23,8 +23,10 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		return err == nil && !result
 	case "PasswordChanged":
 		if check.Message == "" {
-			check.Message = "Insecure password has been changed"
+			check.Message = "Insecure password for " + arg2 + " has been changed"
 		}
+		result, err := passwordChanged(arg1, arg2)
+		return err == nil && result
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -61,7 +63,7 @@ func firewallUp() (bool, error) {
 	return command("ufw status | grep -q 'Status: active'")
 }
 
-func passwordChanged(hash string) (bool, error) {
+func passwordChanged(hash string, user string) (bool, error) {
 	res, err := fileContains("/etc/shadow", hash)
 	return !res, err
 }

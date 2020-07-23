@@ -266,9 +266,9 @@ while [[ "$next" != "None" ]] && [[ -n "$next" ]]; do
 		;;
 
 	"PasswordChanged")
-		data=$(zenity --forms --text="Pass if user's password has changed" --add-entry "Message" --add-entry="Points" --add-entry="Hash" --separator=$'\034')
-		read -r mess pts arg1 <<<"$data"
-		vulns="type='PasswordChanged'\narg1='${arg1}'"
+		data=$(zenity --forms --text="Pass if user's password has changed" --add-entry "Message" --add-entry="Points" --add-entry="Hash" --add-entry="User" --separator=$'\034')
+		read -r mess pts arg1 arg2 <<<"$data"
+		vulns="type='PasswordChanged'\narg1='${arg1}'\narg2='${arg2}'"
 		write_check "$mess" "$pts" "$vulns"
 		;;
 	esac

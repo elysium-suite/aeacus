@@ -138,6 +138,8 @@ type='GuestDisabledLDM'
 
 ```
 type='PasswordChanged'
+arg1='password-hash-here'
+arg2='user'
 ```
 
 <hr>
