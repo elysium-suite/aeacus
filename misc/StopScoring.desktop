@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec=/bin/bash /opt/aeacus/misc/stop_scoring.sh
+Name=Stop Scoring
+Icon=/opt/aeacus/assets/logo.png
