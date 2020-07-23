@@ -37,9 +37,11 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		failPrint("No check type " + checkType)
 	case "PackageVersion":
 		if check.Message == "" {
+			check.Message = "Package " + arg1 + " has been updated to version " + arg2
 		}
 		result, err := packageVersion(arg1, arg2)
 		return err == nil && result
+	case "PackageVersionNot":
 		if check.Message == "" {
 			check.Message = "Package " + arg1 + " has not been updated to version " + arg2
 		}
