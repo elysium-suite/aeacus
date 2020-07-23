@@ -152,7 +152,7 @@ func sidToLocalUser(sid string) string {
 // localUserToSid takes a username as a string and returns a string containing
 // its SID. This is the opposite of sidToLocalUser.
 func localUserToSid(userName string) (string, error) {
-	return shellCommandOutput(fmt.Sprintf("$objUser = New-Object System.Security.Principal.NTAccount('%s'); $strSID = $objUser.Translate([System.Security.Principal.SecurityIdentifier]); Write-Host $strSID.Value", userName))
+	return shellCommandOutput("$objUser = New-Object System.Security.Principal.NTAccount('" + userName + "'); $strSID = $objUser.Translate([System.Security.Principal.SecurityIdentifier]); Write-Host $strSID.Value")
 }
 
 // getSecedit returns the string value of the secedit.exe command:
