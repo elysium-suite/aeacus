@@ -38,6 +38,18 @@ func writeDesktopFiles(mc *metaConfig) {
 
 func configureAutologin(mc *metaConfig) {
 	// set up user autologin
+	powershellAutoLogin := `
+	$RegPath = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\DefaultUsername"
+	If(!(Test-Path $RegPath)) {
+		New-ItemProperty HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\ -name "DefaultUsername" -Value "$env:USERNAME" -type String
+	} else {
+		Set-ItemProperty HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\ -name "DefaultUsername" -Value "$env:USERNAME" -type String
+	}
+	`
+	shellCommand(powershellAutoLogin)
+	if verboseEnabled {
+		infoPrint("Setting Up AutoLogin")
+	}
 }
 
 func installService() {

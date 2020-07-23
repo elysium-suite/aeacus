@@ -155,6 +155,13 @@ arg2='1:2.17.1-1ubuntu0.4'
 ### Windows-Specific Checks
 
 > todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
+**PasswordChanged**: pass if user password has changed
+```
+type='PasswordChanged'
+arg1='user'
+arg2='01/17/2019 20:57:41'
+```
+
 
 **UserDetail**: pass if user detail key is equal to value
 
