@@ -141,13 +141,13 @@ func packageInstalled(packageName string) (bool, error) {
 }
 
 func serviceUp(serviceName string) (bool, error) {
-	return command(fmt.Sprintf("if (!((Get-Service -Name '%s').Status -eq 'Running')) { Throw 'Service is stopped' }", serviceName))
+	return command("if (!((Get-Service -Name '" + serviceName + "').Status -eq 'Running')) { Throw 'Service is stopped' }")
 }
 
 func userExists(userName string) (bool, error) {
 	// eventually going to not use powershell for everything
 	// but until then...
-	return command(fmt.Sprintf("Get-LocalUser '%s'", userName))
+	return command("Get-LocalUser '" + userName + "'")
 }
 
 func userInGroup(userName string, groupName string) (bool, error) {
@@ -169,7 +169,7 @@ func firewallUp() (bool, error) {
 	fwProfiles := []string{"Domain", "Public", "Private"}
 	for _, profile := range fwProfiles {
 		// This is kind of jank and kind of slow
-		cmdText := fmt.Sprintf("if (!((Get-NetFirewallProfile -Name '%s').Enabled -eq 'True')) { Throw 'Firewall profile is disabled' }", profile)
+		cmdText := "if (!((Get-NetFirewallProfile -Name '" + profile + "').Enabled -eq 'True')) { Throw 'Firewall profile is disabled' }"
 		result, err := command(cmdText)
 		if result == false || err != nil {
 			return result, err
@@ -251,11 +251,11 @@ func userRights(userOrGroup string, privilege string) (bool, error) {
 }
 
 func shareExists(shareName string) (bool, error) {
-	return command(fmt.Sprintf("Get-SmbShare -Name '%s'", shareName))
+	return command("Get-SmbShare -Name '" + shareName + "'")
 }
 
 func scheduledTaskExists(taskName string) (bool, error) {
-	return command(fmt.Sprintf("Get-ScheduledTask -TaskName '%s'", taskName))
+	return command("Get-ScheduledTask -TaskName '" + taskName + "'")
 }
 
 func startupProgramExists(progName string) (bool, error) {
@@ -275,7 +275,7 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 		}
 		if keyName == "NewAdministratorName" || keyName == "NewGuestName" {
 			// These two are strings, not numbers, so they have ""
-			desiredString = fmt.Sprintf("%s = \"%s\"", keyName, keyValue)
+			desiredString = keyName + " = " + keyValue
 		} else if keyName == "MinimumPasswordAge" ||
 			keyName == "MinimumPasswordAge" ||
 			keyName == "MinimumPasswordLength" ||
@@ -288,7 +288,7 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 				return false, errors.New("Invalid keyValue")
 			}
 			for c := intKeyValue; c <= 999; c++ {
-				desiredString = fmt.Sprintf("%s = %d", keyName, c)
+				desiredString = keyName + " = " + c
 				if strings.Contains(output, desiredString) {
 					return true, err
 				}
@@ -301,13 +301,13 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 				return false, errors.New("Invalid keyValue")
 			}
 			for c := intKeyValue; c > 0; c-- {
-				desiredString = fmt.Sprintf("%s = %d", keyName, c)
+				desiredString = keyName + " = " + c
 				if strings.Contains(output, desiredString) {
 					return true, err
 				}
 			}
 		} else {
-			desiredString = fmt.Sprintf("%s = %s", keyName, keyValue)
+			desiredString = keyName + " = " + keyValue
 		}
 		return strings.Contains(output, desiredString), err
 	}
@@ -318,7 +318,7 @@ func registryKey(keyName string, keyValue string, existCheck bool) (bool, error)
 	// Break down input
 	registryArgs := regexp.MustCompile("[\\\\]+").Split(keyName, -1)
 	registryHiveText := registryArgs[0]
-	keyPath := fmt.Sprintf(strings.Join(registryArgs[1:len(registryArgs)-1], "\\"))
+	keyPath := fmt.Sprintf(strings.Join(registryArgs[1:len(registryArgs)-1], "\\")) // idk??
 	keyLoc := registryArgs[len(registryArgs)-1]
 	//fmt.Printf("REGISTRY: getting keypath %s from %s\n", keyPath, registryHiveText)
 

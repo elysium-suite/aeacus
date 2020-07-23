@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os/exec"
 )
 
@@ -62,7 +61,7 @@ func userExists(userName string) (bool, error) {
 }
 
 func userInGroup(userName string, groupName string) (bool, error) {
-	return command(fmt.Sprintf(`groups "%s" | grep -q "%s"`, userName, groupName))
+	return command("groups " + userName + " | grep -q " + groupName + "")
 }
 
 func firewallUp() (bool, error) {
