@@ -46,6 +46,18 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		}
 		result, err := packageVersion(arg1, arg2)
 		return err == nil && !result
+	case "KernelVersion":
+		if check.Message == "" {
+			check.Message = "Kernel has been updated to version " + arg1
+		}
+		result, err := kernelVersion(arg1)
+		return err == nil && result
+	case "KernelVersionNot":
+		if check.Message == "" {
+			check.Message = "Kernel has not been updated to version " + arg1
+		}
+		result, err := kernelVersion(arg1)
+		return err == nil && !result
 	}
 	return false
 }
@@ -95,4 +107,8 @@ func guestDisabledLDM() (bool, error) {
 
 func packageVersion(packageName string, versionNumber string) (bool, error) {
 	return command(`dpkg -l | awk '$2=="` + packageName + `" { print $3 }' | grep -q "` + versionNumber + `"`)
+}
+
+func kernelVersion(version string) (bool, error) {
+	return command("uname -r | grep -q " + version)
 }
