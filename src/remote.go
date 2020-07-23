@@ -18,6 +18,7 @@ import (
 
 func readTeamID(mc *metaConfig, id *imageData) {
 	fileContent, err := readFile(mc.DirPath + "TeamID.txt")
+	fileContent = strings.TrimSpace(fileContent)
 	if err != nil {
 		failPrint("TeamID.txt does not exist!")
 		sendNotification(mc, "TeamID.txt does not exist!")
@@ -37,65 +38,94 @@ func readTeamID(mc *metaConfig, id *imageData) {
 
 // genChallenge generates a crypto challenge for the CSS endpoint
 func genChallenge(mc *metaConfig) string {
-	// I'm aware this is sus, but right now there's no implemented way to generate a key between aeacus and minos on the fly. Stretch goal
+	// I'm aware this is sus, but right now there's no implemented way to generate a key between aeacus and minos on the fly.
 	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
 	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
 	chalString := hexEncode(xor(randomHash1, randomHash2))
+	var password string
 	if mc.Config.Password != "" {
-		hasher := sha256.New()
-		hasher.Write([]byte(mc.Config.Password))
-		key := hexEncode(string(hasher.Sum(nil)))
-		return hexEncode(xor(key, chalString))
+		password = mc.Config.Password
+	} else {
+		password = remoteBackupKey
 	}
-	return chalString
+	hasher := sha256.New()
+	hasher.Write([]byte(password))
+	key := hexEncode(string(hasher.Sum(nil)))
+	return hexEncode(xor(key, chalString))
+}
+
+func writeString(stringToWrite *strings.Builder, key, value string) {
+	delimiter := "|-SP-|"
+	stringToWrite.WriteString(key)
+	stringToWrite.WriteString(delimiter)
+	stringToWrite.WriteString(value)
+	stringToWrite.WriteString(delimiter)
+}
+
+func genUpdate(mc *metaConfig, id *imageData) string {
+	var update strings.Builder
+
+	// Write values for score update
+	writeString(&update, "team", mc.TeamID)
+	writeString(&update, "image", mc.Config.Name)
+	writeString(&update, "score", strconv.Itoa(id.Score))
+	writeString(&update, "challenge", genChallenge(mc))
+	writeString(&update, "vulns", genVulns(mc, id))
+	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
+
+	var password string
+	if mc.Config.Password != "" {
+		password = mc.Config.Password
+	} else {
+		password = remoteBackupKey
+	}
+	if verboseEnabled {
+		infoPrint("Encrypting vulnerabilities for score report...")
+	}
+	return hexEncode(encryptString(password, update.String()))
 }
 
 func genVulns(mc *metaConfig, id *imageData) string {
 	var vulnString strings.Builder
-	// This could be an unprintable character and be more reliable
-	delimiter := "|-|"
+	vulnDelimiter := "|-VS-|"
 
 	// Vulns achieved
-	vulnString.WriteString(fmt.Sprintf("%d%s", len(id.Points), delimiter))
+	vulnString.WriteString(fmt.Sprintf("%d%s", len(id.Points), vulnDelimiter))
 	// Total vulns
-	vulnString.WriteString(fmt.Sprintf("%d%s", id.ScoredVulns, delimiter))
+	vulnString.WriteString(fmt.Sprintf("%d%s", id.ScoredVulns, vulnDelimiter))
 
 	// Build vuln string
 	for _, penalty := range id.Penalties {
 		vulnString.WriteString(fmt.Sprintf("[PENALTY] %s - %.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
-		vulnString.WriteString(delimiter)
+		vulnString.WriteString(vulnDelimiter)
 	}
 
 	for _, point := range id.Points {
 		vulnString.WriteString(fmt.Sprintf("%s - %d pts", point.Message, point.Points))
-		vulnString.WriteString(delimiter)
+		vulnString.WriteString(vulnDelimiter)
 	}
 
+	var password string
 	if mc.Config.Password != "" {
-		if verboseEnabled {
-			infoPrint("Encrypting vulnerabilities for score report...")
-		}
-		return hexEncode(encryptString(mc.Config.Password, vulnString.String()))
+		password = mc.Config.Password
+	} else {
+		password = remoteBackupKey
 	}
-	return hexEncode(vulnString.String())
+	if verboseEnabled {
+		infoPrint("Encrypting vulnerabilities for score report...")
+	}
+	return hexEncode(encryptString(password, vulnString.String()))
 }
 
 func reportScore(mc *metaConfig, id *imageData) {
 	resp, err := http.PostForm(mc.Config.Remote+"/scores/css/update",
-		url.Values{"team": {mc.TeamID},
-			"image": {mc.Config.Name},
-			"score": {strconv.Itoa(id.Score)},
-			// Challenge string: hash of password
-			// XORd with some random crap
-			"challenge": {genChallenge(mc)},
-			// Vulns: Hex encoded list of vulns
-			// encrypted if password exists
-			"vulns": {genVulns(mc, id)},
-			"id":    {"id"}})
+		url.Values{"update": {genUpdate(mc, id)}})
+
 	if err != nil {
 		failPrint(err.Error())
 		return
 	}
+
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	if string(body) != "OK" {

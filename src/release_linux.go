@@ -6,7 +6,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	}
 	shellCommand("touch /opt/aeacus/TeamID.txt")
 	shellCommand("echo 'YOUR-TEAMID-HERE' > /opt/aeacus/TeamID.txt")
-	shellCommand("chmod 777 /opt/aeacus/teamID.txt")
+	shellCommand("chmod 666 /opt/aeacus/TeamID.txt")
 	if verboseEnabled {
 		infoPrint("Writing shortcuts to Desktop...")
 	}
