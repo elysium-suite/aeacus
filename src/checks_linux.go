@@ -21,6 +21,18 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		}
 		result, err := guestDisabledLDM()
 		return err == nil && !result
+	case "PasswordChanged":
+		if check.Message == "" {
+			check.Message = "Password for " + arg1 + " has been changed"
+		}
+		result, err := passwordChanged(arg1, arg2)
+		return err == nil && result
+	case "PasswordChangedNot":
+		if check.Message == "" {
+			check.Message = "Password for " + arg1 + " has not been changed"
+		}
+		result, err := passwordChanged(arg1, arg2)
+		return err == nil && !result
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -55,6 +67,11 @@ func userInGroup(userName string, groupName string) (bool, error) {
 
 func firewallUp() (bool, error) {
 	return command("ufw status | grep -q 'Status: active'")
+}
+
+func passwordChanged(user, hash string) (bool, error) {
+	res, err := fileContains("/etc/shadow", hash)
+	return !res, err
 }
 
 func guestDisabledLDM() (bool, error) {
