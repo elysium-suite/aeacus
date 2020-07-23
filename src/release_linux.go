@@ -1,5 +1,9 @@
 package main
 
+import (
+	"os"
+)
+
 func writeDesktopFiles(mc *metaConfig) {
 	if verboseEnabled {
 		infoPrint("Creating or emptying TeamID.txt...")
@@ -16,7 +20,14 @@ func writeDesktopFiles(mc *metaConfig) {
 }
 
 func configureAutologin(mc *metaConfig) {
-	// set up user autologin
+	if _, err := os.Stat("/usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf"); err == nil {
+		shellCommand("echo autologin-user=" + mc.Config.User + " > /usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf")
+	} else if  _, err := os.Stat("/etc/gdm/custom.conf"); err == nil {
+		shellCommand("echo AutomaticLogin=True > /etc/gdm/custom.conf")
+		shellCommand("echo AutomaticLogin=" + mc.Config.User + " > /etc/gdm/custom.conf")
+	} else {
+		failPrint("Autologin not able to configure on this system")
+	}
 }
 
 func installService() {
