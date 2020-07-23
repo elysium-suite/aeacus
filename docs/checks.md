@@ -150,6 +150,16 @@ arg1='git'
 arg2='1:2.17.1-1ubuntu0.4'
 ```
 
+> `PackageVersion` checks `uname -r`.
+
+**KernelVersion**: pass if kernel version is equal to specified
+
+```
+type='KernelVersion'
+arg1='5.4.0-42-generic'
+```
+> `KernelVersion` checks `dpkg -l | awk '$2=="<PACKAGENAME>" { print $3 }'`.
+
 <hr>
 
 ### Windows-Specific Checks
