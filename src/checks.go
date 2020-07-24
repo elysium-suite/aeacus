@@ -34,13 +34,13 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" exists"
 		}
-		result, err := fileExists(arg1)
+		result, err := pathExists(arg1)
 		return err == nil && result
 	case "FileExistsNot":
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" does not exist"
 		}
-		result, err := fileExists(arg1)
+		result, err := pathExists(arg1)
 		return err == nil && !result
 	case "FileContains":
 		if check.Message == "" {
@@ -155,8 +155,8 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 	}
 }
 
-func fileExists(fileName string) (bool, error) {
-	_, err := os.Stat(fileName)
+func pathExists(pathName string) (bool, error) {
+	_, err := os.Stat(pathName)
 	return !os.IsNotExist(err), nil
 }
 
@@ -179,7 +179,7 @@ func fileContainsRegex(fileName string, expressionString string) (bool, error) {
 
 // dirContainsRegex returns true if any file in the directory matches the regular expression provided
 func dirContainsRegex(dirName string, expressionString string) (bool, error) {
-	result, err := fileExists(dirName)
+	result, err := pathExists(dirName)
 	if err != nil || !result {
 		return false, errors.New("DirContainsRegex: file does not exist")
 	}
