@@ -16,7 +16,19 @@ func writeDesktopFiles(mc *metaConfig) {
 }
 
 func configureAutologin(mc *metaConfig) {
-	// set up user autologin
+	lightdm, err := pathExists("/usr/share/lightdm")
+	gdm, err := pathExists("/etc/gdm/custom.conf")
+
+	if err != nil {
+		if lightdm {
+			writeFile("/usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf", "echo autologin-user="+mc.Config.User)
+		} else if gdm {
+			writeFile("/etc/gdm/custom.conf", `echo AutomaticLogin=True
+AutomaticLogin=`+mc.Config.User)
+		} else {
+			failPrint("Unable to configure autologin. Please do so manually")
+		}
+	}
 }
 
 func installService() {
