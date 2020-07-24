@@ -37,7 +37,51 @@ func writeDesktopFiles(mc *metaConfig) {
 }
 
 func configureAutologin(mc *metaConfig) {
-	// set up user autologin
+	if verboseEnabled {
+		infoPrint("Setting Up autologin for " + mc.Config.User + "...")
+	}
+	powershellAutoLogin := `
+	function Test-RegistryValue {
+
+		param (
+		
+		 [parameter(Mandatory=$true)]
+		 [ValidateNotNullOrEmpty()]$Path,
+		
+		[parameter(Mandatory=$true)]
+		 [ValidateNotNullOrEmpty()]$Value
+		)
+		
+		try {
+		
+		Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop | Out-Null
+		 return $true
+		 }
+		
+		catch {
+		
+		return $false
+		
+		}
+		
+	}
+	$RegPath1Exists = Test-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Value "DefaultUsername"
+	if ($RegPath1Exists -eq $false) {
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -name "DefaultUsername" -Value $env:USERNAME -type String
+	}
+	elseif ($RegPath1Exists -eq $true) {
+		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -name "DefaultUsername" -Value $env:USERNAME -type String
+	}
+	
+	$RegPath2Exists = Test-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Value "AutoAdminLogon"
+	if ($RegPath2Exists -eq $false) {
+		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -name "AutoAdminLogon" -Value 1 -type String
+	}
+	elseif ($RegPath2Exists -eq $true) {
+		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -name "AutoAdminLogon" -Value 1 -type String
+	}
+	`
+	shellCommand(powershellAutoLogin)
 }
 
 func installService() {

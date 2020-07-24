@@ -18,7 +18,7 @@
 
   - windows startup programs
   - windows and linux updates and auto-updating status (apt only for linux)
-  - windows and linux password changes of users
+  - windows (Make less janky)
   - windows and linux firefox checks
   - service-specific hardening and checks
     - do we implement this for linux or just let people use filecontains?
@@ -30,8 +30,6 @@
   - windows
     - Detect if firefox.exe is in x86 Program Files or just Program Files
     - clear run and command history
-  - autologin user
-    - see release\_\*.go
   - linux
     - clear ff history?
 

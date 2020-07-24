@@ -114,6 +114,19 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		}
 		result, err := registryKey(arg1, arg2, true)
 		return err == nil && !result
+	case "PasswordChanged":
+		if check.Message == "" {
+			check.Message = "Password for " + arg1 + " has been changed"
+		}
+		result, err := PasswordChanged(arg1,arg2)
+		return err == nil && result
+	case "PasswordChangedNot":
+		if check.Message == "" {
+			check.Message = "Password for " + arg1 + " has not been changed"
+		}
+		!result, err := PasswordChanged(arg1,arg2)
+		return err == nil && result
+	
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -142,6 +155,12 @@ func packageInstalled(packageName string) (bool, error) {
 
 func serviceUp(serviceName string) (bool, error) {
 	return command("if (!((Get-Service -Name '" + serviceName + "').Status -eq 'Running')) { Throw 'Service is stopped' }")
+}
+
+
+func PasswordChanged(user, date string) (bool, error) {
+	res, err := command(`Get-LocalUser " + user + " | select PasswordLastSet | Select-String "` + date + `"`)
+	return !res, err
 }
 
 func userExists(userName string) (bool, error) {
