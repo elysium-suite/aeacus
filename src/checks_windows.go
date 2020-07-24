@@ -159,7 +159,7 @@ func serviceUp(serviceName string) (bool, error) {
 
 
 func PasswordChanged(user, date string) (bool, error) {
-	res, err := command("Get-LocalUser " + user + " | select PasswordLastSet | Select-String " + "date\"")
+	res, err := command(`Get-LocalUser " + user + " | select PasswordLastSet | Select-String "` + date + `"`)
 	return !res, err
 }
 
