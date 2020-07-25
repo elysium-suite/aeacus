@@ -27,6 +27,19 @@ func sendNotification(mc *metaConfig, messageString string) {
 	shellCommand(`l_display=":$(ls /tmp/.X11-unix/* | sed 's#/tmp/.X11-unix/X##' | head -n 1)"; l_user=$(who | grep '('$display')' | awk '{print $1}' | head -n 1); if [ -z "$l_user" ]; then l_user="` + mc.Config.User + `"; fi; l_uid=$(id -u $l_user); sudo -u $l_user DISPLAY=$l_display DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$l_uid/bus notify-send -i /opt/aeacus/assets/logo.png "Aeacus SE" "` + messageString + `"`)
 }
 
+// createFQs is a quality of life function that creates Forensic Question files
+// on the Desktop, pre-populated with a template.
+func createFQs(mc *metaConfig, numFqs int) {
+	for i := 1; i <= numFqs; i++ {
+		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
+		shellCommand("echo 'QUESTION:' > /home/" + mc.Config.User + "/Desktop/" + fileName)
+		shellCommand("echo 'ANSWER:' >> /home/" + mc.Config.User + "/Desktop/" + fileName)
+		if verboseEnabled {
+			infoPrint("Wrote " + fileName + " to Desktop")
+		}
+	}
+}
+
 // shellCommand executes a given command in a sh environment, and prints an
 // error if one occurred.
 func shellCommand(commandGiven string) {
