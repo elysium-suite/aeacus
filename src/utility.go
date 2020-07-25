@@ -3,7 +3,6 @@ package main
 import (
 	"io/ioutil"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -47,19 +46,6 @@ func timeCheck(mc *metaConfig) {
 			if time.Now().After(endDate) {
 				destroyImage(mc)
 			}
-		}
-	}
-}
-
-// createFQs is a quality of life function that creates Forensic Question files
-// on the Desktop, pre-populated with a template.
-func createFQs(mc *metaConfig, numFqs int) {
-	for i := 1; i <= numFqs; i++ {
-		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
-		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
-		shellCommand("echo 'ANSWER:' >> C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
-		if verboseEnabled {
-			infoPrint("Wrote " + fileName + " to Desktop")
 		}
 	}
 }

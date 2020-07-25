@@ -30,6 +30,18 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 		}
 		result, err := command(arg1)
 		return err == nil && !result
+	case "CommandOutput":
+		if check.Message == "" {
+			check.Message = "Command \"" + arg1 + "\" had the output \"" + arg2 + "\""
+		}
+		result, err := commandOutput(arg1, arg2)
+		return err == nil && result
+	case "CommandOutputNot":
+		if check.Message == "" {
+			check.Message = "Command \"" + arg1 + "\" did not have the output \"" + arg2 + "\""
+		}
+		result, err := commandOutput(arg1, arg2)
+		return err == nil && !result
 	case "FileExists":
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" exists"
