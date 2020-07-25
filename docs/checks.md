@@ -185,7 +185,7 @@ type='PasswordChanged'
 arg1='user'
 arg2='01/17/2019 20:57:41'
 ```
-> `Get-LocalUser user | select PasswordLastSet` Take that and value and put it in arg2
+> You should take the value from `Get-LocalUser user | select PasswordLastSet` and use it as `arg2`.
 
 **UserDetail**: pass if user detail key is equal to value
 
