@@ -36,7 +36,7 @@ func scoreImage(mc *metaConfig, id *imageData) {
 	if mc.Config.Remote != "" && mc.Config.Local == "yes" {
 		checkServer(mc, id)
 	}
-	if id.Connection {
+	if mc.Config.Remote != "" && id.Connection {
 		reportScore(mc, id)
 	}
 }

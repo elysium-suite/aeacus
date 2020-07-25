@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 	"strconv"
+	"strings"
 
 	"github.com/gen2brain/beeep"
 	"golang.org/x/text/encoding/unicode"
@@ -84,8 +84,8 @@ func shellCommand(commandGiven string) {
 	cmd := rawCmd(commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
-			if len(commandGiven) > 9 {
-				failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
+			if len(commandGiven) > 12 {
+				failPrint("Command \"" + commandGiven[:12] + "...\" errored out (code " + err.Error() + ").")
 			} else {
 				failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
 			}
