@@ -8,7 +8,8 @@
   - create list of admins/users
   - other things? esp for windows
 - windows
-
+  - improve scoring.conf example crypto (add aes-gcm, obfuscate key, etc)
+  - disable net/http using HTTP_PROXY environmental variable
   - fix windows service quit WaitGroup (phocus_windows.go)
   - reading TEAMID fails beacuse it's unicode by default and ioutil/program expects ANSI
   - as above, this is for FQs too. add ability to detect, or run through pruning function to remove null terms
@@ -17,6 +18,7 @@
 - checks to implement
 
   - windows startup programs
+  - windows features
   - windows and linux updates and auto-updating status (apt only for linux)
   - windows (Make less janky)
   - windows and linux firefox checks
