@@ -24,7 +24,23 @@ func decodeString(fileContent string) (string, error) {
 
 // sendNotification sends a notification to the end user.
 func sendNotification(mc *metaConfig, messageString string) {
-	shellCommand(`l_display=":$(ls /tmp/.X11-unix/* | sed 's#/tmp/.X11-unix/X##' | head -n 1)"; l_user=$(who | grep '('$display')' | awk '{print $1}' | head -n 1); if [ -z "$l_user" ]; then l_user="` + mc.Config.User + `"; fi; l_uid=$(id -u $l_user); sudo -u $l_user DISPLAY=$l_display DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$l_uid/bus notify-send -i /opt/aeacus/assets/logo.png "Aeacus SE" "` + messageString + `"`)
+	if mc.Config.User == "" {
+		failPrint("User not specified in configuration, can't send notification.")
+	} else {
+		shellCommand(`
+			user="` + mc.Config.User + `"
+			uid="$(id -u $user)"
+
+			# If bus exists, Ubuntu >= 18
+			if [ -e /run/user/$uid/bus ]; then
+			    display="unix:path=/run/user/$uid/bus"
+			else
+			# Ubuntu <= 16
+			    display="unix:abstract=$(cat /run/user/$uid/dbus-session | cut -d '=' -f3)"
+			fi
+
+			sudo -u $user DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$display notify-send -i /opt/aeacus/assets/logo.png "Aeacus SE" "` + messageString + `"`)
+	}
 }
 
 // createFQs is a quality of life function that creates Forensic Question files
@@ -60,8 +76,8 @@ func shellCommand(commandGiven string) {
 func shellCommandOutput(commandGiven string) (string, error) {
 	out, err := exec.Command("sh", "-c", commandGiven).Output()
 	if err != nil {
-		if len(commandGiven) > 9 {
-			failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
+		if len(commandGiven) > 12 {
+			failPrint("Command \"" + commandGiven[:12] + "...\" errored out (code " + err.Error() + ").")
 		} else {
 			failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
 		}

@@ -166,7 +166,7 @@ func packageInstalled(packageName string) (bool, error) {
 }
 
 func serviceUp(serviceName string) (bool, error) {
-	return commandOutput("(Get-Service -Name '" + serviceName + "').Status", "Running")
+	return commandOutput("(Get-Service -Name '"+serviceName+"').Status", "Running")
 }
 
 func PasswordChanged(user, date string) (bool, error) {

@@ -18,7 +18,7 @@ arg1='grep "pam_history.so" /etc/pam.d/common-password'
 **CommandOutput**: pass if command output matches
 
 ```
-type='Command'
+type='CommandOutput'
 arg1='(Get-NetFirewallProfile -Name Domain).Enabled'
 arg2='True'
 ```
