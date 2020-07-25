@@ -7,18 +7,15 @@ import (
 
 func scoreImage(mc *metaConfig, id *imageData) {
 	// Check connection and configuration
-	if mc.Config.Remote != "" {
+	if mc.Config.Remote != "" && mc.Config.Local != "yes" {
 		checkServer(mc, id)
-		if !id.Connection && mc.Config.Local != "yes" {
+		if !id.Connection {
 			genReport(mc, id)
 			return
 		}
 	}
 
 	scoreChecks(mc, id)
-	if id.Connection && mc.Config.Remote != "" {
-		reportScore(mc, id)
-	}
 	genReport(mc, id)
 
 	// Check if points increased/decreased
@@ -35,6 +32,13 @@ func scoreImage(mc *metaConfig, id *imageData) {
 	}
 
 	writeFile(mc.DirPath+"/previous.txt", strconv.Itoa(id.Score))
+
+	if mc.Config.Remote != "" && mc.Config.Local == "yes" {
+		checkServer(mc, id)
+	}
+	if id.Connection {
+		reportScore(mc, id)
+	}
 }
 
 func scoreChecks(mc *metaConfig, id *imageData) {
@@ -115,6 +119,6 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 		}
 	}
 	if verboseEnabled {
-		infoPrint(fmt.Sprintf("Score: %d\n", id.Score))
+		infoPrint(fmt.Sprintf("Score: %d", id.Score))
 	}
 }

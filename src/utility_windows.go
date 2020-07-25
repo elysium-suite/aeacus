@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"strconv"
 
 	"github.com/gen2brain/beeep"
 	"golang.org/x/text/encoding/unicode"
@@ -73,6 +74,7 @@ func sendNotification(mc *metaConfig, messageString string) {
 // speed things up, as well as some other flags) to run commands on the host
 // system and retrieve the return value.
 func rawCmd(commandGiven string) *exec.Cmd {
+	fmt.Println("[!] Executing a command: ", "powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 }
 
@@ -109,6 +111,19 @@ func shellCommandOutput(commandGiven string) (string, error) {
 func playAudio(wavPath string) {
 	commandText := "(New-Object Media.SoundPlayer '" + wavPath + "').PlaySync();"
 	shellCommand(commandText)
+}
+
+// createFQs is a quality of life function that creates Forensic Question files
+// on the Desktop, pre-populated with a template.
+func createFQs(mc *metaConfig, numFqs int) {
+	for i := 1; i <= numFqs; i++ {
+		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
+		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
+		shellCommand("echo 'ANSWER:' >> C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
+		if verboseEnabled {
+			infoPrint("Wrote " + fileName + " to Desktop")
+		}
+	}
 }
 
 // adminCheck (Windows) will attempt to open:

@@ -134,13 +134,25 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 }
 
 func command(commandGiven string) (bool, error) {
-	cmd := rawCmd(commandGiven + "; if (!($?)) { Throw 'Error' } }")
+	cmd := rawCmd(commandGiven + "; if (!($?)) { Throw 'Error' }")
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
 			return false, nil
 		}
 	}
 	return true, nil
+}
+
+func commandOutput(commandGiven, desiredOutput string) (bool, error) {
+	out, err := rawCmd(commandGiven).Output()
+	if err != nil {
+		return false, err
+	}
+	outString := strings.TrimSpace(string(out))
+	if outString == desiredOutput {
+		return true, nil
+	}
+	return false, nil
 }
 
 func packageInstalled(packageName string) (bool, error) {
@@ -154,7 +166,7 @@ func packageInstalled(packageName string) (bool, error) {
 }
 
 func serviceUp(serviceName string) (bool, error) {
-	return command("if (!((Get-Service -Name '" + serviceName + "').Status -eq 'Running')) { Throw 'Service is stopped' }")
+	return commandOutput("(Get-Service -Name '" + serviceName + "').Status", "Running")
 }
 
 func PasswordChanged(user, date string) (bool, error) {
@@ -187,8 +199,8 @@ func firewallUp() (bool, error) {
 	fwProfiles := []string{"Domain", "Public", "Private"}
 	for _, profile := range fwProfiles {
 		// This is kind of jank and kind of slow
-		cmdText := "if (!((Get-NetFirewallProfile -Name '" + profile + "').Enabled -eq 'True')) { Throw 'Firewall profile is disabled' }"
-		result, err := command(cmdText)
+		cmdText := "(Get-NetFirewallProfile -Name '" + profile + "').Enabled"
+		result, err := commandOutput(cmdText, "True")
 		if result == false || err != nil {
 			return result, err
 		}
