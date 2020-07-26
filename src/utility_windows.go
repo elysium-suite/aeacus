@@ -74,7 +74,6 @@ func sendNotification(mc *metaConfig, messageString string) {
 // speed things up, as well as some other flags) to run commands on the host
 // system and retrieve the return value.
 func rawCmd(commandGiven string) *exec.Cmd {
-	fmt.Println("[!] Executing a command: ", "powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 }
 
