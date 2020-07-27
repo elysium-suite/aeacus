@@ -35,15 +35,15 @@ func installService() {
 	if verboseEnabled {
 		infoPrint("Installing service...")
 	}
-	shellCommand("cp /opt/aeacus/misc/aeacus-client /etc/init.d/")
-	shellCommand("chmod +x /etc/init.d/aeacus-client")
-	shellCommand("systemctl enable aeacus-client")
-	shellCommand("systemctl start aeacus-client")
+	shellCommand("cp /opt/aeacus/misc/CSSClient /etc/init.d/")
+	shellCommand("chmod +x /etc/init.d/CSSClient")
+	shellCommand("systemctl enable CSSClient")
+	shellCommand("systemctl start CSSClient")
 }
 
 func cleanUp() {
-
 	findPaths := "/bin /etc /home /opt /root /sbin /srv /usr /mnt /var"
+
 	if verboseEnabled {
 		infoPrint("Changing perms to 755 in /opt/aeacus...")
 	}

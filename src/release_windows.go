@@ -44,26 +44,26 @@ func configureAutologin(mc *metaConfig) {
 	function Test-RegistryValue {
 
 		param (
-		
+
 		 [parameter(Mandatory=$true)]
 		 [ValidateNotNullOrEmpty()]$Path,
-		
+
 		[parameter(Mandatory=$true)]
 		 [ValidateNotNullOrEmpty()]$Value
 		)
-		
+
 		try {
-		
+
 		Get-ItemProperty -Path $Path | Select-Object -ExpandProperty $Value -ErrorAction Stop | Out-Null
 		 return $true
 		 }
-		
+
 		catch {
-		
+
 		return $false
-		
+
 		}
-		
+
 	}
 	$RegPath1Exists = Test-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Value "DefaultUsername"
 	if ($RegPath1Exists -eq $false) {
@@ -72,7 +72,7 @@ func configureAutologin(mc *metaConfig) {
 	elseif ($RegPath1Exists -eq $true) {
 		Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -name "DefaultUsername" -Value $env:USERNAME -type String
 	}
-	
+
 	$RegPath2Exists = Test-RegistryValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Value "AutoAdminLogon"
 	if ($RegPath2Exists -eq $false) {
 		New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -name "AutoAdminLogon" -Value 1 -type String
@@ -116,6 +116,6 @@ func cleanUp() {
 	}
 	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
 	if verboseEnabled {
-		warnPrint("Done cleaning up! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the assets directory.")
+		warnPrint("Done with automatic cleanup! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the assets directory.")
 	}
 }
