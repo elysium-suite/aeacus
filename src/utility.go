@@ -7,6 +7,7 @@ import (
 )
 
 var verboseEnabled = false
+var reverseEnabled = false
 var aeacusVersion = "1.2.0"
 
 // writeFile wraps ioutil's WriteFule function, and prints
