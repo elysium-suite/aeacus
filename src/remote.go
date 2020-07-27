@@ -95,7 +95,7 @@ func genVulns(mc *metaConfig, id *imageData) string {
 
 	// Build vuln string
 	for _, penalty := range id.Penalties {
-		vulnString.WriteString(fmt.Sprintf("[PENALTY] %s - %.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
+		vulnString.WriteString(fmt.Sprintf("[PENALTY] %s - N%.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
 		vulnString.WriteString(delimiter)
 	}
 

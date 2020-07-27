@@ -54,6 +54,11 @@ func main() {
 				Aliases: []string{"v"},
 				Usage:   "Print extra information",
 			},
+			&cli.BoolFlag{
+				Name:    "reverse",
+				Aliases: []string{"r"},
+				Usage:   "Every check returns the opposite result",
+			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -184,6 +189,9 @@ func main() {
 func parseFlags(c *cli.Context) {
 	if c.Bool("v") {
 		verboseEnabled = true
+	}
+	if c.Bool("r") {
+		reverseEnabled = true
 	}
 }
 
