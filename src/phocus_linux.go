@@ -33,12 +33,19 @@ func main() {
 		failPrint("You need to run this binary as root or Administrator!")
 		os.Exit(1)
 	}
+
 	if runtime.GOOS == "linux" {
 		dirPath = "/opt/aeacus/"
 	} else if runtime.GOOS == "windows" {
 		dirPath = "C:\\aeacus\\"
 	} else {
 		failPrint("What are you up to?")
+		os.Exit(1)
+	}
+
+	daemonTest := os.Getenv("INVOCATION_ID")
+	if daemonTest == "" {
+		failPrint("Sorry! You're not supposed to run this binary manually. It's probably already running as a daemon (CSSClient).")
 		os.Exit(1)
 	}
 
