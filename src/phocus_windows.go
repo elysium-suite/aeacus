@@ -49,6 +49,7 @@ func main() {
 func (p *program) Init(env svc.Environment) error {
 	if !env.IsWindowsService() && !*idgui {
 		failPrint("Sorry! Don't run this binary. It's probably already running as a Windows service (CSSClient).")
+		time.Sleep(5 * time.Second)
 		os.Exit(1)
 	}
 	return nil
