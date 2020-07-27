@@ -18,6 +18,10 @@ func scoreImage(mc *metaConfig, id *imageData) {
 	scoreChecks(mc, id)
 	genReport(mc, id)
 
+	if mc.Config.Remote != "" && mc.Config.Local != "yes" {
+		reportScore(mc, id)
+	}
+
 	// Check if points increased/decreased
 	prevPoints, err := readFile(mc.DirPath + "/previous.txt")
 	if err == nil {
@@ -35,9 +39,9 @@ func scoreImage(mc *metaConfig, id *imageData) {
 
 	if mc.Config.Remote != "" && mc.Config.Local == "yes" {
 		checkServer(mc, id)
-	}
-	if mc.Config.Remote != "" && id.Connection {
-		reportScore(mc, id)
+		if id.Connection {
+			reportScore(mc, id)
+		}
 	}
 }
 

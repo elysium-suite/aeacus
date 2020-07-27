@@ -7,7 +7,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
 	"net/http"
 	"net/url"
@@ -15,6 +14,8 @@ import (
 	"strings"
 	"time"
 )
+
+var delimiter = "|-S#-|"
 
 func readTeamID(mc *metaConfig, id *imageData) {
 	fileContent, err := readFile(mc.DirPath + "TeamID.txt")
@@ -55,7 +56,6 @@ func genChallenge(mc *metaConfig) string {
 }
 
 func writeString(stringToWrite *strings.Builder, key, value string) {
-	delimiter := "|-SP-|"
 	stringToWrite.WriteString(key)
 	stringToWrite.WriteString(delimiter)
 	stringToWrite.WriteString(value)
@@ -80,29 +80,28 @@ func genUpdate(mc *metaConfig, id *imageData) string {
 		password = remoteBackupKey
 	}
 	if verboseEnabled {
-		infoPrint("Encrypting vulnerabilities for score report...")
+		infoPrint("Encrypting score report...")
 	}
 	return hexEncode(encryptString(password, update.String()))
 }
 
 func genVulns(mc *metaConfig, id *imageData) string {
 	var vulnString strings.Builder
-	vulnDelimiter := "|-VS-|"
 
 	// Vulns achieved
-	vulnString.WriteString(fmt.Sprintf("%d%s", len(id.Points), vulnDelimiter))
+	vulnString.WriteString(fmt.Sprintf("%d%s", len(id.Points), delimiter))
 	// Total vulns
-	vulnString.WriteString(fmt.Sprintf("%d%s", id.ScoredVulns, vulnDelimiter))
+	vulnString.WriteString(fmt.Sprintf("%d%s", id.ScoredVulns, delimiter))
 
 	// Build vuln string
 	for _, penalty := range id.Penalties {
 		vulnString.WriteString(fmt.Sprintf("[PENALTY] %s - %.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
-		vulnString.WriteString(vulnDelimiter)
+		vulnString.WriteString(delimiter)
 	}
 
 	for _, point := range id.Points {
 		vulnString.WriteString(fmt.Sprintf("%s - %d pts", point.Message, point.Points))
-		vulnString.WriteString(vulnDelimiter)
+		vulnString.WriteString(delimiter)
 	}
 
 	var password string
@@ -112,13 +111,13 @@ func genVulns(mc *metaConfig, id *imageData) string {
 		password = remoteBackupKey
 	}
 	if verboseEnabled {
-		infoPrint("Encrypting vulnerabilities for score report...")
+		infoPrint("Encrypting vulnerabilities...")
 	}
 	return hexEncode(encryptString(password, vulnString.String()))
 }
 
 func reportScore(mc *metaConfig, id *imageData) {
-	resp, err := http.PostForm(mc.Config.Remote+"/scores/css/update",
+	resp, err := http.PostForm(mc.Config.Remote+"/update",
 		url.Values{"update": {genUpdate(mc, id)}})
 
 	if err != nil {
@@ -126,9 +125,7 @@ func reportScore(mc *metaConfig, id *imageData) {
 		return
 	}
 
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	if string(body) != "OK" {
+	if resp.StatusCode != 200 {
 		failPrint("Failed to upload score! Is your TeamID wrong?")
 		id.ConnStatus[0] = "red"
 		id.ConnStatus[1] = "Failed to upload score! Please ensure that your Team ID is correct."
@@ -167,7 +164,7 @@ func checkServer(mc *metaConfig, id *imageData) {
 	if verboseEnabled {
 		infoPrint("Checking for scoring engine connection...")
 	}
-	resp, err := client.Get(mc.Config.Remote + "/scores/css/status")
+	resp, err := client.Get(mc.Config.Remote + "/status")
 
 	// todo enforce status/time limit
 	// grab body or status message from minos
