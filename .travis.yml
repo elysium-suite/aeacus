@@ -1,7 +1,0 @@
-os: linux
-dist: xenial
-language: go
-script: sh misc/travis.sh
-branches:
-  only:
-  - master
