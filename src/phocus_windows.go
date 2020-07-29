@@ -102,8 +102,6 @@ func phocusStart(quit chan struct{}) {
 		os.Exit(1)
 	}
 
-	mc := metaConfig{teamID, dirPath, scoringChecks{}}
-
 	app := &cli.App{
 		Name:  "phocus",
 		Usage: "score vulnerabilities",
@@ -112,13 +110,13 @@ func phocusStart(quit chan struct{}) {
 			if err != nil {
 				return errors.New("Error in reading scoring.dat!")
 			}
-			parseConfig(&mc, decryptedData)
+			parseConfig(decryptedData)
 			rand.Seed(time.Now().UnixNano())
 			for {
-				timeCheck(&mc)
-				id := newImageData()
+				timeCheck()
+				mc.Image = imageData{}
 				infoPrint("Scoring image...")
-				scoreImage(&mc, &id)
+				scoreImage(&id)
 				jitter := time.Duration(rand.Intn(8) + 8)
 				infoPrint("Scored image, sleeping for a bit...")
 				time.Sleep(jitter * time.Second)

@@ -15,10 +15,8 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"compress/zlib"
-	"fmt"
 	"io"
 	"os"
 )
@@ -39,26 +37,7 @@ var randomHashTwo = "NowThatsWhatICallARandomString"
 // file `scoring.dat`, in the DirPath specified in the metaConfig.
 // writeCryptoConfig is used to create the encrypted `scoring.dat` from the
 // plaintext configuration `scoring.conf`.
-func writeCryptoConfig(mc *metaConfig) string {
-
-	// Open the hardcoded file path to the plaintext configuration.
-	configFile, err := os.Open(mc.DirPath + "scoring.conf")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	defer configFile.Close()
-
-	// Read the file into a buffer.
-	info, _ := configFile.Stat()
-	var size int64 = info.Size()
-	configBuffer := make([]byte, size)
-	buffer := bufio.NewReader(configFile)
-	_, err = buffer.Read(configBuffer)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+func encryptConfig(plainText string) string {
 
 	if verboseEnabled {
 		infoPrint("Encrypting configuration...")
@@ -70,7 +49,7 @@ func writeCryptoConfig(mc *metaConfig) string {
 	// Compress the file with zlib.
 	var encryptedFile bytes.Buffer
 	writer := zlib.NewWriter(&encryptedFile)
-	writer.Write(configBuffer)
+	writer.Write([]byte(plainText))
 	writer.Close()
 
 	// XOR the encrypted file with our key.
@@ -80,14 +59,7 @@ func writeCryptoConfig(mc *metaConfig) string {
 
 // readCryptoConfig is used to decrypt the `scoring.dat` file, which contains
 // the configuration for aeacus.
-func readCryptoConfig(mc *metaConfig) string {
-
-	// Read in the encrypted configuration file.
-	dataFile, err := readFile(mc.DirPath + "scoring.dat")
-	if err != nil {
-		failPrint("Data file not found.")
-		os.Exit(1)
-	}
+func decryptConfig(cipherText string) string {
 
 	// Create our key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
@@ -96,13 +68,13 @@ func readCryptoConfig(mc *metaConfig) string {
 	//
 	// XOR is special in that when you apply it twice, you get the original data
 	// as long as the key was the same.
-	dataFile = xor(key, dataFile)
+	cipherText = xor(key, cipherText)
 
 	// Decompress zlib data.
-	reader, err := zlib.NewReader(bytes.NewReader([]byte(dataFile)))
+	reader, err := zlib.NewReader(bytes.NewReader([]byte(cipherText)))
 	if err != nil {
 		failPrint("Error decrypting scoring.dat. You naughty little competitor. Commencing self destruct...")
-		destroyImage(mc)
+		destroyImage()
 		os.Exit(1)
 	}
 	defer reader.Close()

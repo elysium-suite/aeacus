@@ -4,39 +4,49 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fatih/color"
 )
 
-func parseConfig(mc *metaConfig, configContent string) {
+func parseConfig(configContent string) {
 	if _, err := toml.Decode(configContent, &mc.Config); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	mc.Config.Local = strings.ToLower(mc.Config.Local)
 }
 
-func writeConfig(mc *metaConfig) {
+func writeConfig(fileName string) {
 	if verboseEnabled {
-		infoPrint("Reading configuration from " + mc.DirPath + "scoring.conf" + "...")
+		infoPrint("Reading configuration from " + mc.DirPath + fileName + "...")
 	}
-	encryptedConfig := writeCryptoConfig(mc)
+	// Open the hardcoded file path to the plaintext configuration.
+	configFile, err := readFile(mc.DirPath + fileName)
+	if err != nil {
+		failPrint("Can't open scoring configuration file (" + fileName + "): " + err.Error())
+		os.Exit(1)
+	}
+	encryptedConfig := encryptConfig(configFile)
 	if verboseEnabled {
 		infoPrint("Writing data to " + mc.DirPath + "...")
 	}
-	writeFile(mc.DirPath+"scoring.dat", encryptedConfig)
+	writeFile(mc.DirPath+scoringDat, encryptedConfig)
 }
 
-func readData(mc *metaConfig) string {
+func readData(fileName string) string {
 	if verboseEnabled {
-		infoPrint("Decrypting data from " + mc.DirPath + "scoring.dat...")
+		infoPrint("Decrypting data from " + mc.DirPath + fileName + "...")
 	}
-	return readCryptoConfig(mc)
+	// Read in the encrypted configuration file.
+	dataFile, err := readFile(mc.DirPath + "scoring.dat")
+	if err != nil {
+		failPrint("Data file (" + fileName + ") not found.")
+		os.Exit(1)
+	}
+	return decryptConfig(dataFile)
 }
 
-func printConfig(mc *metaConfig) {
+func printConfig() {
 	passPrint("Configuration " + mc.DirPath + "scoring.conf" + " check passed!")
 	fmt.Printf("Title: %s (%s)\n", mc.Config.Title, mc.Config.Name)
 	fmt.Printf("User: %s\n", mc.Config.User)

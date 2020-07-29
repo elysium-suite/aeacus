@@ -61,7 +61,7 @@ func decodeString(fileContent string) (string, error) {
 
 // sendNotification (Windows) employes the beeep library to send notifications
 // to the end user.
-func sendNotification(mc *metaConfig, messageString string) {
+func sendNotification(messageString string) {
 	err := beeep.Notify("Aeacus SE", messageString, mc.DirPath+"assets/logo.png")
 	if err != nil {
 		failPrint("Notification error: " + err.Error())
@@ -114,7 +114,7 @@ func playAudio(wavPath string) {
 
 // createFQs is a quality of life function that creates Forensic Question files
 // on the Desktop, pre-populated with a template.
-func createFQs(mc *metaConfig, numFqs int) {
+func createFQs(numFqs int) {
 	for i := 1; i <= numFqs; i++ {
 		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
 		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
@@ -134,7 +134,7 @@ func adminCheck() bool {
 	return err == nil
 }
 
-func destroyImage(mc *metaConfig) {
+func destroyImage() {
 	failPrint("Destroying the image!")
 	if verboseEnabled {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")

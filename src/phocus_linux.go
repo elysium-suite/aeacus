@@ -49,9 +49,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	id := newImageData()
-	mc := metaConfig{teamID, dirPath, scoringChecks{}}
-
 	app := &cli.App{
 		Name:  "phocus",
 		Usage: "score vulnerabilities",
@@ -59,9 +56,9 @@ func main() {
 			parseConfig(&mc, readData(&mc))
 			rand.Seed(time.Now().UnixNano())
 			for {
-				timeCheck(&mc)
+				timeCheck()
 				infoPrint("Scoring image...")
-				scoreImage(&mc, &id)
+				scoreImage()
 				jitter := time.Duration(rand.Intn(8) + 10)
 				infoPrint("Scored image, sleeping for a bit...")
 				time.Sleep(jitter * time.Second)

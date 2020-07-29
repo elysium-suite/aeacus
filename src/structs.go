@@ -1,13 +1,18 @@
 package main
 
+import (
+	"time"
+)
+
 type metaConfig struct {
 	TeamID  string
 	DirPath string
 	Config  scoringChecks
+	Image imageData
 }
 
 type imageData struct {
-	RunningTime int // change to time or smth idk
+	RunningTime time.Time
 	Score       int
 	ScoredVulns int
 	Points      []scoreItem
@@ -15,8 +20,17 @@ type imageData struct {
 	Penalties   []scoreItem
 	Detracts    int
 	TotalPoints int
-	ConnStatus  []string
+	Conn connData
 	Connection  bool
+}
+
+type connData struct {
+	ServerColor string
+	ServerStatus string
+	NetColor string
+	NetStatus string
+	OverallColor string
+	OverallStatus string
 }
 
 type scoreItem struct {
@@ -31,9 +45,9 @@ type scoringChecks struct {
 	OS        string
 	Remote    string
 	Password  string
-	Local     string
+	Local     bool
 	EndDate   string
-	NoDestroy string
+	NoDestroy bool
 	Check     []check
 }
 
