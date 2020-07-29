@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var aeacusVersion = "1.2.0"
+var aeacusVersion = "1.3.0"
 
 var verboseEnabled = false
 var reverseEnabled = false

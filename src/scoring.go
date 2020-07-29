@@ -54,7 +54,10 @@ func scoreImage() {
 
 func checkConfigData() {
 	readTeamID()
-	// TODO validitiy checks for config data (non-0 checks, etc)
+	if len(mc.Config.Check) == 0 {
+		mc.Image.Conn.OverallColor = "red"
+		mc.Image.Conn.OverallStatus = "There were no checks found in the configuration."
+	}
 }
 
 func scoreChecks() {
