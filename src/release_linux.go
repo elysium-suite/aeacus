@@ -1,6 +1,6 @@
 package main
 
-func writeDesktopFiles(mc *metaConfig) {
+func writeDesktopFiles() {
 	if verboseEnabled {
 		infoPrint("Creating or emptying TeamID.txt...")
 	}
@@ -15,7 +15,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
 }
 
-func configureAutologin(mc *metaConfig) {
+func configureAutologin() {
 	lightdm, err := pathExists("/usr/share/lightdm")
 	gdm, err := pathExists("/etc/gdm/custom.conf")
 

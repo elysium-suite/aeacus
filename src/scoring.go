@@ -5,61 +5,76 @@ import (
 	"strconv"
 )
 
-func scoreImage(mc *metaConfig, id *imageData) {
-	// Check connection and configuration
-	if mc.Config.Remote != "" && mc.Config.Local != "yes" {
-		checkServer(mc, id)
-		if !id.Connection {
-			genReport(mc, id)
+func scoreImage() {
+	checkConfigData()
+
+	if mc.Config.Local {
+		scoreChecks()
+		if mc.Config.Remote != "" {
+			checkServer()
+			if mc.Image.Connection {
+				reportScore()
+			}
+		}
+		genReport(mc.Image)
+
+	} else {
+		if mc.Config.Remote != "" {
+			checkServer()
+			if !mc.Image.Connection {
+				genReport(mc.Image)
+				return
+			}
+		}
+		scoreChecks()
+		err := reportScore()
+		if err != nil {
 			return
 		}
-	}
-
-	scoreChecks(mc, id)
-	genReport(mc, id)
-
-	if mc.Config.Remote != "" && mc.Config.Local != "yes" {
-		reportScore(mc, id)
+		genReport(mc.Image)
 	}
 
 	// Check if points increased/decreased
 	prevPoints, err := readFile(mc.DirPath + "/previous.txt")
 	if err == nil {
 		prevScore, _ := strconv.Atoi(prevPoints)
-		if prevScore < id.Score {
-			sendNotification(mc, "You gained points!")
+		if prevScore < mc.Image.Score {
+			sendNotification("You gained points!")
 			playAudio(mc.DirPath + "assets/gain.wav")
-		} else if prevScore > id.Score {
-			sendNotification(mc, "You lost points!")
+		} else if prevScore > mc.Image.Score {
+			sendNotification("You lost points!")
 			playAudio(mc.DirPath + "assets/alarm.wav")
 		}
+	} else {
+		warnPrint("Reading from previous.txt failed.")
 	}
 
-	writeFile(mc.DirPath+"/previous.txt", strconv.Itoa(id.Score))
+	writeFile(mc.DirPath+"/previous.txt", strconv.Itoa(mc.Image.Score))
+}
 
-	if mc.Config.Remote != "" && mc.Config.Local == "yes" {
-		checkServer(mc, id)
-		if id.Connection {
-			reportScore(mc, id)
-		}
+func checkConfigData() {
+	readTeamID()
+	if len(mc.Config.Check) == 0 {
+		mc.Image.Conn.OverallColor = "red"
+		mc.Image.Conn.OverallStatus = "There were no checks found in the configuration."
 	}
 }
 
-func scoreChecks(mc *metaConfig, id *imageData) {
-	clearImageData(id)
+func scoreChecks() {
+	mc.Image = imageData{}
 	pointlessChecks := []int{}
 
 	for i, check := range mc.Config.Check {
 		if check.Points == 0 {
 			pointlessChecks = append(pointlessChecks, i)
-			id.ScoredVulns++
+			mc.Image.ScoredVulns++
 		} else if check.Points > 0 {
-			id.TotalPoints += check.Points
-			id.ScoredVulns++
+			mc.Image.TotalPoints += check.Points
+			mc.Image.ScoredVulns++
 		}
 	}
 
-	pointsLeft := 100 - id.TotalPoints
+	pointsLeft := 100 - mc.Image.TotalPoints
 	if pointsLeft < 0 && len(pointlessChecks) > 0 {
 		// If the specified points already value over 100, yet there are
 		// checks without points assigned, we assign the default point value
@@ -72,16 +87,16 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 		for _, check := range pointlessChecks {
 			mc.Config.Check[check].Points = pointsEach
 		}
-		id.TotalPoints += (pointsEach * len(pointlessChecks))
-		if id.TotalPoints < 100 {
-			for i := 0; id.TotalPoints < 100; id.TotalPoints++ {
+		mc.Image.TotalPoints += (pointsEach * len(pointlessChecks))
+		if mc.Image.TotalPoints < 100 {
+			for i := 0; mc.Image.TotalPoints < 100; mc.Image.TotalPoints++ {
 				mc.Config.Check[pointlessChecks[i]].Points++
 				i++
 				if i > len(pointlessChecks)-1 {
 					i = 0
 				}
 			}
-			id.TotalPoints += (100 - id.TotalPoints)
+			mc.Image.TotalPoints += (100 - mc.Image.TotalPoints)
 		}
 	}
 
@@ -112,9 +127,9 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 					passPrint("")
 					fmt.Printf("Check passed: %s - %d pts\n", check.Message, check.Points)
 				}
-				id.Points = append(id.Points, scoreItem{check.Message, check.Points})
-				id.Score += check.Points
-				id.Contribs += check.Points
+				mc.Image.Points = append(mc.Image.Points, scoreItem{check.Message, check.Points})
+				mc.Image.Score += check.Points
+				mc.Image.Contribs += check.Points
 			}
 		} else {
 			if status {
@@ -122,13 +137,13 @@ func scoreChecks(mc *metaConfig, id *imageData) {
 					failPrint("")
 					fmt.Printf("Penalty triggered: %s - %d pts\n", check.Message, check.Points)
 				}
-				id.Penalties = append(id.Penalties, scoreItem{check.Message, check.Points})
-				id.Score += check.Points
-				id.Detracts += check.Points
+				mc.Image.Penalties = append(mc.Image.Penalties, scoreItem{check.Message, check.Points})
+				mc.Image.Score += check.Points
+				mc.Image.Detracts += check.Points
 			}
 		}
 	}
 	if verboseEnabled {
-		infoPrint(fmt.Sprintf("Score: %d", id.Score))
+		infoPrint(fmt.Sprintf("Score: %d", mc.Image.Score))
 	}
 }
