@@ -5,9 +5,9 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"io"
-	"errors"
 	"math"
 	"net/http"
 	"net/url"
@@ -30,8 +30,8 @@ func readTeamID() {
 	} else if fileContent == "" {
 		failPrint("TeamID.txt is empty!")
 		sendNotification("TeamID.txt is empty!")
-		mc.Image.Conn.OverallStatus  = "red"
-		mc.Image.Conn.OverallStatus  = "Your TeamID is empty! Failed to upload scores."
+		mc.Image.Conn.OverallStatus = "red"
+		mc.Image.Conn.OverallStatus = "Your TeamID is empty! Failed to upload scores."
 		mc.Image.Connection = false
 	} else {
 		mc.TeamID = fileContent
@@ -44,14 +44,8 @@ func genChallenge() string {
 	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
 	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
 	chalString := hexEncode(xor(randomHash1, randomHash2))
-	var password string
-	if mc.Config.Password != "" {
-		password = mc.Config.Password
-	} else {
-		password = remoteBackupKey
-	}
 	hasher := sha256.New()
-	hasher.Write([]byte(password))
+	hasher.Write([]byte(mc.Config.Password))
 	key := hexEncode(string(hasher.Sum(nil)))
 	return hexEncode(xor(key, chalString))
 }
@@ -65,7 +59,6 @@ func writeString(stringToWrite *strings.Builder, key, value string) {
 
 func genUpdate() string {
 	var update strings.Builder
-
 	// Write values for score update
 	writeString(&update, "team", mc.TeamID)
 	writeString(&update, "image", mc.Config.Name)
@@ -73,17 +66,10 @@ func genUpdate() string {
 	writeString(&update, "challenge", genChallenge())
 	writeString(&update, "vulns", genVulns())
 	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
-
-	var password string
-	if mc.Config.Password != "" {
-		password = mc.Config.Password
-	} else {
-		password = remoteBackupKey
-	}
 	if verboseEnabled {
-		infoPrint("Encrypting score report...")
+		infoPrint("Encrypting score update...")
 	}
-	return hexEncode(encryptString(password, update.String()))
+	return hexEncode(encryptString(mc.Config.Password, update.String()))
 }
 
 func genVulns() string {
@@ -96,7 +82,7 @@ func genVulns() string {
 
 	// Build vuln string
 	for _, penalty := range mc.Image.Penalties {
-		vulnString.WriteString(fmt.Sprintf("[PENALTY] %s - N%.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
+		vulnString.WriteString(fmt.Sprintf("%s - N%.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
 		vulnString.WriteString(delimiter)
 	}
 
@@ -105,16 +91,11 @@ func genVulns() string {
 		vulnString.WriteString(delimiter)
 	}
 
-	var password string
-	if mc.Config.Password != "" {
-		password = mc.Config.Password
-	} else {
-		password = remoteBackupKey
-	}
 	if verboseEnabled {
 		infoPrint("Encrypting vulnerabilities...")
 	}
-	return hexEncode(encryptString(password, vulnString.String()))
+
+	return hexEncode(encryptString(mc.Config.Password, vulnString.String()))
 }
 
 func reportScore() error {
@@ -218,21 +199,21 @@ func checkServer() {
 //
 // This function is used in aeacus to encrypt reported vulnerability data to
 // the remote scoring endpoint (ex. minos).
-func encryptString(password, plaintext string) string {
+func encryptString(password, plainText string) string {
 
 	// Create a sha256sum hash of the password provided.
 	hasher := sha256.New()
 	hasher.Write([]byte(password))
 	key := hasher.Sum(nil)
 
-	// Pad plaintext to be a 16-byte block.
-	paddingArray := make([]byte, (aes.BlockSize - len(plaintext)%aes.BlockSize))
+	// Pad plainText to be a 16-byte block.
+	paddingArray := make([]byte, (aes.BlockSize - len(plainText)%aes.BlockSize))
 	for char := range paddingArray {
 		paddingArray[char] = 0x20 // Padding with space character.
 	}
-	plaintext = plaintext + string(paddingArray)
-	if len(plaintext)%aes.BlockSize != 0 {
-		panic("Plaintext is not a multiple of block size!")
+	plainText = plainText + string(paddingArray)
+	if len(plainText)%aes.BlockSize != 0 {
+		panic("plainText is not a multiple of block size!")
 	}
 
 	// Create cipher block with key.
@@ -253,8 +234,8 @@ func encryptString(password, plaintext string) string {
 		panic(err.Error())
 	}
 
-	// Encrypt and seal plaintext.
-	ciphertext := aesgcm.Seal(nil, nonce, []byte(plaintext), nil)
+	// Encrypt and seal plainText.
+	ciphertext := aesgcm.Seal(nil, nonce, []byte(plainText), nil)
 	ciphertext = []byte(fmt.Sprintf("%s%s", nonce, ciphertext))
 
 	return string(ciphertext)
@@ -288,11 +269,11 @@ func decryptString(password, ciphertext string) string {
 	}
 
 	// Decrypt (and check validity, since it's GCM) of ciphertext.
-	plaintext, err := aesgcm.Open(nil, iv, []byte(ciphertext), nil)
+	plainText, err := aesgcm.Open(nil, iv, []byte(ciphertext), nil)
 	if err != nil {
 		failPrint(err.Error())
 		return ""
 	}
 
-	return string(plaintext)
+	return strings.TrimSpace(string(plainText))
 }

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log"
 	"os"
-	"runtime"
 	"strconv"
 
 	"github.com/urfave/cli"
@@ -22,14 +21,7 @@ import (
 
 func main() {
 
-	if runtime.GOOS == "linux" {
-		mc.DirPath = "/opt/aeacus/"
-	} else if runtime.GOOS == "windows" {
-		mc.DirPath = "C:\\aeacus\\"
-	} else {
-		failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
-		os.Exit(1)
-	}
+	fillConstants()
 
 	app := &cli.App{
 		UseShortOptionHandling: true,
@@ -39,7 +31,7 @@ func main() {
 		Action: func(c *cli.Context) error {
 			parseFlags(c)
 			runningPermsCheck()
-			checkConfig()
+			checkConfig(scoringConf)
 			scoreImage()
 			return nil
 		},
@@ -63,7 +55,7 @@ func main() {
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
 					runningPermsCheck()
-					checkConfig()
+					checkConfig(scoringConf)
 					scoreImage()
 					return nil
 				},
@@ -74,27 +66,27 @@ func main() {
 				Usage:   "Check that the scoring config is valid",
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
-					checkConfig()
+					checkConfig(scoringConf)
 					return nil
 				},
 			},
 			{
 				Name:    "encrypt",
 				Aliases: []string{"e"},
-				Usage:   "Encrypt scoring.conf to scoring.dat",
+				Usage:   "Encrypt scoring configuration",
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
-					writeConfig(scoringConf)
+					writeConfig(scoringConf, scoringData)
 					return nil
 				},
 			},
 			{
 				Name:    "decrypt",
 				Aliases: []string{"d"},
-				Usage:   "Check that scoring.dat is valid",
+				Usage:   "Check that scoring data file is valid",
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
-					decryptedData, err := decodeString(readData(scoringDat))
+					decryptedData, err := decodeString(readData(scoringData))
 					if err != nil {
 						return errors.New("error in reading scoring.dat")
 					}
@@ -116,7 +108,7 @@ func main() {
 						return errors.New("Invalid or missing number passed to forensics")
 					}
 					parseFlags(c)
-					checkConfig()
+					checkConfig(scoringConf)
 					createFQs(numFqs)
 					return nil
 				},
@@ -192,10 +184,10 @@ func parseFlags(c *cli.Context) {
 
 // checkConfig parses and checks the validity of the current
 // `scoring.conf` file.
-func checkConfig() {
-	fileContent, err := readFile(mc.DirPath + "scoring.conf")
+func checkConfig(fileName string) {
+	fileContent, err := readFile(mc.DirPath + fileName)
 	if err != nil {
-		failPrint("Configuration file not found!")
+		failPrint("Configuration file (" + fileName + "not found!")
 		os.Exit(1)
 	}
 	parseConfig(fileContent)
@@ -208,8 +200,8 @@ func checkConfig() {
 // writing the ReadMe/Desktop Files, installing the system service,
 // and cleaning the image for release.
 func releaseImage() {
-	checkConfig()
-	writeConfig(scoringDat)
+	checkConfig(scoringConf)
+	writeConfig(scoringConf, scoringData)
 	genReadMe()
 	writeDesktopFiles()
 	configureAutologin()

@@ -8,7 +8,7 @@ type metaConfig struct {
 	TeamID  string
 	DirPath string
 	Config  scoringChecks
-	Image imageData
+	Image   imageData
 }
 
 type imageData struct {
@@ -20,16 +20,16 @@ type imageData struct {
 	Penalties   []scoreItem
 	Detracts    int
 	TotalPoints int
-	Conn connData
+	Conn        connData
 	Connection  bool
 }
 
 type connData struct {
-	ServerColor string
-	ServerStatus string
-	NetColor string
-	NetStatus string
-	OverallColor string
+	ServerColor   string
+	ServerStatus  string
+	NetColor      string
+	NetStatus     string
+	OverallColor  string
 	OverallStatus string
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"runtime"
 	"time"
 )
 
@@ -11,7 +12,7 @@ var aeacusVersion = "1.2.0"
 var verboseEnabled = false
 var reverseEnabled = false
 var scoringConf = "scoring.conf"
-var scoringDat = "scoring.dat"
+var scoringData = "scoring.dat"
 var mc = &metaConfig{}
 
 // writeFile wraps ioutil's WriteFule function, and prints
@@ -36,6 +37,17 @@ func timeCheck() {
 				destroyImage()
 			}
 		}
+	}
+}
+
+func fillConstants() {
+	if runtime.GOOS == "linux" {
+		mc.DirPath = "/opt/aeacus/"
+	} else if runtime.GOOS == "windows" {
+		mc.DirPath = "C:\\aeacus\\"
+	} else {
+		failPrint("This operating system (" + runtime.GOOS + ") is not supported!")
+		os.Exit(1)
 	}
 }
 

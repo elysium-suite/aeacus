@@ -86,27 +86,18 @@ func launchIDPromptWrapper(quit chan struct{}) {
 
 func phocusStart(quit chan struct{}) {
 
-	var teamID string
-	var dirPath string
-
 	if !adminCheck() {
 		failPrint("You need to run this binary as root or Administrator!")
 		os.Exit(1)
 	}
-	if runtime.GOOS == "linux" {
-		dirPath = "/opt/aeacus/"
-	} else if runtime.GOOS == "windows" {
-		dirPath = "C:\\aeacus\\"
-	} else {
-		failPrint("What are you up to?")
-		os.Exit(1)
-	}
+
+	fillConstants()
 
 	app := &cli.App{
 		Name:  "phocus",
 		Usage: "score vulnerabilities",
 		Action: func(c *cli.Context) error {
-			decryptedData, err := decodeString(readData(&mc))
+			decryptedData, err := decodeString(readData(scoringData))
 			if err != nil {
 				return errors.New("Error in reading scoring.dat!")
 			}
@@ -116,7 +107,7 @@ func phocusStart(quit chan struct{}) {
 				timeCheck()
 				mc.Image = imageData{}
 				infoPrint("Scoring image...")
-				scoreImage(&id)
+				scoreImage()
 				jitter := time.Duration(rand.Intn(8) + 8)
 				infoPrint("Scored image, sleeping for a bit...")
 				time.Sleep(jitter * time.Second)

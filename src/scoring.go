@@ -52,7 +52,6 @@ func scoreImage() {
 	writeFile(mc.DirPath+"/previous.txt", strconv.Itoa(mc.Image.Score))
 }
 
-
 func checkConfigData() {
 	readTeamID()
 	// TODO validitiy checks for config data (non-0 checks, etc)

@@ -21,22 +21,13 @@ import (
 	"os"
 )
 
-// This key is used as a backup for remote encryption when there is no password
-// specified in the configuration.
-//
-// This must be the same value specified in Minos (or any other reporting
-// endpoint) as a backup password.
-var remoteBackupKey = "ThisIsAReallyCoolAndSecureKeyLol"
-
 // These hashes are used for XORing the plaintext. Again-- not
 // cryptographically genius.
 var randomHashOne = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 var randomHashTwo = "NowThatsWhatICallARandomString"
 
-// writeCryptoConfig takes the metaConfig (context) and writes to the hardcoded
-// file `scoring.dat`, in the DirPath specified in the metaConfig.
-// writeCryptoConfig is used to create the encrypted `scoring.dat` from the
-// plaintext configuration `scoring.conf`.
+// encryptConfig takes the plainText config and returns an encrypted string
+// that should be written to the encrypted scoring data file.
 func encryptConfig(plainText string) string {
 
 	if verboseEnabled {
@@ -57,8 +48,7 @@ func encryptConfig(plainText string) string {
 
 }
 
-// readCryptoConfig is used to decrypt the `scoring.dat` file, which contains
-// the configuration for aeacus.
+// decryptConfig is used to decrypt the scoring data file.
 func decryptConfig(cipherText string) string {
 
 	// Create our key by XORing two strings.

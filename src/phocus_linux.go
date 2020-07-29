@@ -26,22 +26,12 @@ import (
 
 func main() {
 
-	var teamID string
-	var dirPath string
-
 	if !adminCheck() {
 		failPrint("You need to run this binary as root or Administrator!")
 		os.Exit(1)
 	}
 
-	if runtime.GOOS == "linux" {
-		dirPath = "/opt/aeacus/"
-	} else if runtime.GOOS == "windows" {
-		dirPath = "C:\\aeacus\\"
-	} else {
-		failPrint("What are you up to?")
-		os.Exit(1)
-	}
+	fillConstants()
 
 	daemonTest := os.Getenv("INVOCATION_ID")
 	if daemonTest == "" {
@@ -53,7 +43,7 @@ func main() {
 		Name:  "phocus",
 		Usage: "score vulnerabilities",
 		Action: func(c *cli.Context) error {
-			parseConfig(&mc, readData(&mc))
+			parseConfig(readData(scoringData))
 			rand.Seed(time.Now().UnixNano())
 			for {
 				timeCheck()

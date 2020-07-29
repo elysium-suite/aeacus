@@ -140,7 +140,7 @@ func destroyImage() {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
 	} else {
 		shellCommand("del /s /q C:\\aeacus")
-		if !(mc.Config.NoDestroy == "yes") {
+		if !mc.Config.NoDestroy {
 			// nuke registry
 			// other destructive commands
 			// rm -rf /

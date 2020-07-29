@@ -16,21 +16,21 @@ func parseConfig(configContent string) {
 	}
 }
 
-func writeConfig(fileName string) {
+func writeConfig(sourceFile, destFile string) {
 	if verboseEnabled {
-		infoPrint("Reading configuration from " + mc.DirPath + fileName + "...")
+		infoPrint("Reading configuration from " + mc.DirPath + sourceFile + "...")
 	}
-	// Open the hardcoded file path to the plaintext configuration.
-	configFile, err := readFile(mc.DirPath + fileName)
+
+	configFile, err := readFile(mc.DirPath + sourceFile)
 	if err != nil {
-		failPrint("Can't open scoring configuration file (" + fileName + "): " + err.Error())
+		failPrint("Can't open scoring configuration file (" + sourceFile + "): " + err.Error())
 		os.Exit(1)
 	}
 	encryptedConfig := encryptConfig(configFile)
 	if verboseEnabled {
 		infoPrint("Writing data to " + mc.DirPath + "...")
 	}
-	writeFile(mc.DirPath+scoringDat, encryptedConfig)
+	writeFile(mc.DirPath+destFile, encryptedConfig)
 }
 
 func readData(fileName string) string {
