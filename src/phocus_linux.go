@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/urfave/cli"
