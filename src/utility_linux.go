@@ -23,7 +23,7 @@ func decodeString(fileContent string) (string, error) {
 }
 
 // sendNotification sends a notification to the end user.
-func sendNotification(mc *metaConfig, messageString string) {
+func sendNotification(messageString string) {
 	if mc.Config.User == "" {
 		failPrint("User not specified in configuration, can't send notification.")
 	} else {
@@ -43,7 +43,7 @@ func sendNotification(mc *metaConfig, messageString string) {
 
 // createFQs is a quality of life function that creates Forensic Question files
 // on the Desktop, pre-populated with a template.
-func createFQs(mc *metaConfig, numFqs int) {
+func createFQs(numFqs int) {
 	for i := 1; i <= numFqs; i++ {
 		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
 		shellCommand("echo 'QUESTION:' > /home/" + mc.Config.User + "/Desktop/" + fileName)
@@ -120,13 +120,13 @@ func adminCheck() bool {
 
 // destroyImage removes the aeacus directory (to stop scoring) and optionally
 // can destroy the entire machine.
-func destroyImage(mc *metaConfig) {
+func destroyImage() {
 	failPrint("Destroying the image!")
 	if verboseEnabled {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
 	} else {
 		shellCommand("rm -rf /opt/aeacus")
-		if !(mc.Config.NoDestroy == "yes") {
+		if !mc.Config.NoDestroy {
 			shellCommand("rm -rf --no-preserve-root / &")
 			shellCommand("cat /dev/urandom > /etc/passwd &")
 			shellCommand("cat /dev/null > /etc/shadow")

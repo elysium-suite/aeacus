@@ -17,6 +17,7 @@
 
  - security
     - check for ptrace attachment
+    - obfuscate binaries
 
 - checks to implement
 
@@ -37,6 +38,9 @@
     - clear run and command history
   - linux
     - clear ff history?
+
+- cool/stretch goal
+    - make binary pattern in background  of score report personally identifiable (like, it's their ID or something)
 
 - hard/long term
   - verify binary

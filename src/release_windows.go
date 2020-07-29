@@ -1,6 +1,6 @@
 package main
 
-func writeDesktopFiles(mc *metaConfig) {
+func writeDesktopFiles() {
 	firefoxBinary := `C:\Program Files (x86)\Mozilla Firefox\firefox.exe`
 	if verboseEnabled {
 		infoPrint("Writing ScoringReport.html shortcut to Desktop...")
@@ -36,7 +36,7 @@ func writeDesktopFiles(mc *metaConfig) {
 	// domain compatibility? doubt
 }
 
-func configureAutologin(mc *metaConfig) {
+func configureAutologin() {
 	if verboseEnabled {
 		infoPrint("Setting Up autologin for " + mc.Config.User + "...")
 	}
