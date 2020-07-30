@@ -186,7 +186,7 @@ arg1='user'
 arg2='01/17/2019 20:57:41'
 ```
 > You should take the value from `Get-LocalUser user | select PasswordLastSet` and use it as `arg2`.
-**windowsFeature**: pass if Feature Enabled
+**WindowsFeature**: pass if Feature Enabled
 
 ```
 type='WindowsFeature'
