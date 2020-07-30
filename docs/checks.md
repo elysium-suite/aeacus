@@ -282,3 +282,5 @@ type='FileOwner'
 arg1='C:\test.txt'
 arg2='BUILTIN\Administrators'
 ```
+
+> Get owner of the file using (Get-Acl [FILENAME]).Owner
