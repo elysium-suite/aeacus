@@ -12,7 +12,7 @@ func scoreImage() {
 		scoreChecks()
 		if mc.Config.Remote != "" {
 			checkServer()
-			if mc.Image.Connection {
+			if mc.Connection {
 				reportScore()
 			}
 		}
@@ -21,7 +21,7 @@ func scoreImage() {
 	} else {
 		if mc.Config.Remote != "" {
 			checkServer()
-			if !mc.Image.Connection {
+			if !mc.Connection {
 				genReport(mc.Image)
 				return
 			}
@@ -53,11 +53,15 @@ func scoreImage() {
 }
 
 func checkConfigData() {
-	readTeamID()
 	if len(mc.Config.Check) == 0 {
-		mc.Image.Conn.OverallColor = "red"
-		mc.Image.Conn.OverallStatus = "There were no checks found in the configuration."
+		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallStatus = "There were no checks found in the configuration."
+	} else {
+		// For none-remote local connections
+		mc.Conn.OverallColor = "green"
+		mc.Conn.OverallStatus = "OK"
 	}
+	readTeamID()
 }
 
 func scoreChecks() {

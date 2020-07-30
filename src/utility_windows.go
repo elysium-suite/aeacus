@@ -10,8 +10,14 @@ import (
 	"strings"
 
 	"github.com/gen2brain/beeep"
+	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
+)
+
+var (
+	kernel32DLL   = windows.NewLazyDLL("Kernel32.dll")
+	debuggerCheck = kernel32DLL.NewProc("IsDebuggerPresent")
 )
 
 // readFile (Windows) uses ioutil's ReadFile function and passes the returned
@@ -57,6 +63,14 @@ func decodeString(fileContent string) (string, error) {
 	// Decode and print
 	decoded, err := ioutil.ReadAll(unicodeReader)
 	return string(decoded), err
+}
+
+func checkTrace() {
+	result, _, _ := debuggerCheck.Call()
+	if int(result) != 0 {
+		failPrint("Reversing is cool, but we would appreciate if you practiced your skills in an environment that was less destructive to other peoples' experiences.")
+		os.Exit(1)
+	}
 }
 
 // sendNotification (Windows) employes the beeep library to send notifications

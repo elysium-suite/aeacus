@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"os/user"
 	"strconv"
+	"strings"
 )
 
 // readFile (Linux) wraps ioutil's ReadFile function.
@@ -38,6 +39,15 @@ func sendNotification(messageString string) {
 			    display="unix:abstract=$(cat /run/user/$uid/dbus-session | cut -d '=' -f3)"
 			fi
 			sudo -u $user DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$display notify-send -i /opt/aeacus/assets/logo.png "Aeacus SE" "` + messageString + `"`)
+	}
+}
+
+func checkTrace() {
+	procStatus, _ := readFile("/proc/self/status")
+	splitProcStatus := strings.Split(grepString("TracerPid", procStatus), "\t")
+	if len(splitProcStatus) > 1 && strings.TrimSpace(splitProcStatus[1]) != "0" {
+		failPrint("Try harder instead of tracing the engine, please.")
+		os.Exit(1)
 	}
 }
 

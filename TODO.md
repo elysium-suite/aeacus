@@ -16,19 +16,15 @@
   - ^^ THIS IS LARGELY FIXED. I count null bytes to detect unicode vs ansi. However, when the text read is only one character (for example, `b`), it will fail if unicode
 
  - security
-    - check for ptrace attachment
     - obfuscate binaries
 
 - checks to implement
 
   - windows startup programs
-  - windows features
   - windows and linux updates and auto-updating status (apt only for linux)
   - windows (Make less janky)
   - windows and linux firefox checks
-  - service-specific hardening and checks
-    - do we implement this for linux or just let people use filecontains?
-    - do we implement sysctl checks?
+  - windows service-specific hardening and checks
   - windows DEP
 
 - release

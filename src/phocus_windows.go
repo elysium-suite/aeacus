@@ -90,6 +90,7 @@ func phocusStart(quit chan struct{}) {
 		os.Exit(1)
 	}
 
+	checkTrace()
 	fillConstants()
 
 	app := &cli.App{
@@ -103,6 +104,7 @@ func phocusStart(quit chan struct{}) {
 			parseConfig(decryptedData)
 			rand.Seed(time.Now().UnixNano())
 			for {
+				checkTrace()
 				timeCheck()
 				mc.Image = imageData{}
 				infoPrint("Scoring image...")

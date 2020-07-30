@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"regexp"
 	"runtime"
 	"time"
 )
@@ -38,6 +39,11 @@ func timeCheck() {
 			}
 		}
 	}
+}
+
+func grepString(patternText, fileText string) string {
+	re := regexp.MustCompile("(?m)[\r\n]+^.*" + patternText + ".*$")
+	return string(re.Find([]byte(fileText)))
 }
 
 func fillConstants() {
