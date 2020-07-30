@@ -71,17 +71,17 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		}
 		result, err := autoCheckUpdatesEnabled()
 		return err == nil && !result
-	case "OctalPermissionIs":
+	case "PermissionIs":
 		if check.Message == "" {
-			check.Message = "The octal permissions value of the " + arg1 + " file is " + arg2
+			check.Message = "The permissions of the " + arg1 + " file is " + arg2
 		}
-		result, err := octalPermissionIs(arg1, arg2)
+		result, err := permissionIs(arg1, arg2)
 		return err == nil && result
-	case "OctalPermissionIsNot":
+	case "PermissionIsNot":
 		if check.Message == "" {
-			check.Message = "The octal permissions value of the " + arg1 + " file is not " + arg2
+			check.Message = "The permissions of the " + arg1 + " file is not " + arg2
 		}
-		result, err := octalPermissionIs(arg1, arg2)
+		result, err := permissionIs(arg1, arg2)
 		return err == nil && !result
 	}
 	return false
@@ -154,6 +154,6 @@ func autoCheckUpdatesEnabled() (bool, error) {
 	return fileContainsRegex("/etc/apt/apt.conf.d/20auto-upgrades", `APT::Periodic::Update-Package-Lists( |)"1";`)
 }
 
-func octalPermissionIs(filePath string, permissionToCheck string) (bool, error) {
+func permissionIs(filePath, permissionToCheck string) (bool, error) {
 	return command(`stat -c '%a' ` + filePath + ` | grep -q ` + permissionToCheck)
 }

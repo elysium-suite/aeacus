@@ -174,10 +174,10 @@ arg1='5.4.0-42-generic'
 type='AutoCheckUpdatesEnabled'
 ```
 
-**OctalPermissionIs**: pass if the specified file has the octal permissions specified
+**PermissionIs**: pass if the specified file has the octal permissions specified
 
 ```
-type='OctalPermissionIs'
+type='PermissionIs'
 arg1='/etc/passwd'
 arg2='644'
 ```
