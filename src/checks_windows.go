@@ -182,13 +182,11 @@ func serviceUp(serviceName string) (bool, error) {
 }
 
 func PasswordChanged(user, date string) (bool, error) {
-	res, err := command(`Get-LocalUser " + user + " | select PasswordLastSet | Select-String "` + date + `"`)
-	return !res, err
+	return command(`Get-LocalUser " + user + " | select PasswordLastSet | Select-String "` + date + `"`)
 }
 
 func WindowsFeature(feature string) (bool, error) {
-	res, err := command("Get-WindowsOptionalFeature -FeatureName " + feature + " -Online | Select-Object State | Select-String Enabled")
-	return res, err
+	return command("Get-WindowsOptionalFeature -FeatureName " + feature + " -Online | Select-Object State | Select-String Enabled")
 }
 
 func userExists(userName string) (bool, error) {
