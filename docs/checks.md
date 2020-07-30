@@ -282,3 +282,13 @@ arg1='SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
 > **Note!**: Notice the single quotes `'` on the above argument! This means it's a _string literal_ in TOML. If you don't do this, you have to make sure to escape your slashes (`\` --> `\\`)
 
 > Note: You can use `SOFTWARE` as a shortcut to mean `HKEY_LOCAL_MACHINE\SOFTWARE`.
+
+**FileOwner**: pass if specified owner is the owner of the specified file
+
+```
+type='FileOwner'
+arg1='C:\test.txt'
+arg2='BUILTIN\Administrators'
+```
+
+> Get owner of the file using (Get-Acl [FILENAME]).Owner
