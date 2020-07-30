@@ -174,6 +174,14 @@ arg1='5.4.0-42-generic'
 type='AutoCheckUpdatesEnabled'
 ```
 
+**PermissionIs**: pass if the specified file has the octal permissions specified
+
+```
+type='PermissionIs'
+arg1='/etc/passwd'
+arg2='644'
+```
+
 <hr>
 
 ### Windows-Specific Checks
