@@ -73,13 +73,13 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		return err == nil && !result
 	case "PermissionIs":
 		if check.Message == "" {
-			check.Message = "The permissions of the " + arg1 + " file is " + arg2
+			check.Message = "The permissions of " + arg1 " are " + arg2
 		}
 		result, err := permissionIs(arg1, arg2)
 		return err == nil && result
 	case "PermissionIsNot":
 		if check.Message == "" {
-			check.Message = "The permissions of the " + arg1 + " file is not " + arg2
+			check.Message = "The permissions of " + arg1 " are not " + arg2
 		}
 		result, err := permissionIs(arg1, arg2)
 		return err == nil && !result
