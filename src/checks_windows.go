@@ -126,17 +126,17 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		}
 		result, err := PasswordChanged(arg1, arg2)
 		return err == nil && !result
-	case "WindowsFeature":
+	case "windowsFeature":
 		if check.Message == "" {
 			check.Message = arg1 + " Feature has been Enabled"
 		}
-		result, err := WindowsFeature(arg1)
+		result, err := windowsFeature(arg1)
 		return err == nil && result
-	case "WindowsFeatureNot":
+	case "windowsFeatureNot":
 		if check.Message == "" {
 			check.Message = arg1 + " Feature has been Disabled"
 		}
-		result, err := WindowsFeature(arg1)
+		result, err := windowsFeature(arg1)
 		return err == nil && !result
 			
 	default:
@@ -185,7 +185,7 @@ func PasswordChanged(user, date string) (bool, error) {
 	return command(`Get-LocalUser " + user + " | select PasswordLastSet | Select-String "` + date + `"`)
 }
 
-func WindowsFeature(feature string) (bool, error) {
+func windowsFeature(feature string) (bool, error) {
 	return command("Get-WindowsOptionalFeature -FeatureName " + feature + " -Online | Select-Object State | Select-String Enabled")
 }
 
