@@ -1,4 +1,4 @@
-## DO NOT RUN THIS ON YOUR VM, THIS IS FOR TRAVIS ##
+## DO NOT RUN THIS ON YOUR VM, THIS IS FOR ACTIONS ##
 
 # Grab dependencies
 echo "[+] Getting general dependencies..."
