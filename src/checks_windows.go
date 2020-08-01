@@ -128,25 +128,25 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		return err == nil && !result
 	case "WindowsFeature":
 		if check.Message == "" {
-			check.Message = arg1 + " Feature has been Enabled"
+			check.Message = arg1 + " feature has been enabled"
 		}
 		result, err := windowsFeature(arg1)
 		return err == nil && result
 	case "WindowsFeatureNot":
 		if check.Message == "" {
-			check.Message = arg1 + " Feature has been Disabled"
+			check.Message = arg1 + " feature has been disabled"
 		}
 		result, err := windowsFeature(arg1)
 		return err == nil && !result
 	case "FileOwner":
 		if check.Message == "" {
-			check.Message = arg1 + " Is owned by " + arg2
+			check.Message = arg1 + " is owned by " + arg2
 		}
 		result, err := fileOwner(arg1, arg2)
 		return err == nil && result
 	case "FileOwnerNot":
 		if check.Message == "" {
-			check.Message = arg1 + " Is not owned by " + arg2
+			check.Message = arg1 + " is not owned by " + arg2
 		}
 		result, err := fileOwner(arg1, arg2)
 		return err == nil && !result
@@ -197,7 +197,7 @@ func PasswordChanged(user, date string) (bool, error) {
 }
 
 func windowsFeature(feature string) (bool, error) {
-	return commandOutput("(Get-WindowsOptionalFeature -FeatureName " + feature + " -Online).State", "Enabled")
+	return commandOutput("(Get-WindowsOptionalFeature -FeatureName "+feature+" -Online).State", "Enabled")
 }
 
 func fileOwner(filePath, owner string) (bool, error) {

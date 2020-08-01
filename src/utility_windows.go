@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -10,8 +9,14 @@ import (
 	"strings"
 
 	"github.com/gen2brain/beeep"
+	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
+)
+
+var (
+	kernel32DLL   = windows.NewLazyDLL("Kernel32.dll")
+	debuggerCheck = kernel32DLL.NewProc("IsDebuggerPresent")
 )
 
 // readFile (Windows) uses ioutil's ReadFile function and passes the returned
@@ -59,6 +64,14 @@ func decodeString(fileContent string) (string, error) {
 	return string(decoded), err
 }
 
+func checkTrace() {
+	result, _, _ := debuggerCheck.Call()
+	if int(result) != 0 {
+		failPrint("Reversing is cool, but we would appreciate if you practiced your skills in an environment that was less destructive to other peoples' experiences.")
+		os.Exit(1)
+	}
+}
+
 // sendNotification (Windows) employes the beeep library to send notifications
 // to the end user.
 func sendNotification(messageString string) {
@@ -74,6 +87,10 @@ func sendNotification(messageString string) {
 // speed things up, as well as some other flags) to run commands on the host
 // system and retrieve the return value.
 func rawCmd(commandGiven string) *exec.Cmd {
+	if debugEnabled {
+		cmdInput := "powershell.exe -NonInteractive -NoProfile Invoke-Command -ScriptBlock { "+commandGiven+" }"
+		infoPrint("rawCmd input: " + cmdInput)
+	}
 	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 }
 
@@ -156,10 +173,7 @@ func destroyImage() {
 // the username of the Local User (NTAccount) that it belongs to.
 func sidToLocalUser(sid string) string {
 	cmdText := "$objSID = New-Object System.Security.Principal.SecurityIdentifier('" + sid + "'); $objUser = $objSID.Translate([System.Security.Principal.NTAccount]); Write-Host $objUser.Value"
-	output, err := shellCommandOutput(cmdText)
-	if err != nil {
-		fmt.Println("yep so err was", err.Error())
-	}
+	output, _ := shellCommandOutput(cmdText)
 	return strings.TrimSpace(output)
 }
 
