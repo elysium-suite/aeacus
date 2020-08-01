@@ -5,10 +5,12 @@ import (
 )
 
 type metaConfig struct {
-	TeamID  string
-	DirPath string
-	Config  scoringChecks
-	Image   imageData
+	TeamID     string
+	DirPath    string
+	Config     scoringChecks
+	Image      imageData
+	Conn       connData
+	Connection bool
 }
 
 type imageData struct {
@@ -20,8 +22,6 @@ type imageData struct {
 	Penalties   []scoreItem
 	Detracts    int
 	TotalPoints int
-	Conn        connData
-	Connection  bool
 }
 
 type connData struct {
@@ -52,10 +52,11 @@ type scoringChecks struct {
 }
 
 type check struct {
-	Message string
-	Points  int
-	Pass    []condition
-	Fail    []condition
+	Message      string
+	Points       int
+	Pass         []condition
+	PassOverride []condition
+	Fail         []condition
 }
 
 type condition struct {

@@ -14,6 +14,11 @@ func parseConfig(configContent string) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	// If there's no remote, local must be enabled
+	if mc.Config.Remote == "" {
+		mc.Config.Local = true
+	}
 }
 
 func writeConfig(sourceFile, destFile string) {

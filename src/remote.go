@@ -24,15 +24,15 @@ func readTeamID() {
 	if err != nil {
 		failPrint("TeamID.txt does not exist!")
 		sendNotification("TeamID.txt does not exist!")
-		mc.Image.Conn.OverallColor = "red"
-		mc.Image.Conn.OverallStatus = "Your TeamID files does not exist! Failed to upload scores."
-		mc.Image.Connection = false
+		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallStatus = "Your TeamID files does not exist! Failed to upload scores."
+		mc.Connection = false
 	} else if fileContent == "" {
 		failPrint("TeamID.txt is empty!")
 		sendNotification("TeamID.txt is empty!")
-		mc.Image.Conn.OverallStatus = "red"
-		mc.Image.Conn.OverallStatus = "Your TeamID is empty! Failed to upload scores."
-		mc.Image.Connection = false
+		mc.Conn.OverallStatus = "red"
+		mc.Conn.OverallStatus = "Your TeamID is empty! Failed to upload scores."
+		mc.Connection = false
 	} else {
 		mc.TeamID = fileContent
 	}
@@ -109,9 +109,9 @@ func reportScore() error {
 
 	if resp.StatusCode != 200 {
 		failPrint("Failed to upload score! Is your TeamID wrong?")
-		mc.Image.Conn.OverallColor = "red"
-		mc.Image.Conn.OverallStatus = "Failed to upload score! Please ensure that your Team ID is correct."
-		mc.Image.Connection = false
+		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallStatus = "Failed to upload score! Please ensure that your Team ID is correct."
+		mc.Connection = false
 		sendNotification("Failed to upload score! Is your Team ID correct?")
 		if !mc.Config.Local {
 			if verboseEnabled {
@@ -136,11 +136,11 @@ func checkServer() {
 	_, err := client.Get("http://example.org")
 
 	if err != nil {
-		mc.Image.Conn.NetColor = "red"
-		mc.Image.Conn.NetStatus = "FAIL"
+		mc.Conn.NetColor = "red"
+		mc.Conn.NetStatus = "FAIL"
 	} else {
-		mc.Image.Conn.NetColor = "green"
-		mc.Image.Conn.NetStatus = "OK"
+		mc.Conn.NetColor = "green"
+		mc.Conn.NetStatus = "OK"
 	}
 
 	// Scoring engine check
@@ -156,39 +156,39 @@ func checkServer() {
 	// destroy image
 
 	if err != nil {
-		mc.Image.Conn.ServerColor = "red"
-		mc.Image.Conn.ServerStatus = "FAIL"
+		mc.Conn.ServerColor = "red"
+		mc.Conn.ServerStatus = "FAIL"
 	} else {
 		if resp.StatusCode == 200 {
-			mc.Image.Conn.ServerColor = "green"
-			mc.Image.Conn.ServerStatus = "OK"
+			mc.Conn.ServerColor = "green"
+			mc.Conn.ServerStatus = "OK"
 		} else {
-			mc.Image.Conn.ServerColor = "red"
-			mc.Image.Conn.ServerStatus = "ERROR"
+			mc.Conn.ServerColor = "red"
+			mc.Conn.ServerStatus = "ERROR"
 		}
 	}
 
 	// Overall
-	if mc.Image.Conn.NetStatus == "FAIL" && mc.Image.Conn.ServerStatus == "OK" {
-		mc.Image.Conn.OverallColor = "yellow"
-		mc.Image.Conn.OverallStatus = "Server connection good but no Internet. Assuming you're on an isolated LAN."
-		mc.Image.Connection = true
-	} else if mc.Image.Conn.ServerStatus == "FAIL" {
-		mc.Image.Conn.OverallColor = "red"
-		mc.Image.Conn.OverallStatus = "Failure! Can't access remote scoring server."
+	if mc.Conn.NetStatus == "FAIL" && mc.Conn.ServerStatus == "OK" {
+		mc.Conn.OverallColor = "yellow"
+		mc.Conn.OverallStatus = "Server connection good but no Internet. Assuming you're on an isolated LAN."
+		mc.Connection = true
+	} else if mc.Conn.ServerStatus == "FAIL" {
+		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallStatus = "Failure! Can't access remote scoring server."
 		failPrint("Can't access remote scoring server!")
 		sendNotification("Score upload failure! Unable to access remote server.")
-		mc.Image.Connection = false
-	} else if mc.Image.Conn.ServerStatus == "ERROR" {
-		mc.Image.Conn.OverallColor = "red"
-		mc.Image.Conn.OverallStatus = "Score upload failure. Can't send scores to remote server."
+		mc.Connection = false
+	} else if mc.Conn.ServerStatus == "ERROR" {
+		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallStatus = "Score upload failure. Can't send scores to remote server."
 		failPrint("Remote server returned an error for its status!")
 		sendNotification("Score upload failure! Remote server returned an error.")
-		mc.Image.Connection = false
+		mc.Connection = false
 	} else {
-		mc.Image.Conn.OverallColor = "green"
-		mc.Image.Conn.OverallStatus = "OK"
-		mc.Image.Connection = true
+		mc.Conn.OverallColor = "green"
+		mc.Conn.OverallStatus = "OK"
+		mc.Connection = true
 	}
 
 }
