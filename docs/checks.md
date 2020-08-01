@@ -158,7 +158,7 @@ arg1='git'
 arg2='1:2.17.1-1ubuntu0.4'
 ```
 
-> `PackageVersion` checks `uname -r`.
+> `PackageVersion` checks `dpkg -l | awk '$2=="<PACKAGENAME>" { print $3 }'`.
 
 **KernelVersion**: pass if kernel version is equal to specified
 
@@ -166,7 +166,7 @@ arg2='1:2.17.1-1ubuntu0.4'
 type='KernelVersion'
 arg1='5.4.0-42-generic'
 ```
-> `KernelVersion` checks `dpkg -l | awk '$2=="<PACKAGENAME>" { print $3 }'`.
+> `KernelVersion` checks `uname -r`.
 
 **AutoCheckUpdatesEnabled**: pass if the system is configured to automatically check for updates
 
