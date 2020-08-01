@@ -138,7 +138,7 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 		}
 		result, err := windowsFeature(arg1)
 		return err == nil && !result
-			
+
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -186,7 +186,7 @@ func PasswordChanged(user, date string) (bool, error) {
 }
 
 func windowsFeature(feature string) (bool, error) {
-	return commandOutput("(Get-WindowsOptionalFeature -FeatureName " + feature + " -Online).State", "Enabled")
+	return commandOutput("(Get-WindowsOptionalFeature -FeatureName "+feature+" -Online).State", "Enabled")
 }
 
 func userExists(userName string) (bool, error) {

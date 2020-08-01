@@ -52,10 +52,11 @@ type scoringChecks struct {
 }
 
 type check struct {
-	Message string
-	Points  int
-	Pass    []condition
-	Fail    []condition
+	Message      string
+	Points       int
+	Pass         []condition
+	PassOverride []condition
+	Fail         []condition
 }
 
 type condition struct {

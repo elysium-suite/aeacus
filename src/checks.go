@@ -17,6 +17,9 @@ import (
 // processCheckWrapper takes the data from a check in the config
 // and runs the correct function with the correct parameters
 func processCheckWrapper(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
+	if debugEnabled {
+		infoPrint("Handling check: " + checkType)
+	}
 	switch checkType {
 	case "Command":
 		if check.Message == "" {

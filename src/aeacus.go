@@ -22,7 +22,6 @@ import (
 func main() {
 
 	fillConstants()
-
 	app := &cli.App{
 		UseShortOptionHandling: true,
 		EnableBashCompletion:   true,
@@ -42,9 +41,9 @@ func main() {
 				Usage:   "Print extra information",
 			},
 			&cli.BoolFlag{
-				Name:    "reverse",
-				Aliases: []string{"r"},
-				Usage:   "Every check returns the opposite result",
+				Name:    "debug",
+				Aliases: []string{"d"},
+				Usage:   "Print a lot of information",
 			},
 		},
 		Commands: []*cli.Command{
@@ -177,8 +176,8 @@ func parseFlags(c *cli.Context) {
 	if c.Bool("v") {
 		verboseEnabled = true
 	}
-	if c.Bool("r") {
-		reverseEnabled = true
+	if c.Bool("d") {
+		debugEnabled = true
 	}
 }
 

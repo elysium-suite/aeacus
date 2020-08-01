@@ -35,7 +35,7 @@ func scoreImage() {
 	}
 
 	// Check if points increased/decreased
-	prevPoints, err := readFile(mc.DirPath + "/previous.txt")
+	prevPoints, err := readFile(mc.DirPath + "previous.txt")
 	if err == nil {
 		prevScore, _ := strconv.Atoi(prevPoints)
 		if prevScore < mc.Image.Score {
@@ -49,7 +49,7 @@ func scoreImage() {
 		warnPrint("Reading from previous.txt failed.")
 	}
 
-	writeFile(mc.DirPath+"/previous.txt", strconv.Itoa(mc.Image.Score))
+	writeFile(mc.DirPath+"previous.txt", strconv.Itoa(mc.Image.Score))
 }
 
 func checkConfigData() {
@@ -106,19 +106,41 @@ func scoreChecks() {
 
 	for _, check := range mc.Config.Check {
 		status := true
+		passStatus := []bool{}
 		for _, condition := range check.Pass {
-			status = processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-			if reverseEnabled {
-				status = !status
+			passItemStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+			if debugEnabled {
+				infoPrint(fmt.Sprint("Result of last pass check was ", status))
 			}
-			if status {
+			passStatus = append(passStatus, passItemStatus)
+		}
+
+		// For multiple pass conditions, will only be true if ALL of them are
+		for _, result := range passStatus {
+			status = status && result
+			if !status {
+				break
+			}
+		}
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of all pass check was ", status))
+		}
+
+		// If an AnyPass succeeds, that overrides the Pass checks
+		for _, condition := range check.PassOverride {
+			passOverrideStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+			if debugEnabled {
+				infoPrint(fmt.Sprint("Result of pass override was ", passOverrideStatus))
+			}
+			if passOverrideStatus {
+				status = true
 				break
 			}
 		}
 		for _, condition := range check.Fail {
 			failStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-			if reverseEnabled {
-				failStatus = !failStatus
+			if debugEnabled {
+				infoPrint(fmt.Sprint("Result of fail check was ", failStatus))
 			}
 			if failStatus {
 				status = false
@@ -128,8 +150,7 @@ func scoreChecks() {
 		if check.Points >= 0 {
 			if status {
 				if verboseEnabled {
-					passPrint("")
-					fmt.Printf("Check passed: %s - %d pts\n", check.Message, check.Points)
+					passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
 				}
 				mc.Image.Points = append(mc.Image.Points, scoreItem{check.Message, check.Points})
 				mc.Image.Score += check.Points
@@ -138,8 +159,7 @@ func scoreChecks() {
 		} else {
 			if status {
 				if verboseEnabled {
-					failPrint("")
-					fmt.Printf("Penalty triggered: %s - %d pts\n", check.Message, check.Points)
+					failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
 				}
 				mc.Image.Penalties = append(mc.Image.Penalties, scoreItem{check.Message, check.Points})
 				mc.Image.Score += check.Points

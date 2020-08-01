@@ -88,6 +88,10 @@ func sendNotification(messageString string) {
 // speed things up, as well as some other flags) to run commands on the host
 // system and retrieve the return value.
 func rawCmd(commandGiven string) *exec.Cmd {
+	if debugEnabled {
+		cmdInput := fmt.Sprintln("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
+		infoPrint("rawCmd input: " + cmdInput)
+	}
 	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 }
 
@@ -170,10 +174,7 @@ func destroyImage() {
 // the username of the Local User (NTAccount) that it belongs to.
 func sidToLocalUser(sid string) string {
 	cmdText := "$objSID = New-Object System.Security.Principal.SecurityIdentifier('" + sid + "'); $objUser = $objSID.Translate([System.Security.Principal.NTAccount]); Write-Host $objUser.Value"
-	output, err := shellCommandOutput(cmdText)
-	if err != nil {
-		fmt.Println("yep so err was", err.Error())
-	}
+	output, _ := shellCommandOutput(cmdText)
 	return strings.TrimSpace(output)
 }
 

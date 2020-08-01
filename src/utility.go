@@ -11,7 +11,7 @@ import (
 var aeacusVersion = "1.3.0"
 
 var verboseEnabled = false
-var reverseEnabled = false
+var debugEnabled = false
 var scoringConf = "scoring.conf"
 var scoringData = "scoring.dat"
 var mc = &metaConfig{}
