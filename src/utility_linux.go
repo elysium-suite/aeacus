@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"os/user"
 	"strconv"
+	"strings"
 )
 
 // readFile (Linux) wraps ioutil's ReadFile function.
@@ -37,7 +38,16 @@ func sendNotification(messageString string) {
 			# Ubuntu <= 16
 			    display="unix:abstract=$(cat /run/user/$uid/dbus-session | cut -d '=' -f3)"
 			fi
-			sudo -u $user DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$display notify-send -i /opt/aeacus/assets/logo.png "Aeacus SE" "` + messageString + `"`)
+			sudo -u $user DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$display notify-send -i ` + mc.DirPath + `assets/logo.png "Aeacus SE" "` + messageString + `"`)
+	}
+}
+
+func checkTrace() {
+	procStatus, _ := readFile("/proc/self/status")
+	splitProcStatus := strings.Split(grepString("TracerPid", procStatus), "\t")
+	if len(splitProcStatus) > 1 && strings.TrimSpace(splitProcStatus[1]) != "0" {
+		failPrint("Try harder instead of tracing the engine, please.")
+		os.Exit(1)
 	}
 }
 
@@ -54,10 +64,18 @@ func createFQs(numFqs int) {
 	}
 }
 
+// rawCmd returns a exec.Command object for Linux shell commands.
+func rawCmd(commandGiven string) *exec.Cmd {
+	if debugEnabled {
+		infoPrint("rawCmd input: sh -c " + commandGiven)
+	}
+	return exec.Command("sh", "-c", commandGiven)
+}
+
 // shellCommand executes a given command in a sh environment, and prints an
 // error if one occurred.
 func shellCommand(commandGiven string) {
-	cmd := exec.Command("sh", "-c", commandGiven)
+	cmd := rawCmd(commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
 			if len(commandGiven) > 9 {
@@ -72,7 +90,7 @@ func shellCommand(commandGiven string) {
 // shellCommandOutput executes a given command in a sh environment, and
 // returns its output and error (if one occurred).
 func shellCommandOutput(commandGiven string) (string, error) {
-	out, err := exec.Command("sh", "-c", commandGiven).Output()
+	out, err := rawCmd(commandGiven).Output()
 	if err != nil {
 		if len(commandGiven) > 12 {
 			failPrint("Command \"" + commandGiven[:12] + "...\" errored out (code " + err.Error() + ").")

@@ -14,7 +14,7 @@ func genReport(img imageData) {
 	if len(teamID) < 7 {
 		teamID = "1010 1101"
 	}
-	header := `<!DOCTYPE html> <html> <head> <meta http-equiv="refresh" content="60"> <title>Aeacus Scoring Report</title> <style type="text/css"> h1 { text-align: center; } h2 { text-align: center; } body { font-family: Arial, Verdana, sans-serif; font-size: 14px; margin: 0; padding: 0; width: 100%; height: 100%; background: url('background.png'); background-size: cover; background-attachment: fixed; background-position: top center; background-color: #336699; } .red {color: red;} .green {color: green;} .blue {color: blue;} .main { margin-top: 10px; margin-bottom: 10px; margin-left: auto; margin-right: auto; padding: 0px; border-radius: 12px; background-color: white; width: 900px; max-width: 100%; min-width: 600px; box-shadow: 0px 0px 12px #003366; } .text { padding: 12px; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } .center { text-align: center; } .binary { position: relative; overflow: hidden; } .binary::before { position: absolute; top: -75%; left: -125%; display: block; width: 400%; height: 150%; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -ms-transform: rotate(-45deg); transform: rotate(-45deg); content: attr(data-binary); opacity: 0.15; line-height: 2em; letter-spacing: 2px; color: #369; font-size: 10px; pointer-events: none; } </style> <meta http-equiv="refresh"> </head> <body><div class="main"><div class="text"><div class="binary" data-binary="`+teamID+`"><p align=center style="width:100%;text-align:center"><img align=middle style="width:180px; float:middle" src="logo.png"></p>`
+	header := `<!DOCTYPE html> <html> <head> <meta http-equiv="refresh" content="60"> <title>Aeacus Scoring Report</title> <style type="text/css"> h1 { text-align: center; } h2 { text-align: center; } body { font-family: Arial, Verdana, sans-serif; font-size: 14px; margin: 0; padding: 0; width: 100%; height: 100%; background: url('background.png'); background-size: cover; background-attachment: fixed; background-position: top center; background-color: #336699; } .red {color: red;} .green {color: green;} .blue {color: blue;} .main { margin-top: 10px; margin-bottom: 10px; margin-left: auto; margin-right: auto; padding: 0px; border-radius: 12px; background-color: white; width: 900px; max-width: 100%; min-width: 600px; box-shadow: 0px 0px 12px #003366; } .text { padding: 12px; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } .center { text-align: center; } .binary { position: relative; overflow: hidden; } .binary::before { position: absolute; top: -1000px; left: -1000px; display: block; width: 500%; height: 300%; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -ms-transform: rotate(-45deg); transform: rotate(-45deg); content: attr(data-binary); opacity: 0.15; line-height: 2em; letter-spacing: 2px; color: #369; font-size: 10px; pointer-events: none; } </style> <meta http-equiv="refresh"> </head> <body><div class="main"><div class="text"><div class="binary" data-binary="` + teamID + `"><p align=center style="width:100%;text-align:center"><img align=middle style="width:180px; float:middle" src="logo.png"></p>`
 
 	footer := `</p> <br> <p align=center style="text-align:center"> The Aeacus project is free and open source software. This project is in no way endorsed or affiliated with the Air Force Association or the University of Texas at San Antonio. </p> </div> </div> </div> </body> </html>`
 
@@ -23,7 +23,7 @@ func genReport(img imageData) {
 	genTime := time.Now()
 	htmlFile.WriteString("<h1>" + mc.Config.Title + "</h1>")
 	htmlFile.WriteString("<h2>Report Generated At: " + genTime.Format("2006/01/02 15:04:05 MST") + " </h2>")
-	htmlFile.WriteString(`<script>var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(8192).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CCS Scoring service may not be running</h2></span>'); } </script>`)
+	htmlFile.WriteString(`<script>var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(10000).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CCS Scoring service may not be running</h2></span>'); } </script>`)
 
 	if mc.Config.Remote != "" {
 		htmlFile.WriteString(`<h3 class="center">Current Team ID: ` + mc.TeamID + `</h3>`)
@@ -34,10 +34,14 @@ func genReport(img imageData) {
 	if mc.Config.Remote != "" {
 		htmlFile.WriteString(`<a href="` + mc.Config.Remote + `">Click here to view the public scoreboard</a><br>`)
 
-		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + img.Conn.OverallColor + `">` + img.Conn.OverallStatus + `<span></h3>`)
+		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + mc.Conn.OverallColor + `">` + mc.Conn.OverallStatus + `<span></h3>`)
 
-		htmlFile.WriteString(`Internet Connectivity Check: <span style="color:` + img.Conn.NetColor + `">` + img.Conn.NetStatus + `</span><br>`)
-		htmlFile.WriteString(`Aeacus Server Connection Status: <span style="color:` + img.Conn.ServerColor + `">` + img.Conn.ServerStatus + `</span></p>`)
+		htmlFile.WriteString(`Internet Connectivity Check: <span style="color:` + mc.Conn.NetColor + `">` + mc.Conn.NetStatus + `</span><br>`)
+		htmlFile.WriteString(`Aeacus Server Connection Status: <span style="color:` + mc.Conn.ServerColor + `">` + mc.Conn.ServerStatus + `</span></p>`)
+	} else {
+		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + mc.Conn.OverallColor + `">` + mc.Conn.OverallStatus + `<span></h3>`)
+		htmlFile.WriteString(`Internet Connectivity Check: <span style="color:grey">N/A</span><br>`)
+		htmlFile.WriteString(`Aeacus Server Connection Status: <span style="color:grey">N/A</span><br>`)
 	}
 
 	htmlFile.WriteString(fmt.Sprintf(`<h3> %d penalties assessed, for a loss of %.0f points: </h3> <p> <span style="color:red">`, len(img.Penalties), math.Abs(float64(img.Detracts))))
