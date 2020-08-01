@@ -122,7 +122,13 @@ points = 20
     arg1="ufw status"
 
 [[check]]
-# If no points are specified, they are auto-calculated out of 100
+message = "Malicious user 'user' can't read /etc/shadow"
+# If no points are specified, they are auto-calculated.
+# If total points specified is less than 100, each check
+# is assigned points (integers) that add up to 100.
+# If total points already specified is above 100, each check
+# without points is worth 2 points.
+
     [[check.pass]]
     type="CommandNot"
     arg1="sudo -u user cat /etc/shadow"
