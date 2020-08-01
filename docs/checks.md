@@ -158,7 +158,7 @@ arg1='git'
 arg2='1:2.17.1-1ubuntu0.4'
 ```
 
-> `PackageVersion` checks `uname -r`.
+> `PackageVersion` checks `dpkg -l | awk '$2=="<PACKAGENAME>" { print $3 }'`.
 
 **KernelVersion**: pass if kernel version is equal to specified
 
@@ -166,12 +166,20 @@ arg2='1:2.17.1-1ubuntu0.4'
 type='KernelVersion'
 arg1='5.4.0-42-generic'
 ```
-> `KernelVersion` checks `dpkg -l | awk '$2=="<PACKAGENAME>" { print $3 }'`.
+> `KernelVersion` checks `uname -r`.
 
 **AutoCheckUpdatesEnabled**: pass if the system is configured to automatically check for updates
 
 ```
 type='AutoCheckUpdatesEnabled'
+```
+
+**PermissionIs**: pass if the specified file has the octal permissions specified
+
+```
+type='PermissionIs'
+arg1='/etc/passwd'
+arg2='644'
 ```
 
 <hr>
@@ -274,3 +282,13 @@ arg1='SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
 > **Note!**: Notice the single quotes `'` on the above argument! This means it's a _string literal_ in TOML. If you don't do this, you have to make sure to escape your slashes (`\` --> `\\`)
 
 > Note: You can use `SOFTWARE` as a shortcut to mean `HKEY_LOCAL_MACHINE\SOFTWARE`.
+
+**FileOwner**: pass if specified owner is the owner of the specified file
+
+```
+type='FileOwner'
+arg1='C:\test.txt'
+arg2='BUILTIN\Administrators'
+```
+
+> Get owner of the file using (Get-Acl [FILENAME]).Owner
