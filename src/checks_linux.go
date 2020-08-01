@@ -88,7 +88,7 @@ func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3
 }
 
 func command(commandGiven string) (bool, error) {
-	cmd := exec.Command("sh", "-c", commandGiven)
+	cmd := rawCmd(commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
 			return false, nil
@@ -98,7 +98,7 @@ func command(commandGiven string) (bool, error) {
 }
 
 func commandOutput(commandGiven, desiredOutput string) (bool, error) {
-	out, err := exec.Command("sh", "-c", commandGiven).Output()
+	out, err := rawCmd(commandGiven).Output()
 	if err != nil {
 		return false, err
 	}

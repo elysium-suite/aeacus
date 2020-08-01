@@ -33,7 +33,7 @@
 ./aeacus --verbose score
 ```
 
-> The TeamID is read from `/opt/aeacus/misc/TeamID.txt` or `C:\aeacus\misc\TeamID.txt`.
+> The TeamID is read from `/opt/aeacus/TeamID.txt` or `C:\aeacus\TeamID.txt`.
 
 4. **Prepare the image for release.**
 
@@ -118,20 +118,33 @@ points = 20
     arg1="/etc/secrets.zip"
 
     [[check.pass]] # You can code multiple pass conditions
-    type="Command" # If any pass, the check passes
+    type="Command" # they must ALL succeed for the check to pass
     arg1="ufw status"
 
 [[check]]
-# If no points are specified, they are auto-calculated
-# out of 100 points (ex. 50 specified points, 5 checks
-# with no points specified-- they're 10 points each)
+message = "Malicious user 'user' can't read /etc/shadow"
+# If no points are specified, they are auto-calculated.
+# If total points specified is less than 100, each check
+# is assigned points (integers) that add up to 100.
+# If total points already specified is above 100, each check
+# without points is worth 2 points.
+
     [[check.pass]]
     type="CommandNot"
     arg1="sudo -u user cat /etc/shadow"
 
-    [[check.fail]]       # If any fail conditions pass,
-    type="FileExistsNot" # the check fails, even if
-    arg1="/etc/shadow"   # pass conditions succeeded
+    [[check.pass]]
+    type="FileExists"
+    arg1="/etc/shadow"
+
+    [[check.passoverride]]  # If you a check to succeed if just one condition
+    type="UserExistsNot"    # passes, regardless of other pass checks, use
+    arg1="user"             # an override pass (passoverride). This is still
+                            # overridden by fail conditions.
+
+    [[check.fail]]       # If any fail conditions pass, the whole check
+    type="FileExistsNot" # will fail
+    arg1="/etc/shadow"
 
 [[check]]
 message = "Administrator has been removed"
@@ -211,6 +224,8 @@ After setting up an environment (sorry, only Linux dev environments supported) w
 - `aeacus-build-linux-production`: stripped version of the above, to make reverse engineering a bit harder
 - `aeacus-build-windows`: builds aeacus and phocus for windows
 - `aeacus-build-windows-production`: stripped version
+
+If you want to do a bit more, you should obfuscate the build to make reverse engineering mode difficult (ex. with [garble](https://github.com/mvdan/garble) or [gobfuscate](https://github.com/unixpickle/gobfuscate)).
 
 ## Contributing and Disclaimer
 

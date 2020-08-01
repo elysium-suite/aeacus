@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"os"
+	"regexp"
 	"runtime"
 	"time"
 )
@@ -10,7 +11,7 @@ import (
 var aeacusVersion = "1.3.0"
 
 var verboseEnabled = false
-var reverseEnabled = false
+var debugEnabled = false
 var scoringConf = "scoring.conf"
 var scoringData = "scoring.dat"
 var mc = &metaConfig{}
@@ -38,6 +39,11 @@ func timeCheck() {
 			}
 		}
 	}
+}
+
+func grepString(patternText, fileText string) string {
+	re := regexp.MustCompile("(?m)[\r\n]+^.*" + patternText + ".*$")
+	return string(re.Find([]byte(fileText)))
 }
 
 func fillConstants() {

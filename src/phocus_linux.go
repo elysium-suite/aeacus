@@ -30,6 +30,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	checkTrace()
 	fillConstants()
 
 	daemonTest := os.Getenv("INVOCATION_ID")
@@ -45,6 +46,7 @@ func main() {
 			parseConfig(readData(scoringData))
 			rand.Seed(time.Now().UnixNano())
 			for {
+				checkTrace()
 				timeCheck()
 				infoPrint("Scoring image...")
 				scoreImage()
