@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -89,7 +88,7 @@ func sendNotification(messageString string) {
 // system and retrieve the return value.
 func rawCmd(commandGiven string) *exec.Cmd {
 	if debugEnabled {
-		cmdInput := fmt.Sprintln("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
+		cmdInput := "powershell.exe -NonInteractive -NoProfile Invoke-Command -ScriptBlock { "+commandGiven+" }"
 		infoPrint("rawCmd input: " + cmdInput)
 	}
 	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
