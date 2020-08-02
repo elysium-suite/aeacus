@@ -2,16 +2,12 @@
 
 ## Windows User Properties
 
-These are the user properties that you would normally find the the user edit dialog (`User cannot change password`, `Password never expires`, etc).
+These are the user properties that you would normally find the the user edit dialog.
 
-> Date format is "M/D/YYYY HH:MM:SS AM", but we only use the first part, for example, `5/23/2020` or `12/4/2021`. You really shouldn't be using dates though. You should probably be using `UserDetailNot` if you want to make sure a password expires (not Never).
+__Usernames are case sensitive.__ `Yes`/`No` are not case sensitive. If you input something other than "yes" or "no" for a boolean check, it defaults to "no".
 
-> Values are cAsE sEnSiTiVe (`Yes` != `yes`).
-
-- `Full name`: Full name of user (string)
-- `Comment`: User account comment (string)
-- `Account active`: Yes or No
-- `Account expires`: Never or date
-- `Password expires`: Never or date
-- `Password required`: Yes or No
-- `User may change password`: Yes or No
+- `FullName`: Full name of user (case sensitive)
+- `IsEnabled`: Yes or No
+- `IsLocked`: Yes or No
+- `IsAdmin`: Yes or No
+- `PasswordNeverExpires`: Yes or No

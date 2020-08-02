@@ -179,7 +179,10 @@ func commandOutput(commandGiven, desiredOutput string) (bool, error) {
 }
 
 func packageInstalled(packageName string) (bool, error) {
-	packageList := getPackages()
+	packageList, err := getPackages()
+	if err != nil {
+		return false, err
+	}
 	for _, p := range packageList {
 		if p == packageName {
 			return true, nil
@@ -201,13 +204,12 @@ func windowsFeature(feature string) (bool, error) {
 }
 
 func fileOwner(filePath, owner string) (bool, error) {
-	return commandOutput("(Get-Acl " + filePath + ").Owner", owner)
+	return commandOutput("(Get-Acl "+filePath+").Owner", owner)
 }
 
 func userExists(userName string) (bool, error) {
-	// eventually going to not use powershell for everything
-	// but until then...
-	return command("Get-LocalUser '" + userName + "'")
+	_, err := getLocalUser(userName)
+	return err == nil, err
 }
 
 func userInGroup(userName string, groupName string) (bool, error) {
@@ -239,34 +241,31 @@ func firewallUp() (bool, error) {
 }
 
 func userDetail(userName string, detailName string, detailValue string) (bool, error) {
-	if userName == "" || detailName == "" || detailValue == "" {
-		failPrint("Invalid parameters to UserDetail check")
-		return false, errors.New("Invalid parameters")
+	detailValue = strings.TrimSpace(detailValue)
+	lookingFor := false
+	if strings.ToLower(detailValue) == "yes" {
+		lookingFor = true
 	}
-	userInfo, err := getNetUserInfo(userName)
+	user, err := getLocalUser(userName)
 	if err != nil {
 		return false, err
 	}
-	re := regexp.MustCompile("(?m)[\r\n]+^.*" + detailName + ".*$")
-	detailString := string(re.Find([]byte(userInfo)))
-	if detailString == "" {
-		return false, errors.New("Invalid user detail name")
-	}
-	re = regexp.MustCompile("[\\s]+")
-	userInfoSlice := re.Split(detailString, -1)
-	if len(userInfoSlice) < 2 {
-		failPrint("Error splitting user detail string into two or more parts")
-		return false, errors.New("Error splitting detail string")
-	}
-	indexValue := len(re.Split(detailName, -1)) + 1
-	if indexValue >= len(userInfoSlice) {
-		failPrint("Error in calculating index for detailValue")
-		return false, errors.New("Error splitting detailName")
-	}
-	userDetailValue := strings.TrimSpace(userInfoSlice[indexValue])
-	//fmt.Println("is", detailValue, "equal to", userDetailValue)
-	if detailValue == userDetailValue {
-		return true, nil
+	switch detailName {
+	case "FullName":
+		if user.FullName == detailValue {
+			return true, nil
+		}
+	case "IsEnabled":
+		return user.IsEnabled == lookingFor, nil
+	case "IsLocked":
+		return user.IsLocked == lookingFor, nil
+	case "IsAdmin":
+		return user.IsAdmin == lookingFor, nil
+	case "PasswordNeverExpires":
+		return user.PasswordNeverExpires == lookingFor, nil
+	default:
+		failPrint("detailName (" + detailName + ") passed to userDetail is invalid.")
+		return false, errors.New("Invalid detailName")
 	}
 	return false, nil
 }
@@ -374,13 +373,12 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 }
 
 func registryKey(keyName string, keyValue string, existCheck bool) (bool, error) {
-
 	// Break down input
 	registryArgs := regexp.MustCompile("[\\\\]+").Split(keyName, -1)
 	registryHiveText := registryArgs[0]
 	keyPath := fmt.Sprintf(strings.Join(registryArgs[1:len(registryArgs)-1], "\\")) // idk??
 	keyLoc := registryArgs[len(registryArgs)-1]
-	//fmt.Printf("REGISTRY: getting keypath %s from %s\n", keyPath, registryHiveText)
+	// fmt.Printf("REGISTRY: getting keypath %s from %s\n", keyPath, registryHiveText)
 
 	var registryHive registry.Key
 	switch registryHiveText {
@@ -439,7 +437,7 @@ func registryKey(keyName string, keyValue string, existCheck bool) (bool, error)
 	}
 
 	registrySlice = registrySlice[:regLength]
-	//fmt.Printf("Retrieved registry value was %d (length %d, type %d)\n", registrySlice, regLength, valType)
+	// fmt.Printf("Retrieved registry value was %d (length %d, type %d)\n", registrySlice, regLength, valType)
 
 	// Determine value type to convert to string
 	var registryValue string
@@ -456,7 +454,7 @@ func registryKey(keyName string, keyValue string, existCheck bool) (bool, error)
 		failPrint("Unknown registry type: " + string(valType))
 	}
 
-	//fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
+	// fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
 	if registryValue == keyValue {
 		return true, err
 	}
