@@ -23,13 +23,14 @@ import (
 
 // These hashes are used for XORing the plaintext. Again-- not
 // cryptographically genius.
-var randomHashOne = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-var randomHashTwo = "NowThatsWhatICallARandomString"
+var (
+	randomHashOne = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	randomHashTwo = "NowThatsWhatICallARandomString"
+)
 
 // encryptConfig takes the plainText config and returns an encrypted string
 // that should be written to the encrypted scoring data file.
 func encryptConfig(plainText string) string {
-
 	if verboseEnabled {
 		infoPrint("Encrypting configuration...")
 	}
@@ -45,12 +46,10 @@ func encryptConfig(plainText string) string {
 
 	// XOR the encrypted file with our key.
 	return xor(key, encryptedFile.String())
-
 }
 
 // decryptConfig is used to decrypt the scoring data file.
 func decryptConfig(cipherText string) string {
-
 	// Create our key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
 

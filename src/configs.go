@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fatih/color"
@@ -86,6 +87,16 @@ func printConfig() {
 				fmt.Printf("\t\t\t%s: %s, %s\n", condition.Type, condition.Arg1, condition.Arg2)
 			}
 		}
+	}
+}
+
+func confirmPrint(toPrint string) {
+	printer(color.FgYellow, "CONF", "")
+	fmt.Print(toPrint + " [Y/n]: ")
+	var resp string
+	fmt.Scanln(&resp)
+	if strings.ToLower(strings.TrimSpace(resp)) == "n" {
+		os.Exit(1)
 	}
 }
 

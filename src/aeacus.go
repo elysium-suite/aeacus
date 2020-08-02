@@ -20,7 +20,6 @@ import (
 //////////////////////////////////////////////////////////////////
 
 func main() {
-
 	fillConstants()
 	app := &cli.App{
 		UseShortOptionHandling: true,
@@ -44,6 +43,11 @@ func main() {
 				Name:    "debug",
 				Aliases: []string{"d"},
 				Usage:   "Print a lot of information",
+			},
+			&cli.BoolFlag{
+				Name:    "yes",
+				Aliases: []string{"y"},
+				Usage:   "Automatically answer 'yes' to any prompts",
 			},
 		},
 		Commands: []*cli.Command{
@@ -101,12 +105,12 @@ func main() {
 				Aliases: []string{"f"},
 				Usage:   "Create forensic question files",
 				Action: func(c *cli.Context) error {
+					parseFlags(c)
 					runningPermsCheck()
 					numFqs, err := strconv.Atoi(c.Args().First())
 					if err != nil {
 						return errors.New("Invalid or missing number passed to forensics")
 					}
-					parseFlags(c)
 					checkConfig(scoringConf)
 					createFQs(numFqs)
 					return nil
@@ -155,9 +159,26 @@ func main() {
 				Aliases: []string{"r"},
 				Usage:   "Prepare the image for release",
 				Action: func(c *cli.Context) error {
-					runningPermsCheck()
 					parseFlags(c)
+					runningPermsCheck()
+					if !yesEnabled {
+						confirmPrint("Are you sure you want to being the image releasing process?")
+					}
 					releaseImage()
+					return nil
+				},
+			},
+			{
+				Name:    "mitigate",
+				Aliases: []string{"m"},
+				Usage:   "Automatically mitigate the configured vulnerabilities",
+				Action: func(c *cli.Context) error {
+					parseFlags(c)
+					runningPermsCheck()
+					if !yesEnabled {
+						confirmPrint("Are you sure you want to try to automatically mitigate the configured vulns?")
+					}
+					mitigateVulns()
 					return nil
 				},
 			},
@@ -179,6 +200,9 @@ func parseFlags(c *cli.Context) {
 	if c.Bool("d") {
 		debugEnabled = true
 	}
+	if c.Bool("y") {
+		yesEnabled = true
+	}
 }
 
 // checkConfig parses and checks the validity of the current
@@ -186,7 +210,7 @@ func parseFlags(c *cli.Context) {
 func checkConfig(fileName string) {
 	fileContent, err := readFile(mc.DirPath + fileName)
 	if err != nil {
-		failPrint("Configuration file (" + fileName + "not found!")
+		failPrint("Configuration file (" + fileName + ") not found!")
 		os.Exit(1)
 	}
 	parseConfig(fileContent)

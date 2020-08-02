@@ -67,7 +67,6 @@ func genReport(img imageData) {
 }
 
 func genReadMe() {
-
 	header := `
 <!DOCTYPE html>
 <html>

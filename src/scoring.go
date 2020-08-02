@@ -66,43 +66,8 @@ func checkConfigData() {
 
 func scoreChecks() {
 	mc.Image = imageData{}
-	pointlessChecks := []int{}
 
-	for i, check := range mc.Config.Check {
-		if check.Points == 0 {
-			pointlessChecks = append(pointlessChecks, i)
-			mc.Image.ScoredVulns++
-		} else if check.Points > 0 {
-			mc.Image.TotalPoints += check.Points
-			mc.Image.ScoredVulns++
-		}
-	}
-
-	pointsLeft := 100 - mc.Image.TotalPoints
-	if pointsLeft < 0 && len(pointlessChecks) > 0 {
-		// If the specified points already value over 100, yet there are
-		// checks without points assigned, we assign the default point value
-		// of 3 (arbitrarily chosen).
-		for _, check := range pointlessChecks {
-			mc.Config.Check[check].Points = 3
-		}
-	} else if pointsLeft > 0 && len(pointlessChecks) > 0 {
-		pointsEach := pointsLeft / len(pointlessChecks)
-		for _, check := range pointlessChecks {
-			mc.Config.Check[check].Points = pointsEach
-		}
-		mc.Image.TotalPoints += (pointsEach * len(pointlessChecks))
-		if mc.Image.TotalPoints < 100 {
-			for i := 0; mc.Image.TotalPoints < 100; mc.Image.TotalPoints++ {
-				mc.Config.Check[pointlessChecks[i]].Points++
-				i++
-				if i > len(pointlessChecks)-1 {
-					i = 0
-				}
-			}
-			mc.Image.TotalPoints += (100 - mc.Image.TotalPoints)
-		}
-	}
+	assignPoints()
 
 	for _, check := range mc.Config.Check {
 		status := true
@@ -126,7 +91,7 @@ func scoreChecks() {
 			infoPrint(fmt.Sprint("Result of all pass check was ", status))
 		}
 
-		// If an AnyPass succeeds, that overrides the Pass checks
+		// If a PassOverride succeeds, that overrides the Pass checks
 		for _, condition := range check.PassOverride {
 			passOverrideStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
 			if debugEnabled {
@@ -169,5 +134,45 @@ func scoreChecks() {
 	}
 	if verboseEnabled {
 		infoPrint(fmt.Sprintf("Score: %d", mc.Image.Score))
+	}
+}
+
+func assignPoints() {
+	pointlessChecks := []int{}
+
+	for i, check := range mc.Config.Check {
+		if check.Points == 0 {
+			pointlessChecks = append(pointlessChecks, i)
+			mc.Image.ScoredVulns++
+		} else if check.Points > 0 {
+			mc.Image.TotalPoints += check.Points
+			mc.Image.ScoredVulns++
+		}
+	}
+
+	pointsLeft := 100 - mc.Image.TotalPoints
+	if pointsLeft < 0 && len(pointlessChecks) > 0 {
+		// If the specified points already value over 100, yet there are
+		// checks without points assigned, we assign the default point value
+		// of 3 (arbitrarily chosen).
+		for _, check := range pointlessChecks {
+			mc.Config.Check[check].Points = 3
+		}
+	} else if pointsLeft > 0 && len(pointlessChecks) > 0 {
+		pointsEach := pointsLeft / len(pointlessChecks)
+		for _, check := range pointlessChecks {
+			mc.Config.Check[check].Points = pointsEach
+		}
+		mc.Image.TotalPoints += (pointsEach * len(pointlessChecks))
+		if mc.Image.TotalPoints < 100 {
+			for i := 0; mc.Image.TotalPoints < 100; mc.Image.TotalPoints++ {
+				mc.Config.Check[pointlessChecks[i]].Points++
+				i++
+				if i > len(pointlessChecks)-1 {
+					i = 0
+				}
+			}
+			mc.Image.TotalPoints += (100 - mc.Image.TotalPoints)
+		}
 	}
 }
