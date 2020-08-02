@@ -8,13 +8,18 @@ import (
 	"time"
 )
 
-var aeacusVersion = "1.3.0"
+const (
+	aeacusVersion = "1.3.0"
+	scoringConf   = "scoring.conf"
+	scoringData   = "scoring.dat"
+)
 
-var verboseEnabled = false
-var debugEnabled = false
-var scoringConf = "scoring.conf"
-var scoringData = "scoring.dat"
-var mc = &metaConfig{}
+var (
+	verboseEnabled = false
+	debugEnabled   = false
+	yesEnabled     = false
+	mc             = &metaConfig{}
+)
 
 // writeFile wraps ioutil's WriteFule function, and prints
 // the error the screen if one occurs.

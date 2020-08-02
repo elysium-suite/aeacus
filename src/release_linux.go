@@ -18,7 +18,6 @@ func writeDesktopFiles() {
 func configureAutologin() {
 	lightdm, err := pathExists("/usr/share/lightdm")
 	gdm, err := pathExists("/etc/gdm/custom.conf")
-
 	if err != nil {
 		if lightdm {
 			writeFile("/usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf", "echo autologin-user="+mc.Config.User)

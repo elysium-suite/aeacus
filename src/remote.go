@@ -101,7 +101,6 @@ func genVulns() string {
 func reportScore() error {
 	resp, err := http.PostForm(mc.Config.Remote+"/update",
 		url.Values{"update": {genUpdate()}})
-
 	if err != nil {
 		failPrint(err.Error())
 		return err
@@ -124,7 +123,6 @@ func reportScore() error {
 }
 
 func checkServer() {
-
 	// Internet check (requisite)
 	if verboseEnabled {
 		infoPrint("Checking for internet connection...")
@@ -190,7 +188,6 @@ func checkServer() {
 		mc.Conn.OverallStatus = "OK"
 		mc.Connection = true
 	}
-
 }
 
 // encryptString takes a password and a plaintext and returns an encrypted byte
@@ -200,7 +197,6 @@ func checkServer() {
 // This function is used in aeacus to encrypt reported vulnerability data to
 // the remote scoring endpoint (ex. minos).
 func encryptString(password, plainText string) string {
-
 	// Create a sha256sum hash of the password provided.
 	hasher := sha256.New()
 	hasher.Write([]byte(password))
@@ -244,7 +240,6 @@ func encryptString(password, plainText string) string {
 // decryptString takes a password and a ciphertext and returns a decrypted
 // byte sequence (as a string). The function uses typical AES-GCM.
 func decryptString(password, ciphertext string) string {
-
 	// Create a sha256sum hash of the password provided.
 	hasher := sha256.New()
 	hasher.Write([]byte(password))
