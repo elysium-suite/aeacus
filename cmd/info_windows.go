@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	wapi "github.com/iamacarpet/go-win64api"

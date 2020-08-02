@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"aeacus/cmd"
 	"github.com/judwhite/go-svc/svc"
 	"github.com/urfave/cli"
 )

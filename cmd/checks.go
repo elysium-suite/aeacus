@@ -2,7 +2,7 @@
 // If a checkType does not match one specified, it is handed off to
 // processCheck for the OS-specific checks.
 
-package main
+package cmd
 
 import (
 	"crypto/sha1"

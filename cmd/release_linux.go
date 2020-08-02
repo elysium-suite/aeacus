@@ -1,4 +1,4 @@
-package main
+package cmd
 
 func writeDesktopFiles() {
 	if verboseEnabled {

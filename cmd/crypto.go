@@ -12,7 +12,7 @@
 // At the very least, edit some strings. Add some ciphers and operations if
 // you're feeling spicy.
 
-package main
+package cmd
 
 import (
 	"bytes"

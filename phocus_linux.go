@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"aeacus/cmd"
 	"github.com/urfave/cli"
 )
 
@@ -24,7 +25,6 @@ import (
 /////////////////////////////////////////////////////////////////////
 
 func main() {
-
 	if !adminCheck() {
 		failPrint("You need to run this binary as root or Administrator!")
 		os.Exit(1)

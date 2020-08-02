@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 
+	"aeacus/cmd"
 	"github.com/urfave/cli"
 )
 
@@ -20,7 +21,6 @@ import (
 //////////////////////////////////////////////////////////////////
 
 func main() {
-
 	fillConstants()
 	app := &cli.App{
 		UseShortOptionHandling: true,
