@@ -8,14 +8,16 @@ import (
 	"time"
 )
 
-var aeacusVersion = "1.3.0"
+const (
+	aeacusVersion = "1.3.0"
+	scoringConf   = "scoring.conf"
+	scoringData   = "scoring.dat"
+)
 
 var (
 	verboseEnabled = false
 	debugEnabled   = false
 	yesEnabled     = false
-	scoringConf    = "scoring.conf"
-	scoringData    = "scoring.dat"
 	mc             = &metaConfig{}
 )
 

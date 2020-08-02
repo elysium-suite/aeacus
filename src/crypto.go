@@ -23,7 +23,7 @@ import (
 
 // These hashes are used for XORing the plaintext. Again-- not
 // cryptographically genius.
-var (
+const (
 	randomHashOne = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 	randomHashTwo = "NowThatsWhatICallARandomString"
 )
