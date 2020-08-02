@@ -52,23 +52,6 @@ arg1='C:\Users\coolUser\Desktop\Forensic Question 1.txt'
 arg2='ANSWER:\sCool[a-zA-Z]+VariedAnswer'
 ```
 
-> **Note!** A check passes by default. This means that you can use two failing conditions to simulate two conditions that should pass only if they're _BOTH_ true. That's confusing, so here's an example: you want a check to pass only if this file AND that file contain a string. So, instead of two pass conditions (pass if FileContains, pass if FileContains) (where the check will pass if either pass), you can code two fail conditions where the check will pass only if _BOTH_ fail conditions do not pass (fail if FileContainsNot, fail if FileContainsNot).
-
-_Example of a check with two mutually inclusive pass conditions (User1 must be Group1 and Group2):_
-
-```
-[[check]]
-message = "User1 is in Group1 and Group2"
-[[check.fail]]
-type="UserInGroupNot"
-arg1="User1"
-arg2="Group1"
-[[check.fail]]
-type="UserInGroupNot"
-arg1="User1"
-arg2="Group2"
-```
-
 **DirContainsRegex**: pass if directory contains regex string
 
 ```
@@ -142,7 +125,7 @@ type='FirewallUp'
 type='GuestDisabledLDM'
 ```
 
-**PasswordChanged**: pass if user's hashed password is not in /etc/shadow
+**PasswordChanged**: pass if user's hashed password is not in `/etc/shadow`
 
 ```
 type='PasswordChanged'
@@ -174,6 +157,8 @@ arg1='5.4.0-42-generic'
 type='AutoCheckUpdatesEnabled'
 ```
 
+> Only works for standard `apt` installs.
+
 **PermissionIs**: pass if the specified file has the octal permissions specified
 
 ```
@@ -187,13 +172,15 @@ arg2='644'
 ### Windows-Specific Checks
 
 > todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
-**PasswordChanged**: pass if user password has changed
+
+**PasswordChanged**: pass if user password has changed after the given date
 ```
 type='PasswordChanged'
 arg1='user'
 arg2='01/17/2019 20:57:41'
 ```
 > You should take the value from `Get-LocalUser user | select PasswordLastSet` and use it as `arg2`.
+
 **WindowsFeature**: pass if Feature Enabled
 
 ```
@@ -206,11 +193,11 @@ arg1='SMB1Protocol'
 ```
 type='UserDetailNot'
 arg1='Administrator'
-arg2='Password expires'
-arg3='Never'
+arg2='PasswordNeverExpires'
+arg3='No'
 ```
 
-> `UserDetail` checks `net user` behind the scenes. [See here for reference](userproperties.md).
+> See [here](userproperties.md) for all `UserDetail` properties.
 
 **UserRights**: pass if specified user or group has specified privilege
 
@@ -281,7 +268,7 @@ arg1='SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
 
 > **Note!**: Notice the single quotes `'` on the above argument! This means it's a _string literal_ in TOML. If you don't do this, you have to make sure to escape your slashes (`\` --> `\\`)
 
-> Note: You can use `SOFTWARE` as a shortcut to mean `HKEY_LOCAL_MACHINE\SOFTWARE`.
+> Note: You can use `SOFTWARE` as a shortcut for `HKEY_LOCAL_MACHINE\SOFTWARE`.
 
 **FileOwner**: pass if specified owner is the owner of the specified file
 
@@ -291,4 +278,4 @@ arg1='C:\test.txt'
 arg2='BUILTIN\Administrators'
 ```
 
-> Get owner of the file using (Get-Acl [FILENAME]).Owner
+> Get owner of the file using `(Get-Acl [FILENAME]).Owner`.

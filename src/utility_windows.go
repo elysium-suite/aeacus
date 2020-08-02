@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -9,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/gen2brain/beeep"
+	wapi "github.com/iamacarpet/go-win64api"
+	"github.com/iamacarpet/go-win64api/shared"
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -88,7 +91,7 @@ func sendNotification(messageString string) {
 // system and retrieve the return value.
 func rawCmd(commandGiven string) *exec.Cmd {
 	if debugEnabled {
-		cmdInput := "powershell.exe -NonInteractive -NoProfile Invoke-Command -ScriptBlock { "+commandGiven+" }"
+		cmdInput := "powershell.exe -NonInteractive -NoProfile Invoke-Command -ScriptBlock { " + commandGiven + " }"
 		infoPrint("rawCmd input: " + cmdInput)
 	}
 	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
@@ -195,4 +198,38 @@ func getSecedit() (string, error) {
 // in order to get user properties and details.
 func getNetUserInfo(userName string) (string, error) {
 	return shellCommandOutput("net user " + userName)
+}
+
+func getPackages() ([]string, error) {
+	softwareList := []string{}
+	sw, err := wapi.InstalledSoftwareList()
+	if err != nil {
+		failPrint("Couldn't get packages: " + err.Error())
+		return softwareList, err
+	}
+	for _, s := range sw {
+		softwareList = append(softwareList, s.Name())
+	}
+	return softwareList, nil
+}
+
+func getLocalUsers() ([]shared.LocalUser, error) {
+	ul, err := wapi.ListLocalUsers()
+	if err != nil {
+		failPrint("Couldn't get local users: " + err.Error())
+	}
+	return ul, err
+}
+
+func getLocalUser(userName string) (shared.LocalUser, error) {
+	userList, err := getLocalUsers()
+	if err != nil {
+		return shared.LocalUser{}, err
+	}
+	for _, user := range userList {
+		if user.Username == userName {
+			return user, nil
+		}
+	}
+	return shared.LocalUser{}, errors.New("User not found")
 }

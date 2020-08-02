@@ -1,16 +1,21 @@
 package main
 
 import (
-	wapi "github.com/iamacarpet/go-win64api"
+	"fmt"
 	"os"
 )
 
 func getInfo(infoType string) {
 	switch infoType {
 	case "packages":
-		packageList := getPackages()
+		packageList, _ := getPackages()
 		for _, p := range packageList {
 			infoPrint(p)
+		}
+	case "users":
+		userList, _ := getLocalUsers()
+		for _, u := range userList {
+			infoPrint(fmt.Sprint(u))
 		}
 	default:
 		if infoType == "" {
@@ -20,16 +25,4 @@ func getInfo(infoType string) {
 		}
 		os.Exit(1)
 	}
-}
-
-func getPackages() []string {
-	sw, err := wapi.InstalledSoftwareList()
-	if err != nil {
-		failPrint(err.Error())
-	}
-	softwareList := []string{}
-	for _, s := range sw {
-		softwareList = append(softwareList, s.Name())
-	}
-	return softwareList
 }
