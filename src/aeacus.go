@@ -162,7 +162,7 @@ func main() {
 					parseFlags(c)
 					runningPermsCheck()
 					if !yesEnabled {
-						confirmPrint("Are you sure you want to being the image releasing process?")
+						confirmPrint("Are you sure you want to begin the image release process?")
 					}
 					releaseImage()
 					return nil
