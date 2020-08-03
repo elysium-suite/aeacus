@@ -62,8 +62,7 @@ func decryptConfig(cipherText string) string {
 	// Decompress zlib data.
 	reader, err := zlib.NewReader(bytes.NewReader([]byte(cipherText)))
 	if err != nil {
-		failPrint("Error decrypting scoring.dat. You naughty little competitor. Commencing self destruct...")
-		destroyImage()
+		failPrint("Error decrypting scoring data, you naughty little competitor. Please play nice.")
 		os.Exit(1)
 	}
 	defer reader.Close()
