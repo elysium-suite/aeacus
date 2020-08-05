@@ -1,7 +1,7 @@
 package main
 
 func launchIDPrompt() {
-	// zenity prompt ree?
+	warnPrint("Custom ID prompt not supported in Linux yet. Gotta use gedit.")
 }
 
 func launchConfigGui() {

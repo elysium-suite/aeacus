@@ -30,12 +30,10 @@ func sendNotification(messageString string) {
 	} else {
 		shellCommand(`
 			user="` + mc.Config.User + `"
-			uid="$(id -u $user)"
-			# If bus exists, Ubuntu >= 18
+			uid="$(id -u $user)" # Ubuntu >= 18
 			if [ -e /run/user/$uid/bus ]; then
 			    display="unix:path=/run/user/$uid/bus"
-			else
-			# Ubuntu <= 16
+			else # Ubuntu <= 16
 			    display="unix:abstract=$(cat /run/user/$uid/dbus-session | cut -d '=' -f3)"
 			fi
 			sudo -u $user DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$display notify-send -i ` + mc.DirPath + `assets/logo.png "Aeacus SE" "` + messageString + `"`)

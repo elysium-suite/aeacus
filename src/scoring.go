@@ -3,11 +3,18 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"sync"
 )
 
 func scoreImage() {
+	// Ensure checks aren't blank, and grab TeamID.
 	checkConfigData()
 
+	// If local is enabled, we want to:
+	//    1. Score checks
+	//    2. Check if server is up (if remote)
+	//    3. If connection, report score
+	//    4. Generate report
 	if mc.Config.Local {
 		scoreChecks()
 		if mc.Config.Remote != "" {
@@ -18,18 +25,29 @@ func scoreImage() {
 		}
 		genReport(mc.Image)
 
+		// If local is disabled, we want to:
+		//    1. Check if server is up
+		//    2. If no connection, generate report with err text
+		//    3. If connection, score checks
+		//    4. Report the score
+		//    5. If reporting failed, show error, wipe scoring data
+		//    6. Generate report
 	} else {
-		if mc.Config.Remote != "" {
-			checkServer()
-			if !mc.Connection {
-				genReport(mc.Image)
-				return
+		checkServer()
+		if !mc.Connection {
+			if verboseEnabled {
+				warnPrint("Connection failed-- generating blank report.")
 			}
+			genReport(mc.Image)
+			return
 		}
 		scoreChecks()
 		err := reportScore()
 		if err != nil {
-			return
+			mc.Image = imageData{}
+			if verboseEnabled {
+				warnPrint("Local is disabled, scoring data removed.")
+			}
 		}
 		genReport(mc.Image)
 	}
@@ -46,12 +64,14 @@ func scoreImage() {
 			playAudio(mc.DirPath + "assets/alarm.wav")
 		}
 	} else {
-		warnPrint("Reading from previous.txt failed.")
+		warnPrint("Reading from previous.txt failed. This is probably fine.")
 	}
 
 	writeFile(mc.DirPath+"previous.txt", strconv.Itoa(mc.Image.Score))
 }
 
+// checkConfigData performs preliminary checks on the configuration data,
+// and reads the TeamID file.
 func checkConfigData() {
 	if len(mc.Config.Check) == 0 {
 		mc.Conn.OverallColor = "red"
@@ -64,79 +84,96 @@ func checkConfigData() {
 	readTeamID()
 }
 
+// scoreChecks runs through every check configured and runs them concurrently.
 func scoreChecks() {
 	mc.Image = imageData{}
-
 	assignPoints()
 
+	var wg sync.WaitGroup
 	for _, check := range mc.Config.Check {
-		status := true
-		passStatus := []bool{}
-		for _, condition := range check.Pass {
-			passItemStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-			if debugEnabled {
-				infoPrint(fmt.Sprint("Result of last pass check was ", status))
-			}
-			passStatus = append(passStatus, passItemStatus)
-		}
-
-		// For multiple pass conditions, will only be true if ALL of them are
-		for _, result := range passStatus {
-			status = status && result
-			if !status {
-				break
-			}
-		}
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of all pass check was ", status))
-		}
-
-		// If a PassOverride succeeds, that overrides the Pass checks
-		for _, condition := range check.PassOverride {
-			passOverrideStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-			if debugEnabled {
-				infoPrint(fmt.Sprint("Result of pass override was ", passOverrideStatus))
-			}
-			if passOverrideStatus {
-				status = true
-				break
-			}
-		}
-		for _, condition := range check.Fail {
-			failStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-			if debugEnabled {
-				infoPrint(fmt.Sprint("Result of fail check was ", failStatus))
-			}
-			if failStatus {
-				status = false
-				break
-			}
-		}
-		if check.Points >= 0 {
-			if status {
-				if verboseEnabled {
-					passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
-				}
-				mc.Image.Points = append(mc.Image.Points, scoreItem{check.Message, check.Points})
-				mc.Image.Score += check.Points
-				mc.Image.Contribs += check.Points
-			}
-		} else {
-			if status {
-				if verboseEnabled {
-					failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
-				}
-				mc.Image.Penalties = append(mc.Image.Penalties, scoreItem{check.Message, check.Points})
-				mc.Image.Score += check.Points
-				mc.Image.Detracts += check.Points
-			}
-		}
+		wg.Add(1)
+		go scoreCheck(&wg, check)
 	}
+
+	wg.Wait()
+	if verboseEnabled {
+		infoPrint("Finished running all checks.")
+	}
+
 	if verboseEnabled {
 		infoPrint(fmt.Sprintf("Score: %d", mc.Image.Score))
 	}
 }
 
+// scoreCheck will go through each condition inside a check, and determine
+// whether or not the check passes.
+func scoreCheck(wg *sync.WaitGroup, check check) {
+	defer wg.Done()
+	status := true
+	passStatus := []bool{}
+	for _, condition := range check.Pass {
+		passItemStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of last pass check was ", status))
+		}
+		passStatus = append(passStatus, passItemStatus)
+	}
+
+	// For multiple pass conditions, will only be true if ALL of them are
+	for _, result := range passStatus {
+		status = status && result
+		if !status {
+			break
+		}
+	}
+	if debugEnabled {
+		infoPrint(fmt.Sprint("Result of all pass check was ", status))
+	}
+
+	// If a PassOverride succeeds, that overrides the Pass checks
+	for _, condition := range check.PassOverride {
+		passOverrideStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of pass override was ", passOverrideStatus))
+		}
+		if passOverrideStatus {
+			status = true
+			break
+		}
+	}
+	for _, condition := range check.Fail {
+		failStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of fail check was ", failStatus))
+		}
+		if failStatus {
+			status = false
+			break
+		}
+	}
+	if check.Points >= 0 {
+		if status {
+			if verboseEnabled {
+				passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
+			}
+			mc.Image.Points = append(mc.Image.Points, scoreItem{check.Message, check.Points})
+			mc.Image.Score += check.Points
+			mc.Image.Contribs += check.Points
+		}
+	} else {
+		if status {
+			if verboseEnabled {
+				failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
+			}
+			mc.Image.Penalties = append(mc.Image.Penalties, scoreItem{check.Message, check.Points})
+			mc.Image.Score += check.Points
+			mc.Image.Detracts += check.Points
+		}
+	}
+}
+
+// assignPoints is used to automatically assign points to checks that don't
+// have a hardcoded points value.
 func assignPoints() {
 	pointlessChecks := []int{}
 
@@ -151,7 +188,7 @@ func assignPoints() {
 	}
 
 	pointsLeft := 100 - mc.Image.TotalPoints
-	if pointsLeft < 0 && len(pointlessChecks) > 0 {
+	if pointsLeft <= 0 && len(pointlessChecks) > 0 || len(pointlessChecks) > 100 {
 		// If the specified points already value over 100, yet there are
 		// checks without points assigned, we assign the default point value
 		// of 3 (arbitrarily chosen).

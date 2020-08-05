@@ -1,12 +1,14 @@
 package main
 
+// writeDesktopFiles creates TeamID.txt and its shortcut, as well as links
+// to the ScoringReport, ReadMe, and other needed files.
 func writeDesktopFiles() {
 	if verboseEnabled {
 		infoPrint("Creating or emptying TeamID.txt...")
 	}
-	shellCommand("touch /opt/aeacus/TeamID.txt")
 	shellCommand("echo 'YOUR-TEAMID-HERE' > /opt/aeacus/TeamID.txt")
 	shellCommand("chmod 666 /opt/aeacus/TeamID.txt")
+	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /opt/aeacus/TeamID.txt")
 	if verboseEnabled {
 		infoPrint("Writing shortcuts to Desktop...")
 	}
@@ -15,21 +17,28 @@ func writeDesktopFiles() {
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
 }
 
+// configureAutologin configures the auto-login capability for LightDM and
+// GDM3, so that the image automatically logs in to the main user's account
+// on boot.
 func configureAutologin() {
-	lightdm, err := pathExists("/usr/share/lightdm")
-	gdm, err := pathExists("/etc/gdm/custom.conf")
-	if err != nil {
-		if lightdm {
-			writeFile("/usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf", "echo autologin-user="+mc.Config.User)
-		} else if gdm {
-			writeFile("/etc/gdm/custom.conf", `echo AutomaticLogin=True
-AutomaticLogin=`+mc.Config.User)
-		} else {
-			failPrint("Unable to configure autologin. Please do so manually")
+	lightdm, _ := pathExists("/usr/share/lightdm")
+	gdm, _ := pathExists("/etc/gdm3/")
+	if lightdm {
+		if verboseEnabled {
+			infoPrint("LightDM detected for autologin.")
 		}
+		shellCommand(`echo "autologin-user=` + mc.Config.User + `" >> /usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf`)
+	} else if gdm {
+		if verboseEnabled {
+			infoPrint("GDM3 detected for autologin.")
+		}
+		shellCommand(`echo -e "AutomaticLogin=True\nAutomaticLogin=` + mc.Config.User + `" >> /etc/gdm3/custom.conf`)
+	} else {
+		failPrint("Unable to configure autologin! Please do so manually.")
 	}
 }
 
+// installService for Linux installs and starts the CSSClient init.d service.
 func installService() {
 	if verboseEnabled {
 		infoPrint("Installing service...")
@@ -40,6 +49,9 @@ func installService() {
 	shellCommand("systemctl start CSSClient")
 }
 
+// cleanUp for Linux is primarily focused on removing cached files, history,
+// and other pieces of forensic evidence. It also removes the non-required
+// files in the aeacus directory.
 func cleanUp() {
 	findPaths := "/bin /etc /home /opt /root /sbin /srv /usr /mnt /var"
 
