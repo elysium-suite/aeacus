@@ -21,6 +21,7 @@ import (
 
 func main() {
 	fillConstants()
+	runningPermsCheck()
 	app := &cli.App{
 		UseShortOptionHandling: true,
 		EnableBashCompletion:   true,
@@ -28,7 +29,6 @@ func main() {
 		Usage:                  "setup and score vulnerabilities in an image",
 		Action: func(c *cli.Context) error {
 			parseFlags(c)
-			runningPermsCheck()
 			checkConfig(scoringConf)
 			scoreImage()
 			return nil
@@ -57,7 +57,6 @@ func main() {
 				Usage:   "Score image with current scoring config",
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
-					runningPermsCheck()
 					checkConfig(scoringConf)
 					scoreImage()
 					return nil
@@ -89,13 +88,11 @@ func main() {
 				Usage:   "Check that scoring data file is valid",
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
-					decryptedData, err := decodeString(readData(scoringData))
+					err := readScoringData()
 					if err != nil {
-						return errors.New("error in reading scoring.dat")
-					}
-					parseConfig(decryptedData)
-					if verboseEnabled {
-						infoPrint("Config looks good! Decryption successful.")
+						failPrint("Error reading in scoring data!")
+					} else if verboseEnabled {
+						infoPrint("Reading in scoring data successful!")
 					}
 					return nil
 				},
@@ -106,7 +103,6 @@ func main() {
 				Usage:   "Create forensic question files",
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
-					runningPermsCheck()
 					numFqs, err := strconv.Atoi(c.Args().First())
 					if err != nil {
 						return errors.New("Invalid or missing number passed to forensics")
@@ -127,7 +123,7 @@ func main() {
 			},
 			{
 				Name:    "idprompt",
-				Aliases: []string{"d"},
+				Aliases: []string{"p"},
 				Usage:   "Launch TeamID GUI prompt",
 				Action: func(c *cli.Context) error {
 					launchIDPrompt()
@@ -139,7 +135,6 @@ func main() {
 				Aliases: []string{"i"},
 				Usage:   "Get info about the system",
 				Action: func(c *cli.Context) error {
-					runningPermsCheck()
 					getInfo(c.Args().Get(0))
 					return nil
 				},
@@ -160,7 +155,6 @@ func main() {
 				Usage:   "Prepare the image for release",
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
-					runningPermsCheck()
 					if !yesEnabled {
 						confirmPrint("Are you sure you want to begin the image release process?")
 					}
@@ -174,7 +168,6 @@ func main() {
 				Usage:   "Automatically mitigate the configured vulnerabilities",
 				Action: func(c *cli.Context) error {
 					parseFlags(c)
-					runningPermsCheck()
 					if !yesEnabled {
 						confirmPrint("Are you sure you want to try to automatically mitigate the configured vulns?")
 					}
@@ -202,20 +195,6 @@ func parseFlags(c *cli.Context) {
 	}
 	if c.Bool("y") {
 		yesEnabled = true
-	}
-}
-
-// checkConfig parses and checks the validity of the current
-// `scoring.conf` file.
-func checkConfig(fileName string) {
-	fileContent, err := readFile(mc.DirPath + fileName)
-	if err != nil {
-		failPrint("Configuration file (" + fileName + ") not found!")
-		os.Exit(1)
-	}
-	parseConfig(fileContent)
-	if verboseEnabled {
-		printConfig()
 	}
 }
 

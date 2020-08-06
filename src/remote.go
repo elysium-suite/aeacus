@@ -107,16 +107,11 @@ func reportScore() error {
 	}
 
 	if resp.StatusCode != 200 {
-		failPrint("Failed to upload score! Is your TeamID wrong?")
 		mc.Conn.OverallColor = "red"
 		mc.Conn.OverallStatus = "Failed to upload score! Please ensure that your Team ID is correct."
 		mc.Connection = false
+		failPrint("Failed to upload score! Is your TeamID wrong?")
 		sendNotification("Failed to upload score! Is your Team ID correct?")
-		if !mc.Config.Local {
-			if verboseEnabled {
-				warnPrint("Local is not set to \"yes\"-- scoring data will not be reported.")
-			}
-		}
 		return errors.New("Non-200 response from remote scoring endpoint")
 	}
 	return nil
@@ -168,7 +163,7 @@ func checkServer() {
 
 	// Overall
 	if mc.Conn.NetStatus == "FAIL" && mc.Conn.ServerStatus == "OK" {
-		mc.Conn.OverallColor = "yellow"
+		mc.Conn.OverallColor = "goldenrod"
 		mc.Conn.OverallStatus = "Server connection good but no Internet. Assuming you're on an isolated LAN."
 		mc.Connection = true
 	} else if mc.Conn.ServerStatus == "FAIL" {

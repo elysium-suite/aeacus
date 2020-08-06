@@ -3,29 +3,22 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"log"
-	"math/rand"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/judwhite/go-svc/svc"
-	"github.com/urfave/cli"
 )
 
-/////////////////////////////////////////////////////////////////////
-//            oooo                                                 //
-//            `888                                                 //
-// oo.ooooo.   888 .oo.    .ooooo.   .ooooo.  oooo  oooo   .oooo.o //
-//  888' `88b  888P"Y88b  d88' `88b d88' `"Y8 `888  `888  d88(  "8 //
-//  888   888  888   888  888   888 888        888   888  `"Y88b.  //
-//  888   888  888   888  888   888 888   .o8  888   888  o.  )88b //
-//  888bod8P' o888o o888o `Y8bod8P' `Y8bod8P'  `V88V"V8P' 8""888P' //
-//  888       production binary for aeacus                         //
-// o888o                                                           //
-/////////////////////////////////////////////////////////////////////
+func phocusStart(quit chan struct{}) {
+	app := genPhocusApp()
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 // idgui is set using the flag package in order to grab its value before
 // the Windows service is initialized.
@@ -37,6 +30,7 @@ type program struct {
 	quit chan struct{}
 }
 
+// main for phocus_windows.go will
 func main() {
 	flag.Parse()
 	prg := &program{}
@@ -45,9 +39,11 @@ func main() {
 	}
 }
 
+// Init for our windows service *program will prevent people from running
+// the production binary outside of the Windows service.
 func (p *program) Init(env svc.Environment) error {
 	if !env.IsWindowsService() && !*idgui {
-		failPrint("Sorry! Don't run this binary. It's probably already running as a Windows service (CSSClient).")
+		failPrint("Sorry! Don't run this binary yourself. It's probably already running as a Windows service (CSSClient).")
 		time.Sleep(5 * time.Second)
 		os.Exit(1)
 	}
@@ -81,55 +77,4 @@ func (p *program) Stop() error {
 func launchIDPromptWrapper(quit chan struct{}) {
 	launchIDPrompt()
 	os.Exit(0) // This is temporary solution
-}
-
-func phocusStart(quit chan struct{}) {
-	if !adminCheck() {
-		failPrint("You need to run this binary as root or Administrator!")
-		os.Exit(1)
-	}
-
-	checkTrace()
-	fillConstants()
-
-	app := &cli.App{
-		Name:  "phocus",
-		Usage: "score vulnerabilities",
-		Action: func(c *cli.Context) error {
-			decryptedData, err := decodeString(readData(scoringData))
-			if err != nil {
-				return errors.New("Error in reading scoring.dat!")
-			}
-			parseConfig(decryptedData)
-			rand.Seed(time.Now().UnixNano())
-			for {
-				checkTrace()
-				timeCheck()
-				mc.Image = imageData{}
-				infoPrint("Scoring image...")
-				scoreImage()
-				jitter := time.Duration(rand.Intn(8) + 8)
-				infoPrint("Scored image, sleeping for a bit...")
-				time.Sleep(jitter * time.Second)
-			}
-			return nil
-		},
-		Commands: []*cli.Command{
-			{
-				Name:    "version",
-				Aliases: []string{"v"},
-				Usage:   "Print the current version of phocus",
-				Action: func(c *cli.Context) error {
-					infoPrint("=== phocus (windows) ===")
-					infoPrint("version " + aeacusVersion)
-					return nil
-				},
-			},
-		},
-	}
-
-	err := app.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
