@@ -111,12 +111,12 @@ func scoreCheck(wg *sync.WaitGroup, check check) {
 	defer wg.Done()
 	status := true
 	passStatus := []bool{}
-	for _, condition := range check.Pass {
+	for i, condition := range check.Pass {
 		passItemStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of last pass check was ", status))
-		}
 		passStatus = append(passStatus, passItemStatus)
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of last pass check was ", passStatus[i]))
+		}
 	}
 
 	// For multiple pass conditions, will only be true if ALL of them are
