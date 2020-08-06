@@ -1,7 +1,12 @@
 package main
 
 func launchIDPrompt() {
-	warnPrint("Custom ID prompt not supported in Linux yet. Gotta use gedit.")
+	teamID, err := shellCommandOutput("bash /opt/aeacus/misc/id_linux.sh")
+	if err == nil {
+		writeFile("/opt/aeacus/TeamID.txt", teamID)
+	} else {
+		sendNotification("Error saving TeamID!")
+	}
 }
 
 func launchConfigGui() {
