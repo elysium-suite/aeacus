@@ -6,9 +6,9 @@ func writeDesktopFiles() {
 	if verboseEnabled {
 		infoPrint("Creating or emptying TeamID.txt...")
 	}
-	shellCommand("echo 'YOUR-TEAMID-HERE' > /opt/aeacus/TeamID.txt")
-	shellCommand("chmod 666 /opt/aeacus/TeamID.txt")
-	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /opt/aeacus/TeamID.txt")
+	shellCommand("echo 'YOUR-TEAMID-HERE' > " + mc.DirPath + "TeamID.txt")
+	shellCommand("chmod 666 " + mc.DirPath + "TeamID.txt")
+	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " " + mc.DirPath + "TeamID.txt")
 	if verboseEnabled {
 		infoPrint("Writing shortcuts to Desktop...")
 	}
@@ -43,7 +43,7 @@ func installService() {
 	if verboseEnabled {
 		infoPrint("Installing service...")
 	}
-	shellCommand("cp /opt/aeacus/misc/CSSClient /etc/init.d/")
+	shellCommand("cp " + mc.DirPath + "misc/CSSClient /etc/init.d/")
 	shellCommand("chmod +x /etc/init.d/CSSClient")
 	shellCommand("systemctl enable CSSClient")
 	shellCommand("systemctl start CSSClient")
@@ -56,9 +56,9 @@ func cleanUp() {
 	findPaths := "/bin /etc /home /opt /root /sbin /srv /usr /mnt /var"
 
 	if verboseEnabled {
-		infoPrint("Changing perms to 755 in /opt/aeacus...")
+		infoPrint("Changing perms to 755 in " + mc.DirPath + "...")
 	}
-	shellCommand("chmod 755 -R /opt/aeacus")
+	shellCommand("chmod 755 -R " + mc.DirPath)
 
 	if verboseEnabled {
 		infoPrint("Removing .viminfo and .swp files...")
@@ -109,17 +109,17 @@ func cleanUp() {
 	if verboseEnabled {
 		infoPrint("Removing scoring.conf...")
 	}
-	shellCommand("rm /opt/aeacus/scoring.conf*")
+	shellCommand("rm " + mc.DirPath + "scoring.conf*")
 
 	if verboseEnabled {
 		infoPrint("Removing other setup files...")
 	}
-	shellCommand("rm -rf /opt/aeacus/misc/ /opt/aeacus/ReadMe.conf /opt/aeacus/README.md /opt/aeacus/TODO.md")
+	shellCommand("rm -rf " + mc.DirPath + "misc/ " + mc.DirPath + "ReadMe.conf " + mc.DirPath + "README.md " + mc.DirPath + "TODO.md")
 
 	if verboseEnabled {
 		infoPrint("Removing aeacus binary...")
 	}
-	shellCommand("rm /opt/aeacus/aeacus")
+	shellCommand("rm " + mc.DirPath + "aeacus")
 
 	if verboseEnabled {
 		infoPrint("Overwriting timestamps to obfuscate changes...")

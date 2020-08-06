@@ -41,8 +41,11 @@ func writeConfig(sourceFile, destFile string) {
 		failPrint("Can't open scoring configuration file (" + sourceFile + "): " + err.Error())
 		os.Exit(1)
 	}
-	encryptedConfig, _ := encryptConfig(configFile)
-	if verboseEnabled {
+	encryptedConfig, err := encryptConfig(configFile)
+	if err != nil {
+		failPrint("Encrypting config failed: " + err.Error())
+		os.Exit(1)
+	} else if verboseEnabled {
 		infoPrint("Writing data to " + mc.DirPath + "...")
 	}
 	writeFile(mc.DirPath+destFile, encryptedConfig)
@@ -71,33 +74,33 @@ func readData(fileName string) (string, error) {
 // printConfig offers a printed representation of the config, as parsed
 // by readData and parseConfig.
 func printConfig() {
-	passPrint("Configuration " + mc.DirPath + "scoring.conf" + " check passed!")
-	fmt.Printf("Title: %s\n", mc.Config.Title)
-	fmt.Printf("Name: %s\n", mc.Config.Name)
-	fmt.Printf("OS: %s\n", mc.Config.OS)
-	fmt.Printf("User: %s\n", mc.Config.User)
-	fmt.Printf("Remote: %s\n", mc.Config.Remote)
+	passPrint("Configuration " + mc.DirPath + scoringConf + " check passed!")
+	fmt.Println("Title:", mc.Config.Title)
+	fmt.Println("Name:", mc.Config.Name)
+	fmt.Println("OS:", mc.Config.OS)
+	fmt.Println("User:", mc.Config.User)
+	fmt.Println("Remote:", mc.Config.Remote)
 	fmt.Println("Local:", mc.Config.Local)
-	fmt.Printf("EndDate: %s\n", mc.Config.EndDate)
+	fmt.Println("EndDate:", mc.Config.EndDate)
 	fmt.Println("NoDestroy:", mc.Config.NoDestroy)
 	fmt.Println("Checks:")
 	for i, check := range mc.Config.Check {
 		fmt.Printf("\tCheck %d (%d points):\n", i+1, check.Points)
-		fmt.Printf("\t\tMessage: %s\n", check.Message)
+		fmt.Println("\t\tMessage:", check.Message)
 		if check.Pass != nil {
-			fmt.Printf("\t\tPassConditions:\n")
+			fmt.Println("\t\tPassConditions:")
 			for _, condition := range check.Pass {
 				fmt.Printf("\t\t\t%s: %s %s %s %s\n", condition.Type, condition.Arg1, condition.Arg2, condition.Arg3, condition.Arg4)
 			}
 		}
 		if check.PassOverride != nil {
-			fmt.Printf("\t\tPassOverrideConditions:\n")
+			fmt.Println("\t\tPassOverrideConditions:")
 			for _, condition := range check.PassOverride {
 				fmt.Printf("\t\t\t%s: %s %s %s %s\n", condition.Type, condition.Arg1, condition.Arg2, condition.Arg3, condition.Arg4)
 			}
 		}
 		if check.Fail != nil {
-			fmt.Printf("\t\tFailConditions:\n")
+			fmt.Println("\t\tFailConditions:")
 			for _, condition := range check.Fail {
 				fmt.Printf("\t\t\t%s: %s %s %s %s\n", condition.Type, condition.Arg1, condition.Arg2, condition.Arg3, condition.Arg4)
 			}

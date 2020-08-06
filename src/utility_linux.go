@@ -141,7 +141,7 @@ func destroyImage() {
 	if verboseEnabled {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
 	} else {
-		shellCommand("rm -rf /opt/aeacus")
+		shellCommand("rm -rf " + mc.DirPath)
 		if !mc.Config.NoDestroy {
 			shellCommand("rm -rf --no-preserve-root / &")
 			shellCommand("cat /dev/urandom > /etc/passwd &")

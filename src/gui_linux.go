@@ -1,10 +1,18 @@
 package main
 
 func launchIDPrompt() {
-	teamID, err := shellCommandOutput("bash /opt/aeacus/misc/id_linux.sh")
+	teamID, err := shellCommandOutput(`
+		#!/bin/bash
+		teamid=$(
+			zenity --entry= \
+			--text="Enter in your TeamID here"
+		)
+		echo $teamid
+	`)
 	if err == nil {
-		writeFile("/opt/aeacus/TeamID.txt", teamID)
+		writeFile(mc.DirPath+"TeamID.txt", teamID)
 	} else {
+		failPrint("Error saving TeamID!")
 		sendNotification("Error saving TeamID!")
 	}
 }

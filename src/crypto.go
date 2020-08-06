@@ -41,11 +41,19 @@ func encryptConfig(plainText string) (string, error) {
 	// Compress the file with zlib.
 	var encryptedFile bytes.Buffer
 	writer := zlib.NewWriter(&encryptedFile)
-	writer.Write([]byte(plainText))
+
+	// Write zlib compressed data into encryptedFile
+	_, err := writer.Write([]byte(plainText))
+	if err != nil {
+		if debugEnabled {
+			failPrint("Unable to zlib compress scoring data: " + err.Error())
+		}
+		return "", err
+	}
 	writer.Close()
 
 	// XOR the encrypted file with our key.
-	return xor(key, encryptedFile.String()), nil
+	return xor(key, encryptedFile.String()), err
 }
 
 // decryptConfig is used to decrypt the scoring data file.
@@ -54,9 +62,6 @@ func decryptConfig(cipherText string) (string, error) {
 	key := xor(randomHashOne, randomHashTwo)
 
 	// Apply the XOR key to decrypt the zlib-compressed data.
-	//
-	// XOR is special in that when you apply it twice, you get the original data
-	// as long as the key was the same.
 	cipherText = xor(key, cipherText)
 
 	// Create the zlib reader.
@@ -88,5 +93,5 @@ func decryptConfig(cipherText string) (string, error) {
 		return "", errors.New("Decrypted config is empty!")
 	}
 
-	return decryptedConfig, nil
+	return decryptedConfig, err
 }
