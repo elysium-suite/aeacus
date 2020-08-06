@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -10,18 +11,26 @@ import (
 	"github.com/fatih/color"
 )
 
+// parseConfig takes the config content as a string and attempts to parse it
+// into the mc.Config struct based on the TOML spec.
 func parseConfig(configContent string) {
+	if configContent == "" {
+		failPrint("Configuration is empty!")
+	}
+
 	if _, err := toml.Decode(configContent, &mc.Config); err != nil {
-		fmt.Println(err)
+		failPrint("Error decoding TOML: " + err.Error())
 		os.Exit(1)
 	}
 
-	// If there's no remote, local must be enabled
+	// If there's no remote, local must be enabled.
 	if mc.Config.Remote == "" {
 		mc.Config.Local = true
 	}
 }
 
+// writeConfig reads the plaintext configuration from sourceFile, and writes
+// the encrypted configuration into the destFile name passed.
 func writeConfig(sourceFile, destFile string) {
 	if verboseEnabled {
 		infoPrint("Reading configuration from " + mc.DirPath + sourceFile + "...")
@@ -32,64 +41,75 @@ func writeConfig(sourceFile, destFile string) {
 		failPrint("Can't open scoring configuration file (" + sourceFile + "): " + err.Error())
 		os.Exit(1)
 	}
-	encryptedConfig := encryptConfig(configFile)
-	if verboseEnabled {
+	encryptedConfig, err := encryptConfig(configFile)
+	if err != nil {
+		failPrint("Encrypting config failed: " + err.Error())
+		os.Exit(1)
+	} else if verboseEnabled {
 		infoPrint("Writing data to " + mc.DirPath + "...")
 	}
 	writeFile(mc.DirPath+destFile, encryptedConfig)
 }
 
-func readData(fileName string) string {
+// readData is a wrapper around decryptData, taking the scoring data fileName,
+// and reading its content. It returns the decrypt config.
+func readData(fileName string) (string, error) {
 	if verboseEnabled {
 		infoPrint("Decrypting data from " + mc.DirPath + fileName + "...")
 	}
 	// Read in the encrypted configuration file.
-	dataFile, err := readFile(mc.DirPath + "scoring.dat")
+	dataFile, err := readFile(mc.DirPath + scoringData)
 	if err != nil {
-		failPrint("Data file (" + fileName + ") not found.")
-		os.Exit(1)
+		return "", err
+	} else if dataFile == "" {
+		return "", errors.New("Scoring data is empty!")
 	}
-	return decryptConfig(dataFile)
+	decryptedConfig, err := decryptConfig(dataFile)
+	if err != nil {
+		return "", err
+	}
+	return decryptedConfig, nil
 }
 
+// printConfig offers a printed representation of the config, as parsed
+// by readData and parseConfig.
 func printConfig() {
-	passPrint("Configuration " + mc.DirPath + "scoring.conf" + " check passed!")
-	fmt.Printf("Title: %s (%s)\n", mc.Config.Title, mc.Config.Name)
-	fmt.Printf("User: %s\n", mc.Config.User)
-	if mc.Config.Remote == "" {
-		fmt.Printf("Remote: None (local scoring only)\n")
-	} else {
-		fmt.Printf("Remote: %s\n", mc.Config.Remote)
-	}
-	if mc.Config.EndDate == "" {
-		fmt.Printf("Valid Until: None (image lasts forever)\n")
-	} else {
-		fmt.Printf("Valid Until: %s\n", mc.Config.EndDate)
-	}
+	passPrint("Configuration " + mc.DirPath + scoringConf + " check passed!")
+	fmt.Println("Title:", mc.Config.Title)
+	fmt.Println("Name:", mc.Config.Name)
+	fmt.Println("OS:", mc.Config.OS)
+	fmt.Println("User:", mc.Config.User)
+	fmt.Println("Remote:", mc.Config.Remote)
+	fmt.Println("Local:", mc.Config.Local)
+	fmt.Println("EndDate:", mc.Config.EndDate)
+	fmt.Println("NoDestroy:", mc.Config.NoDestroy)
 	fmt.Println("Checks:")
 	for i, check := range mc.Config.Check {
 		fmt.Printf("\tCheck %d (%d points):\n", i+1, check.Points)
-		fmt.Printf("\t\tMessage: %s\n", check.Message)
+		fmt.Println("\t\tMessage:", check.Message)
 		if check.Pass != nil {
-			fmt.Printf("\t\tPassConditions:\n")
+			fmt.Println("\t\tPassConditions:")
 			for _, condition := range check.Pass {
-				fmt.Printf("\t\t\t%s: %s", condition.Type, condition.Arg1)
-				if condition.Arg2 != "" {
-					fmt.Printf(", %s\n", condition.Arg2)
-				} else {
-					fmt.Printf("\n")
-				}
+				fmt.Printf("\t\t\t%s: %s %s %s %s\n", condition.Type, condition.Arg1, condition.Arg2, condition.Arg3, condition.Arg4)
+			}
+		}
+		if check.PassOverride != nil {
+			fmt.Println("\t\tPassOverrideConditions:")
+			for _, condition := range check.PassOverride {
+				fmt.Printf("\t\t\t%s: %s %s %s %s\n", condition.Type, condition.Arg1, condition.Arg2, condition.Arg3, condition.Arg4)
 			}
 		}
 		if check.Fail != nil {
-			fmt.Printf("\t\tFailConditions:\n")
+			fmt.Println("\t\tFailConditions:")
 			for _, condition := range check.Fail {
-				fmt.Printf("\t\t\t%s: %s, %s\n", condition.Type, condition.Arg1, condition.Arg2)
+				fmt.Printf("\t\t\t%s: %s %s %s %s\n", condition.Type, condition.Arg1, condition.Arg2, condition.Arg3, condition.Arg4)
 			}
 		}
 	}
 }
 
+// confirmPrint will prompt the user with the given toPrint string, and
+// exit the program if N or n is input.
 func confirmPrint(toPrint string) {
 	printer(color.FgYellow, "CONF", "")
 	fmt.Print(toPrint + " [Y/n]: ")
@@ -124,17 +144,6 @@ func printer(colorChosen color.Attribute, messageType string, toPrint string) {
 	if toPrint != "" {
 		fmt.Printf("\n")
 	}
-}
-
-func printerNoNewLine(colorChosen color.Attribute, messageType string, toPrint string) {
-	printer := color.New(colorChosen, color.Bold)
-	fmt.Printf("[")
-	printer.Printf(messageType)
-	fmt.Printf("] %s", toPrint)
-}
-
-func printerPrompt(toPrint string) {
-	printer(color.FgBlue, "?", toPrint)
 }
 
 func xor(key string, plaintext string) string {

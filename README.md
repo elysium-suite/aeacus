@@ -72,8 +72,8 @@ The configuration is written in TOML. See the below example:
 ```
 name = "ubuntu-18-supercool" # Image name
 title = "CoolCyberStuff Practice Round" # Round title
-user = "coolUser" # Main user for the image
 os = "Ubuntu 18.04" # OS, used for README
+user = "coolUser" # Main user for the image
 
 # If remote is specified, aeacus will report its score
 # and refuse to score if the remote server does not accept

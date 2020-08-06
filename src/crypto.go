@@ -17,8 +17,8 @@ package main
 import (
 	"bytes"
 	"compress/zlib"
+	"errors"
 	"io"
-	"os"
 )
 
 // These hashes are used for XORing the plaintext. Again-- not
@@ -30,7 +30,7 @@ const (
 
 // encryptConfig takes the plainText config and returns an encrypted string
 // that should be written to the encrypted scoring data file.
-func encryptConfig(plainText string) string {
+func encryptConfig(plainText string) (string, error) {
 	if verboseEnabled {
 		infoPrint("Encrypting configuration...")
 	}
@@ -41,33 +41,57 @@ func encryptConfig(plainText string) string {
 	// Compress the file with zlib.
 	var encryptedFile bytes.Buffer
 	writer := zlib.NewWriter(&encryptedFile)
-	writer.Write([]byte(plainText))
+
+	// Write zlib compressed data into encryptedFile
+	_, err := writer.Write([]byte(plainText))
+	if err != nil {
+		if debugEnabled {
+			failPrint("Unable to zlib compress scoring data: " + err.Error())
+		}
+		return "", err
+	}
 	writer.Close()
 
 	// XOR the encrypted file with our key.
-	return xor(key, encryptedFile.String())
+	return xor(key, encryptedFile.String()), err
 }
 
 // decryptConfig is used to decrypt the scoring data file.
-func decryptConfig(cipherText string) string {
+func decryptConfig(cipherText string) (string, error) {
 	// Create our key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
 
 	// Apply the XOR key to decrypt the zlib-compressed data.
-	//
-	// XOR is special in that when you apply it twice, you get the original data
-	// as long as the key was the same.
 	cipherText = xor(key, cipherText)
 
-	// Decompress zlib data.
+	// Create the zlib reader.
 	reader, err := zlib.NewReader(bytes.NewReader([]byte(cipherText)))
 	if err != nil {
-		failPrint("Error decrypting scoring data, you naughty little competitor. Please play nice.")
-		os.Exit(1)
+		if debugEnabled {
+			failPrint("Error creating archive reader for scoring data.")
+		}
+		return "", errors.New("Error creating zLib reader")
 	}
 	defer reader.Close()
-	dataBuffer := bytes.NewBuffer(nil)
-	io.Copy(dataBuffer, reader)
 
-	return string(dataBuffer.Bytes())
+	// Read into our created buffer.
+	dataBuffer := bytes.NewBuffer(nil)
+	_, err = io.Copy(dataBuffer, reader)
+	if err != nil {
+		if debugEnabled {
+			failPrint("Error decompressing scoring data.")
+		}
+		return "", errors.New("Error decompressing zlib data.")
+	}
+
+	// Check that decryptedConfig is not empty.
+	decryptedConfig := string(dataBuffer.Bytes())
+	if decryptedConfig == "" {
+		if debugEnabled {
+			failPrint("Scoring data is empty!")
+		}
+		return "", errors.New("Decrypted config is empty!")
+	}
+
+	return decryptedConfig, err
 }

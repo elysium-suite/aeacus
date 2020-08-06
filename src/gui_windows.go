@@ -47,5 +47,5 @@ func launchIDPrompt() {
 }
 
 func launchConfigGui() {
-	warnPrint("This feature is not supported yet on Windows")
+	warnPrint("This feature is not supported yet on Windows.")
 }
