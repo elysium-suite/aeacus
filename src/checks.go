@@ -170,16 +170,24 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 	}
 }
 
+// pathExists is a wrapper around os.Stat and os.IsNotExist, and determines
+// whether a file or folder exists.
 func pathExists(pathName string) (bool, error) {
 	_, err := os.Stat(pathName)
 	return !os.IsNotExist(err), nil
 }
 
+// fileContains searches for a given searchString in the provided fileName.
 func fileContains(fileName string, searchString string) (bool, error) {
 	fileContent, err := readFile(fileName)
 	return strings.Contains(strings.TrimSpace(fileContent), searchString), err
 }
 
+// fillContainsRegex determines whether a file contains a given regular
+// expression.
+//
+// Newlines in regex may not work as expected, especially on Windows. It's
+// best to not use these (ex. ^ and $).
 func fileContainsRegex(fileName string, expressionString string) (bool, error) {
 	fileContent, err := readFile(fileName)
 	if err != nil {

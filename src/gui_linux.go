@@ -1,7 +1,20 @@
 package main
 
 func launchIDPrompt() {
-	// zenity prompt ree?
+	teamID, err := shellCommandOutput(`
+		#!/bin/bash
+		teamid=$(
+			zenity --entry= \
+			--text="Enter in your TeamID here"
+		)
+		echo $teamid
+	`)
+	if err == nil {
+		writeFile(mc.DirPath+"TeamID.txt", teamID)
+	} else {
+		failPrint("Error saving TeamID!")
+		sendNotification("Error saving TeamID!")
+	}
 }
 
 func launchConfigGui() {
