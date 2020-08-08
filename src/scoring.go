@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+var points = make(map[int]scoreItem)
+
 func scoreImage() {
 	// Ensure checks aren't blank, and grab TeamID.
 	checkConfigData()
@@ -89,13 +91,31 @@ func scoreChecks() {
 	mc.Image = imageData{}
 	assignPoints()
 
+	points = make(map[int]scoreItem)
+
 	var wg sync.WaitGroup
-	for _, check := range mc.Config.Check {
+	var m sync.Mutex
+
+	for index, check := range mc.Config.Check {
 		wg.Add(1)
-		go scoreCheck(&wg, check)
+		go scoreCheck(index, check, &wg, &m)
 	}
 
 	wg.Wait()
+
+	// Order checks returned from goroutines
+	for index, check := range mc.Config.Check {
+		if check.Points >= 0 {
+			if point, ok := points[index]; ok {
+				mc.Image.Points = append(mc.Image.Points, point)
+			}
+		} else {
+			if point, ok := points[index]; ok {
+				mc.Image.Penalties = append(mc.Image.Penalties, point)
+			}
+		}
+	}
+
 	if verboseEnabled {
 		infoPrint("Finished running all checks.")
 	}
@@ -107,7 +127,7 @@ func scoreChecks() {
 
 // scoreCheck will go through each condition inside a check, and determine
 // whether or not the check passes.
-func scoreCheck(wg *sync.WaitGroup, check check) {
+func scoreCheck(index int, check check, wg *sync.WaitGroup, m *sync.Mutex) {
 	defer wg.Done()
 	status := true
 	passStatus := []bool{}
@@ -151,24 +171,25 @@ func scoreCheck(wg *sync.WaitGroup, check check) {
 			break
 		}
 	}
-	if check.Points >= 0 {
-		if status {
+	if status {
+		if check.Points >= 0 {
 			if verboseEnabled {
 				passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
 			}
-			mc.Image.Points = append(mc.Image.Points, scoreItem{check.Message, check.Points})
-			mc.Image.Score += check.Points
+			m.Lock()
+			points[index] = scoreItem{check.Message, check.Points}
 			mc.Image.Contribs += check.Points
-		}
-	} else {
-		if status {
+			m.Unlock()
+		} else {
 			if verboseEnabled {
 				failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
 			}
-			mc.Image.Penalties = append(mc.Image.Penalties, scoreItem{check.Message, check.Points})
-			mc.Image.Score += check.Points
+			m.Lock()
+			points[index] = scoreItem{check.Message, check.Points}
 			mc.Image.Detracts += check.Points
+			m.Unlock()
 		}
+		mc.Image.Score += check.Points
 	}
 }
 
