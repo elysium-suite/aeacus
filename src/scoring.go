@@ -159,6 +159,8 @@ func scoreCheck(index int, check check, wg *sync.WaitGroup, m *sync.Mutex) {
 		}
 		if passOverrideStatus {
 			break
+		} else {
+			status = false
 		}
 	}
 
