@@ -56,20 +56,28 @@ func scoreImage() {
 
 	// Check if points increased/decreased
 	prevPoints, err := readFile(mc.DirPath + "previous.txt")
+
+	// Write previous.txt before playing sound, in case execution is
+	// interrupted while playing it.
+	writeFile(mc.DirPath+"previous.txt", strconv.Itoa(mc.Image.Score))
+
 	if err == nil {
-		prevScore, _ := strconv.Atoi(prevPoints)
-		if prevScore < mc.Image.Score {
-			sendNotification("You gained points!")
-			playAudio(mc.DirPath + "assets/gain.wav")
-		} else if prevScore > mc.Image.Score {
-			sendNotification("You lost points!")
-			playAudio(mc.DirPath + "assets/alarm.wav")
+		prevScore, err := strconv.Atoi(prevPoints)
+		if err != nil {
+			failPrint("Don't mess with previous.txt!")
+		} else {
+			if prevScore < mc.Image.Score {
+				sendNotification("You gained points!")
+				playAudio(mc.DirPath + "assets/gain.wav")
+			} else if prevScore > mc.Image.Score {
+				sendNotification("You lost points!")
+				playAudio(mc.DirPath + "assets/alarm.wav")
+			}
 		}
 	} else {
 		warnPrint("Reading from previous.txt failed. This is probably fine.")
 	}
 
-	writeFile(mc.DirPath+"previous.txt", strconv.Itoa(mc.Image.Score))
 }
 
 // checkConfigData performs preliminary checks on the configuration data,
@@ -130,47 +138,55 @@ func scoreChecks() {
 func scoreCheck(index int, check check, wg *sync.WaitGroup, m *sync.Mutex) {
 	defer wg.Done()
 	status := true
-	passStatus := []bool{}
-	for i, condition := range check.Pass {
-		passItemStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		passStatus = append(passStatus, passItemStatus)
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of last pass check was ", passStatus[i]))
-		}
-	}
 
-	// For multiple pass conditions, will only be true if ALL of them are
-	for _, result := range passStatus {
-		status = status && result
-		if !status {
-			break
-		}
-	}
-	if debugEnabled {
-		infoPrint(fmt.Sprint("Result of all pass check was ", status))
-	}
-
-	// If a PassOverride succeeds, that overrides the Pass checks
-	for _, condition := range check.PassOverride {
-		passOverrideStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of pass override was ", passOverrideStatus))
-		}
-		if passOverrideStatus {
-			status = true
-			break
-		}
-	}
+	// If a fail condition passes, the check fails, no other checks required.
 	for _, condition := range check.Fail {
 		failStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
 		if debugEnabled {
 			infoPrint(fmt.Sprint("Result of fail check was ", failStatus))
 		}
 		if failStatus {
-			status = false
-			break
+			return
 		}
 	}
+
+	// If a PassOverride succeeds, that overrides the Pass checks
+	passOverrideStatus := false
+	for _, condition := range check.PassOverride {
+		passOverrideStatus = processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of pass override was ", passOverrideStatus))
+		}
+		if passOverrideStatus {
+			break
+		} else {
+			status = false
+		}
+	}
+
+	if !passOverrideStatus {
+		passStatus := []bool{}
+		for i, condition := range check.Pass {
+			passItemStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+			passStatus = append(passStatus, passItemStatus)
+			if debugEnabled {
+				infoPrint(fmt.Sprint("Result of last pass check was ", passStatus[i]))
+			}
+		}
+
+		// For multiple pass conditions, will only be true if ALL of them are
+		for _, result := range passStatus {
+			status = status && result
+			if !status {
+				break
+			}
+		}
+	}
+
+	if debugEnabled {
+		infoPrint(fmt.Sprint("Result of all pass check was ", status))
+	}
+
 	if status {
 		if check.Points >= 0 {
 			if verboseEnabled {

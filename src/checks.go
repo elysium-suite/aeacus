@@ -107,7 +107,7 @@ func processCheckWrapper(check *check, checkType string, arg1 string, arg2 strin
 		return err == nil && !result
 	case "PackageInstalled":
 		if check.Message == "" {
-			check.Message = "Package \"" + arg1 + "\" is installed"
+			check.Message = "Package " + arg1 + " is installed"
 		}
 		result, err := packageInstalled(arg1)
 		return err == nil && result
