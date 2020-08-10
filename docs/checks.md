@@ -167,6 +167,14 @@ arg1='/etc/passwd'
 arg2='644'
 ```
 
+**FirefoxPrefIs**: pass if the specified preference is set in Firefox
+
+```
+type='FirefoxPrefIs'
+arg1='app.normandy.first_run'
+arg2='false'
+```
+
 <hr>
 
 ### Windows-Specific Checks
