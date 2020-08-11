@@ -10,7 +10,7 @@ func launchIDPrompt() {
     $Form.text                       = "Aeacus"
     $Form.TopMost                    = $true
     $Form.Icon                       = "C:\aeacus\assets\logo.ico"
-    $Form.BackgroundImage            = [system.drawing.image]::FromFile("C:\aeacus\assets\background_520x265.png")
+    $Form.BackgroundImage            = [system.drawing.image]::FromFile("C:\aeacus\assets\TeamIDbackground.png")
     
     $Label1                          = New-Object system.Windows.Forms.Label
     $Label1.text                     = "Enter Your Unique Team ID"
@@ -35,7 +35,7 @@ func launchIDPrompt() {
     $Button1.height                  = 40
     $Button1.location                = New-Object System.Drawing.Point(202,155)
     $Button1.Font                    = New-Object System.Drawing.Font('Raleway',10)
-    $Button1.Image                   = [System.Drawing.Image]::FromFile("C:\aeacus\assets\pp_109x36.png")
+    $Button1.Image                   = [System.Drawing.Image]::FromFile("C:\aeacus\assets\Buttonbackground.png")
     $Button1.ForeColor               = [System.Drawing.ColorTranslator]::FromHtml("#ffffff")
     
     $Form.controls.AddRange(@($Label1,$TextBox1,$Button1))
