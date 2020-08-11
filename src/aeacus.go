@@ -207,6 +207,7 @@ func releaseImage() {
 	genReadMe()
 	writeDesktopFiles()
 	configureAutologin()
+	installFont()
 	installService()
 	cleanUp()
 }
