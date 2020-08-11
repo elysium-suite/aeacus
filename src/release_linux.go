@@ -38,6 +38,12 @@ func configureAutologin() {
 	}
 }
 
+func installFont() {
+	if verboseEnabled {
+		infoPrint("Skipping font install for Linux...")
+	}
+}
+
 // installService for Linux installs and starts the CSSClient init.d service.
 func installService() {
 	if verboseEnabled {
