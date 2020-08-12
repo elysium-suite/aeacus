@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -231,5 +230,5 @@ func getLocalUser(userName string) (shared.LocalUser, error) {
 			return user, nil
 		}
 	}
-	return shared.LocalUser{}, errors.New("User not found")
+	return shared.LocalUser{}, nil
 }
