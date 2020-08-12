@@ -101,17 +101,23 @@ func scoreChecks() {
 
 	points = make(map[int]scoreItem)
 
-	var wg sync.WaitGroup
-	var m sync.Mutex
+	if mc.DirPath == linuxDir {
+		var wg sync.WaitGroup
+		var m sync.Mutex
 
-	for index, check := range mc.Config.Check {
-		wg.Add(1)
-		go scoreCheck(index, check, &wg, &m)
+		for index, check := range mc.Config.Check {
+			wg.Add(1)
+			go scoreCheck(index, check, &wg, &m)
+		}
+
+		wg.Wait()
+	} else {
+		for index, check := range mc.Config.Check {
+			scoreCheckBlocking(index, check)
+		}
 	}
 
-	wg.Wait()
-
-	// Order checks returned from goroutines
+	// Order checks
 	for index, check := range mc.Config.Check {
 		if check.Points >= 0 {
 			if point, ok := points[index]; ok {
@@ -134,57 +140,28 @@ func scoreChecks() {
 }
 
 // scoreCheck will go through each condition inside a check, and determine
-// whether or not the check passes.
+// whether or not the check passes. It does this concurrently.
 func scoreCheck(index int, check check, wg *sync.WaitGroup, m *sync.Mutex) {
 	defer wg.Done()
 	status := true
 
 	// If a fail condition passes, the check fails, no other checks required.
-	for _, condition := range check.Fail {
-		failStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of fail check was ", failStatus))
-		}
-		if failStatus {
+	if len(check.Fail) > 0 {
+		status = checkFails(&check)
+		if !status {
 			return
 		}
 	}
 
 	// If a PassOverride succeeds, that overrides the Pass checks
 	passOverrideStatus := false
-	for _, condition := range check.PassOverride {
-		passOverrideStatus = processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of pass override was ", passOverrideStatus))
-		}
-		if passOverrideStatus {
-			break
-		} else {
-			status = false
-		}
+	if len(check.PassOverride) > 0 {
+		passOverrideStatus = checkPassOverrides(&check)
+		status = passOverrideStatus
 	}
 
-	if !passOverrideStatus {
-		passStatus := []bool{}
-		for i, condition := range check.Pass {
-			passItemStatus := processCheckWrapper(&check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-			passStatus = append(passStatus, passItemStatus)
-			if debugEnabled {
-				infoPrint(fmt.Sprint("Result of last pass check was ", passStatus[i]))
-			}
-		}
-
-		// For multiple pass conditions, will only be true if ALL of them are
-		for _, result := range passStatus {
-			status = status && result
-			if !status {
-				break
-			}
-		}
-	}
-
-	if debugEnabled {
-		infoPrint(fmt.Sprint("Result of all pass check was ", status))
+	if !passOverrideStatus && len(check.Pass) > 0 {
+		status = checkPass(&check)
 	}
 
 	if status {
@@ -207,6 +184,97 @@ func scoreCheck(index int, check check, wg *sync.WaitGroup, m *sync.Mutex) {
 		}
 		mc.Image.Score += check.Points
 	}
+}
+
+// scoreCheckBlocking will run checks non-concurrently.
+func scoreCheckBlocking(index int, check check) {
+	status := true
+
+	// If a fail condition passes, the check fails, no other checks required.
+	if len(check.Fail) > 0 {
+		status = checkFails(&check)
+		if !status {
+			return
+		}
+	}
+
+	// If a PassOverride succeeds, that overrides the Pass checks
+	passOverrideStatus := false
+	if len(check.PassOverride) > 0 {
+		passOverrideStatus = checkPassOverrides(&check)
+		status = passOverrideStatus
+	}
+
+	if !passOverrideStatus && len(check.Pass) > 0 {
+		status = checkPass(&check)
+	}
+
+	if status {
+		if check.Points >= 0 {
+			if verboseEnabled {
+				passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
+			}
+			points[index] = scoreItem{check.Message, check.Points}
+			mc.Image.Contribs += check.Points
+		} else {
+			if verboseEnabled {
+				failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
+			}
+			points[index] = scoreItem{check.Message, check.Points}
+			mc.Image.Detracts += check.Points
+		}
+		mc.Image.Score += check.Points
+	}
+}
+
+func checkFails(check *check) bool {
+	for _, condition := range check.Fail {
+		failStatus := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of fail check was ", failStatus))
+		}
+		if failStatus {
+			return true
+		}
+	}
+	return false
+}
+
+func checkPassOverrides(check *check) bool {
+	for _, condition := range check.PassOverride {
+		status := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of pass override was ", status))
+		}
+		if status {
+			return true
+		}
+	}
+	return false
+}
+
+func checkPass(check *check) bool {
+	status := true
+	passStatus := []bool{}
+	for i, condition := range check.Pass {
+		passItemStatus := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
+		passStatus = append(passStatus, passItemStatus)
+		if debugEnabled {
+			infoPrint(fmt.Sprint("Result of component pass check was ", passStatus[i]))
+		}
+	}
+
+	// For multiple pass conditions, will only be true if ALL of them are
+	for _, result := range passStatus {
+		status = status && result
+		if !status {
+			break
+		}
+	}
+	if debugEnabled {
+		infoPrint(fmt.Sprint("Result of all pass check was ", status))
+	}
+	return status
 }
 
 // assignPoints is used to automatically assign points to checks that don't

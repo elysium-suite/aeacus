@@ -208,8 +208,14 @@ func fileOwner(filePath, owner string) (bool, error) {
 }
 
 func userExists(userName string) (bool, error) {
-	_, err := getLocalUser(userName)
-	return err == nil, err
+	user, err := getLocalUser(userName)
+	if err != nil {
+		return false, err
+	}
+	if user.Username == "" {
+		return false, nil
+	}
+	return true, nil
 }
 
 func userInGroup(userName string, groupName string) (bool, error) {
@@ -347,7 +353,7 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 				return false, errors.New("Invalid keyValue")
 			}
 			for c := intKeyValue; c <= 999; c++ {
-				desiredString = keyName + " = " + string(c)
+				desiredString = keyName + " = " + strconv.Itoa(c)
 				if strings.Contains(output, desiredString) {
 					return true, err
 				}
@@ -360,15 +366,15 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 				return false, errors.New("Invalid keyValue")
 			}
 			for c := intKeyValue; c > 0; c-- {
-				desiredString = keyName + " = " + string(c)
+				desiredString = keyName + " = " + strconv.Itoa(c)
 				if strings.Contains(output, desiredString) {
-					return true, err
+					return true, nil
 				}
 			}
 		} else {
 			desiredString = keyName + " = " + keyValue
 		}
-		return strings.Contains(output, desiredString), err
+		return strings.Contains(output, desiredString), nil
 	}
 }
 
