@@ -18,7 +18,7 @@ import (
 // and runs the correct function with the correct parameters
 func processCheckWrapper(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
 	if debugEnabled {
-		infoPrint("Handling check: " + checkType)
+		infoPrint("Handling check: " + checkType + " Arg1: " + arg1 + " Arg2: " + arg2 + " Arg3: " + arg3)
 	}
 	switch checkType {
 	case "Command":

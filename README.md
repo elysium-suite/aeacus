@@ -79,6 +79,7 @@ user = "coolUser" # Main user for the image
 # and refuse to score if the remote server does not accept
 # its messages and Team ID (unless "local" is set to "yes")
 # Make sure to include the scheme (http, https...)
+# NOTE: _DON'T_ include a slash after the url!
 remote = "https://192.168.1.100"
 
 # If password is specified, it will be used to
@@ -214,6 +215,7 @@ The authors of this project recommend using [sarpedon](https://github.com/sourqu
 
 ## Tips and Tricks
 
+- Easily change the branding by replacing `assets/logo.png`.
 - On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities.
 
 ## Compiling
