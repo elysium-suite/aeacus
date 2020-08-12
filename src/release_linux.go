@@ -120,7 +120,12 @@ func cleanUp() {
 	if verboseEnabled {
 		infoPrint("Removing other setup files...")
 	}
-	shellCommand("rm -rf " + mc.DirPath + "misc/ " + mc.DirPath + "ReadMe.conf " + mc.DirPath + "README.md " + mc.DirPath + "TODO.md")
+	shellCommand("rm -rf " + mc.DirPath + "misc/")
+	shellCommand("rm -rf " + mc.DirPath + "ReadMe.conf")
+	shellCommand("rm -rf " + mc.DirPath + "README.md")
+	shellCommand("rm -rf " + mc.DirPath + "TODO.md")
+	shellCommand("rm -rf " + mc.DirPath + ".git")
+	shellCommand("rm -rf " + mc.DirPath + ".github")
 
 	if verboseEnabled {
 		infoPrint("Removing aeacus binary...")
