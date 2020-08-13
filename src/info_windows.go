@@ -17,6 +17,11 @@ func getInfo(infoType string) {
 		for _, u := range userList {
 			infoPrint(fmt.Sprint(u))
 		}
+	case "admins":
+		adminList, _ := getLocalAdmins()
+		for _, u := range adminList {
+			infoPrint(fmt.Sprint(u))
+		}
 	default:
 		if infoType == "" {
 			failPrint("No info type provided.")
