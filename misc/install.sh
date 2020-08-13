@@ -32,6 +32,10 @@ source /etc/profile
 echo "[+] Installing git..."
 apt install -y git
 
+# Install BleachBit (to clear cache and history)
+echo "[+] Installing BleachBit..."
+apt install -y bleachbit
+
 # Grab dependencies
 echo "[+] Getting general dependencies..."
 go get "github.com/urfave/cli"

@@ -4,15 +4,16 @@
   - status/time limit actually enforced
     - see comments in scoring.go and remote.go
 - info
-  - create list of admins/users
   - other things? esp for windows
 - windows
+
   - improve scoring.conf example crypto (add aes-gcm, obfuscate key, etc)
   - fix windows service quit WaitGroup (phocus_windows.go)
   - ^^ THIS IS LARGELY FIXED. I count null bytes to detect unicode vs ansi. However, when the text read is only one character (for example, `b`), it will fail if unicode
 
- - security
-    - disable net/http using HTTP_PROXY environmental variable
+- security
+
+  - disable net/http using HTTP_PROXY environmental variable
 
 - checks to implement
 
@@ -28,11 +29,10 @@
   - windows
     - Detect if firefox.exe is in x86 Program Files or just Program Files
     - clear run and command history
-  - linux
-    - clear ff history?
 
 - cool/stretch goal
-    - make binary pattern in background  of score report personally identifiable (like, it's their ID or something)
+
+  - make binary pattern in background of score report personally identifiable (like, it's their ID or something)
 
 - hard/long term
   - verify binary
