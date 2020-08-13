@@ -220,6 +220,20 @@ func getLocalUsers() ([]shared.LocalUser, error) {
 	return ul, err
 }
 
+func getLocalAdmins() ([]shared.LocalUser, error) {
+	ul, err := wapi.ListLocalUsers()
+	if err != nil {
+		failPrint("Couldn't get local users: " + err.Error())
+	}
+	var admins []shared.LocalUser
+	for _, user := range ul {
+		if (user.IsAdmin) {
+			admins = append(admins,user)
+		}
+	}
+	return admins, err
+}
+
 func getLocalUser(userName string) (shared.LocalUser, error) {
 	userList, err := getLocalUsers()
 	if err != nil {
