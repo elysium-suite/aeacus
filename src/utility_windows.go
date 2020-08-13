@@ -227,8 +227,8 @@ func getLocalAdmins() ([]shared.LocalUser, error) {
 	}
 	var admins []shared.LocalUser
 	for _, user := range ul {
-		if (user.IsAdmin) {
-			admins = append(admins,user)
+		if user.IsAdmin {
+			admins = append(admins, user)
 		}
 	}
 	return admins, err
