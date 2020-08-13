@@ -20,7 +20,6 @@
   - windows startup programs
   - windows and linux updates and auto-updating status (apt only for linux)
   - windows (Make less janky)
-  - windows firefox checks
   - windows service-specific hardening and checks
   - windows DEP
 
