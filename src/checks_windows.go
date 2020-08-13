@@ -504,7 +504,7 @@ func firefoxSetting(param, value string) (bool, error) {
 		}
 
 	} else {
-		err = errors.New("bruh")
+		err = errors.New("Firefox was not detected on the system")
 	}
 
 	return res, err
