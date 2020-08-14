@@ -165,4 +165,9 @@ func cleanUp() {
 	   } 
 	}`
 	shellCommand(clearRunScript)
+
+	if verboseEnabled {
+		infoPrint("Removing Command History for Powershell")
+	}
+	shellCommand("Remove-Item (Get-PSReadlineOption).HistorySavePath")
 }
