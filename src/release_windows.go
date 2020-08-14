@@ -123,5 +123,16 @@ func cleanUp() {
 	shellCommand("Clear-RecycleBin -Force")
 	infoPrint("Clearing recently used...")
 	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
+	infoPrint("Clearing run.exe command history...")
+	clearRunScript := `$path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" 
+	$arr = (Get-Item -Path $path).Property 
+	foreach($item in $arr) 
+	{ 
+	   if($item -ne "MRUList") 
+	   { 
+		 Remove-ItemProperty -Path $path -Name $item -ErrorAction SilentlyContinue 
+	   } 
+	}`
+	shellCommand(clearRunScript)
 	warnPrint("Done with automatic cleanup! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the assets directory.")
 }
