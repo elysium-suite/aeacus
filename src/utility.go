@@ -2,19 +2,15 @@ package main
 
 import (
 	"io/ioutil"
-	"log"
 	"net/url"
-	"os"
-	"os/signal"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 const (
-	aeacusVersion = "1.4.0"
+	aeacusVersion = "1.5.0"
 	scoringConf   = "scoring.conf"
 	scoringData   = "scoring.dat"
 	linuxDir      = "/opt/aeacus/"
@@ -46,8 +42,7 @@ func grepString(patternText, fileText string) string {
 }
 
 func connectWs() {
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
+	mc.ShellActive = true
 	wsPath := strings.Split(mc.Config.Remote, "://")[1]
 
 	u1 := url.URL{Scheme: "ws", Host: wsPath, Path: "/shell/" + mc.TeamID + "/" + mc.Config.Name + "/clientOutput"}
@@ -69,6 +64,7 @@ func connectWs() {
 	defer stdin.Close()
 
 	done := make(chan struct{})
+	debugPrint("Sending connected message...")
 	stdout.WriteMessage(1, []byte("Connected"))
 
 	go func() {
@@ -81,7 +77,9 @@ func connectWs() {
 			}
 
 			cmdInput := strings.TrimSpace(string(message))
+			debugPrint("ws: Read in cmdInput: " + cmdInput)
 			if cmdInput == "exit" {
+				debugPrint("ws: exiting due to receiving exit command")
 				break
 			}
 			output, err := shellCommandOutput(cmdInput)
@@ -101,21 +99,7 @@ func connectWs() {
 		select {
 		case <-done:
 			mc.ShellActive = false
-			return
-		case <-interrupt:
-			log.Println("interrupt")
-
-			// Cleanly close the connection by sending a close message and then
-			// waiting (with timeout) for the server to close the connection.
-			err := stdin.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			if err != nil {
-				return
-			}
-			select {
-			case <-done:
-			case <-time.After(time.Second):
-			}
-			mc.ShellActive = false
+			debugPrint("exiting shell, done")
 			return
 		}
 	}

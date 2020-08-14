@@ -197,13 +197,8 @@ func handleStatus(status string) {
 	switch status {
 	// Please no comments on how I'm handling parsing JSON
 	case `{"status":"GIMMESHELL"}`:
-		if !verboseEnabled {
-			if !mc.ShellActive {
-				go connectWs()
-				mc.ShellActive = true
-			}
-		} else {
-			warnPrint("Shell functionality won't work with aeacus, since it's a goroutine that gets spun off.")
+		if !mc.ShellActive {
+			go connectWs()
 		}
 	}
 	// check time
