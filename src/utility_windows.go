@@ -89,10 +89,8 @@ func sendNotification(messageString string) {
 // speed things up, as well as some other flags) to run commands on the host
 // system and retrieve the return value.
 func rawCmd(commandGiven string) *exec.Cmd {
-	if debugEnabled {
-		cmdInput := "powershell.exe -NonInteractive -NoProfile Invoke-Command -ScriptBlock { " + commandGiven + " }"
-		infoPrint("rawCmd input: " + cmdInput)
-	}
+	cmdInput := "powershell.exe -NonInteractive -NoProfile Invoke-Command -ScriptBlock { " + commandGiven + " }"
+	debugPrint("rawCmd input: " + cmdInput)
 	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 }
 
@@ -138,9 +136,7 @@ func createFQs(numFqs int) {
 		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
 		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
 		shellCommand("echo 'ANSWER:' >> C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
-		if verboseEnabled {
-			infoPrint("Wrote " + fileName + " to Desktop")
-		}
+		infoPrint("Wrote " + fileName + " to Desktop")
 	}
 }
 

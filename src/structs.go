@@ -6,12 +6,13 @@ import (
 
 // metaConfig is the overarching context used by most functions in aeacus.
 type metaConfig struct {
-	TeamID     string
-	DirPath    string
-	Config     scoringChecks
-	Image      imageData
-	Conn       connData
-	Connection bool
+	TeamID      string
+	DirPath     string
+	Config      scoringChecks
+	Image       imageData
+	Conn        connData
+	Connection  bool
+	ShellActive bool
 }
 
 // imageData is the current scoring data for the image. It is able to be
