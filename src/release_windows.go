@@ -152,4 +152,17 @@ func cleanUp() {
 	if verboseEnabled {
 		warnPrint("Done with automatic cleanup! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the assets directory.")
 	}
+	if verboseEnabled {
+		warnPrint("clearing run history")
+	}
+	clearRunScript := `$path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" 
+	$arr = (Get-Item -Path $path).Property 
+	foreach($item in $arr) 
+	{ 
+	   if($item -ne "MRUList") 
+	   { 
+		 Remove-ItemProperty -Path $path -Name $item -ErrorAction SilentlyContinue 
+	   } 
+	}`
+	shellCommand(clearRunScript)
 }
