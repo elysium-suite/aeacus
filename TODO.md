@@ -27,7 +27,7 @@
 
   - windows
     - Detect if firefox.exe is in x86 Program Files or just Program Files
-    - clear run and command history
+    - clear command history
 
 - cool/stretch goal
 
