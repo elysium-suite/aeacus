@@ -31,9 +31,7 @@ const (
 // encryptConfig takes the plainText config and returns an encrypted string
 // that should be written to the encrypted scoring data file.
 func encryptConfig(plainText string) (string, error) {
-	if verboseEnabled {
-		infoPrint("Encrypting configuration...")
-	}
+	infoPrint("Encrypting configuration...")
 
 	// Generate key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
@@ -45,9 +43,7 @@ func encryptConfig(plainText string) (string, error) {
 	// Write zlib compressed data into encryptedFile
 	_, err := writer.Write([]byte(plainText))
 	if err != nil {
-		if debugEnabled {
-			failPrint("Unable to zlib compress scoring data: " + err.Error())
-		}
+		debugPrint("Unable to zlib compress scoring data: " + err.Error())
 		return "", err
 	}
 	writer.Close()
@@ -67,9 +63,7 @@ func decryptConfig(cipherText string) (string, error) {
 	// Create the zlib reader.
 	reader, err := zlib.NewReader(bytes.NewReader([]byte(cipherText)))
 	if err != nil {
-		if debugEnabled {
-			failPrint("Error creating archive reader for scoring data.")
-		}
+		debugPrint("Error creating archive reader for scoring data.")
 		return "", errors.New("Error creating zLib reader")
 	}
 	defer reader.Close()
@@ -78,18 +72,14 @@ func decryptConfig(cipherText string) (string, error) {
 	dataBuffer := bytes.NewBuffer(nil)
 	_, err = io.Copy(dataBuffer, reader)
 	if err != nil {
-		if debugEnabled {
-			failPrint("Error decompressing scoring data.")
-		}
+		failPrint("Error decompressing scoring data.")
 		return "", errors.New("Error decompressing zlib data.")
 	}
 
 	// Check that decryptedConfig is not empty.
 	decryptedConfig := string(dataBuffer.Bytes())
 	if decryptedConfig == "" {
-		if debugEnabled {
-			failPrint("Scoring data is empty!")
-		}
+		debugPrint("Scoring data is empty!")
 		return "", errors.New("Decrypted config is empty!")
 	}
 
