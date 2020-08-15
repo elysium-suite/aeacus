@@ -91,7 +91,7 @@ func main() {
 					err := readScoringData()
 					if err != nil {
 						failPrint("Error reading in scoring data!")
-					} else if verboseEnabled {
+					} else {
 						infoPrint("Reading in scoring data successful!")
 					}
 					return nil

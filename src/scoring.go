@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"sync"
 )
-
-var points = make(map[int]scoreItem)
 
 func scoreImage() {
 	// Ensure checks aren't blank, and grab TeamID.
@@ -37,9 +34,7 @@ func scoreImage() {
 	} else {
 		checkServer()
 		if !mc.Connection {
-			if verboseEnabled {
-				warnPrint("Connection failed-- generating blank report.")
-			}
+			warnPrint("Connection failed-- generating blank report.")
 			genReport(mc.Image)
 			return
 		}
@@ -47,12 +42,11 @@ func scoreImage() {
 		err := reportScore()
 		if err != nil {
 			mc.Image = imageData{}
-			if verboseEnabled {
-				warnPrint("Local is disabled, scoring data removed.")
-			}
+			warnPrint("Local is disabled, scoring data removed.")
 		}
 		genReport(mc.Image)
 	}
+	clearLog()
 
 	// Check if points increased/decreased
 	prevPoints, err := readFile(mc.DirPath + "previous.txt")
@@ -77,7 +71,6 @@ func scoreImage() {
 	} else {
 		warnPrint("Reading from previous.txt failed. This is probably fine.")
 	}
-
 }
 
 // checkConfigData performs preliminary checks on the configuration data,
@@ -99,50 +92,17 @@ func scoreChecks() {
 	mc.Image = imageData{}
 	assignPoints()
 
-	points = make(map[int]scoreItem)
-
-	if mc.DirPath == linuxDir {
-		var wg sync.WaitGroup
-		var m sync.Mutex
-
-		for index, check := range mc.Config.Check {
-			wg.Add(1)
-			go scoreCheck(index, check, &wg, &m)
-		}
-
-		wg.Wait()
-	} else {
-		for index, check := range mc.Config.Check {
-			scoreCheckBlocking(index, check)
-		}
-	}
-
-	// Order checks
 	for index, check := range mc.Config.Check {
-		if check.Points >= 0 {
-			if point, ok := points[index]; ok {
-				mc.Image.Points = append(mc.Image.Points, point)
-			}
-		} else {
-			if point, ok := points[index]; ok {
-				mc.Image.Penalties = append(mc.Image.Penalties, point)
-			}
-		}
+		scoreCheck(index, check)
 	}
 
-	if verboseEnabled {
-		infoPrint("Finished running all checks.")
-	}
-
-	if verboseEnabled {
-		infoPrint(fmt.Sprintf("Score: %d", mc.Image.Score))
-	}
+	infoPrint("Finished running all checks.")
+	infoPrint(fmt.Sprintf("Score: %d", mc.Image.Score))
 }
 
 // scoreCheck will go through each condition inside a check, and determine
 // whether or not the check passes. It does this concurrently.
-func scoreCheck(index int, check check, wg *sync.WaitGroup, m *sync.Mutex) {
-	defer wg.Done()
+func scoreCheck(index int, check check) {
 	status := true
 
 	// If a fail condition passes, the check fails, no other checks required.
@@ -152,7 +112,6 @@ func scoreCheck(index int, check check, wg *sync.WaitGroup, m *sync.Mutex) {
 			return
 		}
 	}
-
 	// If a PassOverride succeeds, that overrides the Pass checks
 	passOverrideStatus := false
 	if len(check.PassOverride) > 0 {
@@ -166,61 +125,12 @@ func scoreCheck(index int, check check, wg *sync.WaitGroup, m *sync.Mutex) {
 
 	if status {
 		if check.Points >= 0 {
-			if verboseEnabled {
-				passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
-			}
-			m.Lock()
-			points[index] = scoreItem{check.Message, check.Points}
-			mc.Image.Contribs += check.Points
-			m.Unlock()
-		} else {
-			if verboseEnabled {
-				failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
-			}
-			m.Lock()
-			points[index] = scoreItem{check.Message, check.Points}
-			mc.Image.Detracts += check.Points
-			m.Unlock()
-		}
-		mc.Image.Score += check.Points
-	}
-}
-
-// scoreCheckBlocking will run checks non-concurrently.
-func scoreCheckBlocking(index int, check check) {
-	status := true
-
-	// If a fail condition passes, the check fails, no other checks required.
-	if len(check.Fail) > 0 {
-		status = checkFails(&check)
-		if !status {
-			return
-		}
-	}
-
-	// If a PassOverride succeeds, that overrides the Pass checks
-	passOverrideStatus := false
-	if len(check.PassOverride) > 0 {
-		passOverrideStatus = checkPassOverrides(&check)
-		status = passOverrideStatus
-	}
-
-	if !passOverrideStatus && len(check.Pass) > 0 {
-		status = checkPass(&check)
-	}
-
-	if status {
-		if check.Points >= 0 {
-			if verboseEnabled {
-				passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
-			}
-			points[index] = scoreItem{check.Message, check.Points}
+			passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
+			mc.Image.Points = append(mc.Image.Points, scoreItem{check.Message, check.Points})
 			mc.Image.Contribs += check.Points
 		} else {
-			if verboseEnabled {
-				failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
-			}
-			points[index] = scoreItem{check.Message, check.Points}
+			failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
+			mc.Image.Penalties = append(mc.Image.Penalties, scoreItem{check.Message, check.Points})
 			mc.Image.Detracts += check.Points
 		}
 		mc.Image.Score += check.Points
@@ -230,9 +140,7 @@ func scoreCheckBlocking(index int, check check) {
 func checkFails(check *check) bool {
 	for _, condition := range check.Fail {
 		failStatus := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of fail check was ", failStatus))
-		}
+		debugPrint(fmt.Sprint("Result of fail check was ", failStatus))
 		if failStatus {
 			return true
 		}
@@ -243,9 +151,7 @@ func checkFails(check *check) bool {
 func checkPassOverrides(check *check) bool {
 	for _, condition := range check.PassOverride {
 		status := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of pass override was ", status))
-		}
+		debugPrint(fmt.Sprint("Result of pass override was ", status))
 		if status {
 			return true
 		}
@@ -259,9 +165,7 @@ func checkPass(check *check) bool {
 	for i, condition := range check.Pass {
 		passItemStatus := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
 		passStatus = append(passStatus, passItemStatus)
-		if debugEnabled {
-			infoPrint(fmt.Sprint("Result of component pass check was ", passStatus[i]))
-		}
+		debugPrint(fmt.Sprint("Result of component pass check was ", passStatus[i]))
 	}
 
 	// For multiple pass conditions, will only be true if ALL of them are
@@ -271,9 +175,7 @@ func checkPass(check *check) bool {
 			break
 		}
 	}
-	if debugEnabled {
-		infoPrint(fmt.Sprint("Result of all pass check was ", status))
-	}
+	debugPrint(fmt.Sprint("Result of all pass check was ", status))
 	return status
 }
 

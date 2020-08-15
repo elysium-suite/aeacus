@@ -12,9 +12,7 @@ import (
 func readScoringData() error {
 	decryptedData, err := readData(scoringData)
 	if err != nil {
-		if verboseEnabled || debugEnabled {
-			failPrint("Error reading in scoring data: " + err.Error())
-		}
+		failPrint("Error reading in scoring data: " + err.Error())
 		return err
 	} else if decryptedData == "" {
 		failPrint("Scoring data is empty! Is the file corrupted?")
@@ -33,9 +31,7 @@ func checkConfig(fileName string) {
 		os.Exit(1)
 	}
 	parseConfig(fileContent)
-	if verboseEnabled {
-		printConfig()
-	}
+	printConfig()
 }
 
 // fillConstants determines the correct constants, such as DirPath, for the

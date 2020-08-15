@@ -56,18 +56,14 @@ func createFQs(numFqs int) {
 		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
 		shellCommand("echo 'QUESTION:' > /home/" + mc.Config.User + "/Desktop/" + fileName)
 		shellCommand("echo 'ANSWER:' >> /home/" + mc.Config.User + "/Desktop/" + fileName)
-		if verboseEnabled {
-			infoPrint("Wrote " + fileName + " to Desktop")
-		}
+		infoPrint("Wrote " + fileName + " to Desktop")
 	}
 }
 
 // rawCmd returns a exec.Command object for Linux shell commands.
 func rawCmd(commandGiven string) *exec.Cmd {
-	if debugEnabled {
-		infoPrint("rawCmd input: sh -c " + commandGiven)
-	}
-	return exec.Command("sh", "-c", commandGiven)
+	debugPrint("rawCmd input: sh -c " + commandGiven)
+	return exec.Command("/bin/sh", "-c", commandGiven)
 }
 
 // shellCommand executes a given command in a sh environment, and prints an

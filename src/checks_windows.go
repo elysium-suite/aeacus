@@ -490,11 +490,11 @@ func firefoxSetting(param, value string) (bool, error) {
 		if err != nil {
 			return res, err
 		}
-		
+
 		if check {
-			res, err = dirContainsRegex(`C:\Program Files\Mozilla Firefox`, `("` + param + `",` + value + `)`)
+			res, err = dirContainsRegex(`C:\Program Files\Mozilla Firefox`, `("`+param+`",`+value+`)`)
 		} else {
-			res, err = dirContainsRegex(`C:\Users\` + mc.Config.User + `\AppData\Roaming\Mozilla\Firefox\Profiles`, `("` + param + `",` + value + `)`)
+			res, err = dirContainsRegex(`C:\Users\`+mc.Config.User+`\AppData\Roaming\Mozilla\Firefox\Profiles`, `("`+param+`",`+value+`)`)
 		}
 
 	} else if bit32 {
@@ -502,11 +502,11 @@ func firefoxSetting(param, value string) (bool, error) {
 		if err != nil {
 			return res, err
 		}
-		
+
 		if check {
-			res, err = dirContainsRegex(`C:\Program Files (x86)\Mozilla Firefox`, `("` + param + `",` + value + `)`)
+			res, err = dirContainsRegex(`C:\Program Files (x86)\Mozilla Firefox`, `("`+param+`",`+value+`)`)
 		} else {
-			res, err = dirContainsRegex(`C:\Users\` + mc.Config.User + `\AppData\Roaming\Mozilla\Firefox\Profiles`, `("` + param + `",` + value + `)`)
+			res, err = dirContainsRegex(`C:\Users\`+mc.Config.User+`\AppData\Roaming\Mozilla\Firefox\Profiles`, `("`+param+`",`+value+`)`)
 		}
 
 	} else {

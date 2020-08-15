@@ -6,12 +6,13 @@ import (
 
 // metaConfig is the overarching context used by most functions in aeacus.
 type metaConfig struct {
-	TeamID     string
-	DirPath    string
-	Config     scoringChecks
-	Image      imageData
-	Conn       connData
-	Connection bool
+	TeamID      string
+	DirPath     string
+	Config      scoringChecks
+	Image       imageData
+	Conn        connData
+	Connection  bool
+	ShellActive bool
 }
 
 // imageData is the current scoring data for the image. It is able to be
@@ -48,16 +49,17 @@ type scoreItem struct {
 // scoringChecks is a representation of the TOML configuration typically
 // specific in scoring.conf.
 type scoringChecks struct {
-	Name      string
-	Title     string
-	User      string
-	OS        string
-	Remote    string
-	Password  string
-	Local     bool
-	EndDate   string
-	NoDestroy bool
-	Check     []check
+	Name         string
+	Title        string
+	User         string
+	OS           string
+	Remote       string
+	Password     string
+	Local        bool
+	EndDate      string
+	NoDestroy    bool
+	DisableShell bool
+	Check        []check
 }
 
 // check is the smallest unit that can show up on a scoring report. It holds
@@ -79,4 +81,9 @@ type condition struct {
 	Arg2 string
 	Arg3 string
 	Arg4 string
+}
+
+// statusRes is to parse a JSON response from the remote server
+type statusRes struct {
+	Status string `json:"status"`
 }
