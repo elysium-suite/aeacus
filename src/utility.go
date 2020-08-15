@@ -49,19 +49,19 @@ func connectWs() {
 	mc.ShellActive = true
 	wsPath := strings.Split(mc.Config.Remote, "://")[1]
 
-	u1 := url.URL{Scheme: "ws", Host: wsPath, Path: "/shell/" + mc.TeamID + "/" + mc.Config.Name + "/clientOutput"}
-	debugPrint("Connecting to " + u1.String())
+	clientIn := url.URL{Scheme: "ws", Host: wsPath, Path: "/shell/" + mc.TeamID + "/" + mc.Config.Name + "/clientOutput"}
+	debugPrint("Connecting to " + clientIn.String())
 
-	u2 := url.URL{Scheme: "ws", Host: wsPath, Path: "/shell/" + mc.TeamID + "/" + mc.Config.Name + "/clientInput"}
-	debugPrint("Connecting to " + u2.String())
+	clientOut := url.URL{Scheme: "ws", Host: wsPath, Path: "/shell/" + mc.TeamID + "/" + mc.Config.Name + "/clientInput"}
+	debugPrint("Connecting to " + clientOut.String())
 
-	stdout, _, err := websocket.DefaultDialer.Dial(u1.String(), nil)
+	stdout, _, err := websocket.DefaultDialer.Dial(clientIn.String(), nil)
 	if err != nil {
 		failPrint("dial: " + err.Error())
 	}
 	defer stdout.Close()
 
-	stdin, _, err := websocket.DefaultDialer.Dial(u2.String(), nil)
+	stdin, _, err := websocket.DefaultDialer.Dial(clientOut.String(), nil)
 	if err != nil {
 		failPrint("dial: " + err.Error())
 	}

@@ -5,10 +5,12 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"math"
 	"net/http"
 	"net/url"
@@ -202,12 +204,16 @@ func checkServer() {
 }
 
 func handleStatus(status string) {
-	switch status {
-	// Please no comments on how I'm handling parsing JSON
-	case `{"status":"DIE"}`:
+	var statusStruct statusRes
+	if err := json.Unmarshal([]byte(status), &statusStruct); err != nil {
+		log.Fatalln("Failed to parse JSON response: " + err.Error())
+	}
+
+	switch statusStruct.Status {
+	case "DIE":
 		failPrint("Destroying image! Server has told me to die.")
 		// destroyImage()
-	case `{"status":"GIMMESHELL"}`:
+	case "GIMMESHELL":
 		if !mc.Config.DisableShell && mc.ShellActive {
 			go connectWs()
 		}

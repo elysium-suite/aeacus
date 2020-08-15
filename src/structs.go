@@ -82,3 +82,8 @@ type condition struct {
 	Arg3 string
 	Arg4 string
 }
+
+// statusRes is to parse a JSON response from the remote server
+type statusRes struct {
+	Status string `json:"status"`
+}

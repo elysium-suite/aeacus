@@ -41,6 +41,7 @@ echo "[+] Getting general dependencies..."
 go get "github.com/urfave/cli"
 go get "github.com/BurntSushi/toml/cmd/tomlv"
 go get "github.com/fatih/color"
+go get "github.com/gorilla/websocket"
 
 # Add convenient aliases for building
 if ! grep -q "aeacus-build" /etc/bash.bashrc; then
