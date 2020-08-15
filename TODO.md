@@ -27,8 +27,6 @@
 
   - windows
     - Detect if firefox.exe is in x86 Program Files or just Program Files
-    - clear command history
-
 - cool/stretch goal
 
   - make binary pattern in background of score report personally identifiable (like, it's their ID or something)

@@ -133,6 +133,8 @@ func cleanUp() {
 		 Remove-ItemProperty -Path $path -Name $item -ErrorAction SilentlyContinue 
 	   } 
 	}`
-	shellCommand(clearRunScript)
+  shellCommand(clearRunScript)
+	infoPrint("Removing Command History for Powershell")
+	shellCommand("Remove-Item (Get-PSReadlineOption).HistorySavePath")
 	warnPrint("Done with automatic cleanup! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the assets directory.")
 }
