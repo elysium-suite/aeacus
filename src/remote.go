@@ -171,22 +171,30 @@ func checkServer() {
 
 	// Overall
 	if mc.Conn.NetStatus == "FAIL" && mc.Conn.ServerStatus == "OK" {
+		timeStart = time.Now()
 		mc.Conn.OverallColor = "goldenrod"
 		mc.Conn.OverallStatus = "Server connection good but no Internet. Assuming you're on an isolated LAN."
 		mc.Connection = true
 	} else if mc.Conn.ServerStatus == "FAIL" {
+		timeStart = time.Now()
 		mc.Conn.OverallColor = "red"
 		mc.Conn.OverallStatus = "Failure! Can't access remote scoring server."
 		failPrint("Can't access remote scoring server!")
 		sendNotification("Score upload failure! Unable to access remote server.")
 		mc.Connection = false
 	} else if mc.Conn.ServerStatus == "ERROR" {
+		timeWithoutId = time.Now().Sub(timeStart)
+		if !mc.Config.NoDestroy && timeWithoutId > withoutIdThreshold {
+			failPrint("Destroying the image! Too long without inputting valid ID.")
+			// destroyImage()
+		}
 		mc.Conn.OverallColor = "red"
 		mc.Conn.OverallStatus = "Scoring engine rejected your TeamID!"
 		failPrint("Remote server returned an error for its status! Your ID is probably wrong.")
 		sendNotification("Status check failed, TeamID incorrect!")
 		mc.Connection = false
 	} else {
+		timeStart = time.Now()
 		mc.Conn.OverallColor = "green"
 		mc.Conn.OverallStatus = "OK"
 		mc.Connection = true
@@ -196,12 +204,14 @@ func checkServer() {
 func handleStatus(status string) {
 	switch status {
 	// Please no comments on how I'm handling parsing JSON
+	case `{"status":"DIE"}`:
+		failPrint("Destroying image! Server has told me to die.")
+		// destroyImage()
 	case `{"status":"GIMMESHELL"}`:
-		if !mc.ShellActive {
+		if !mc.Config.DisableShell && mc.ShellActive {
 			go connectWs()
 		}
 	}
-	// check time
 }
 
 // encryptString takes a password and a plaintext and returns an encrypted byte

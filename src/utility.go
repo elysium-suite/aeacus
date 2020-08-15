@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -18,10 +19,13 @@ const (
 )
 
 var (
-	verboseEnabled = false
-	debugEnabled   = false
-	yesEnabled     = false
-	mc             = &metaConfig{}
+	verboseEnabled        = false
+	debugEnabled          = false
+	yesEnabled            = false
+	mc                    = &metaConfig{}
+	timeStart             = time.Now()
+	timeWithoutId, _      = time.ParseDuration("0s")
+	withoutIdThreshold, _ = time.ParseDuration("30m")
 )
 
 // writeFile wraps ioutil's WriteFile function, and prints

@@ -49,16 +49,17 @@ type scoreItem struct {
 // scoringChecks is a representation of the TOML configuration typically
 // specific in scoring.conf.
 type scoringChecks struct {
-	Name      string
-	Title     string
-	User      string
-	OS        string
-	Remote    string
-	Password  string
-	Local     bool
-	EndDate   string
-	NoDestroy bool
-	Check     []check
+	Name         string
+	Title        string
+	User         string
+	OS           string
+	Remote       string
+	Password     string
+	Local        bool
+	EndDate      string
+	NoDestroy    bool
+	DisableShell bool
+	Check        []check
 }
 
 // check is the smallest unit that can show up on a scoring report. It holds

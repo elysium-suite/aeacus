@@ -98,8 +98,14 @@ local = true
 enddate = "2020/03/21 15:04:05 PDT"
 
 # If nodestroy is set to true, then the image will not
-# self destruct, only the aeacus folder will be deleted
+# self destruct, only the aeacus folder will be deleted.
+# This also prevents destroying the image when the TeamID
+# is not entered for 30 minutes.
 nodestroy = true
+
+# If disableshell is set to true, the aeacus binary will not
+# reach out for the debug remote shell.
+disableshell = true
 
 [[check]]
 message = "Removed insecure sudoers rule"
