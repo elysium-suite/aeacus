@@ -60,9 +60,7 @@ func genReport(img imageData) {
 
 	htmlFile.WriteString(footer)
 
-	if verboseEnabled {
-		infoPrint("Writing HTML to ScoringReport.html...")
-	}
+	infoPrint("Writing HTML to ScoringReport.html...")
 	writeFile(mc.DirPath+"assets/ScoringReport.html", htmlFile.String())
 }
 
@@ -166,8 +164,6 @@ func genReadMe() {
 	}
 	htmlFile.WriteString(userReadMe)
 	htmlFile.WriteString(footer)
-	if verboseEnabled {
-		infoPrint("Writing HTML to ReadMe.html...")
-	}
+	infoPrint("Writing HTML to ReadMe.html...")
 	writeFile(mc.DirPath+"assets/ReadMe.html", htmlFile.String())
 }

@@ -5,9 +5,12 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"log"
 	"math"
 	"net/http"
 	"net/url"
@@ -16,7 +19,10 @@ import (
 	"time"
 )
 
-var delimiter = "|-S#-|"
+var (
+	delimiter      = "|-S#-|"
+	debugDelimiter = "|-D#-|"
+)
 
 func readTeamID() {
 	fileContent, err := readFile(mc.DirPath + "TeamID.txt")
@@ -66,9 +72,12 @@ func genUpdate() string {
 	writeString(&update, "challenge", genChallenge())
 	writeString(&update, "vulns", genVulns())
 	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
-	if verboseEnabled {
-		infoPrint("Encrypting score update...")
+	var debugLog string
+	for _, logItem := range internalLog {
+		debugLog += logItem + debugDelimiter
 	}
+	writeString(&update, "debug", debugLog)
+	infoPrint("Encrypting score update...")
 	return hexEncode(encryptString(mc.Config.Password, update.String()))
 }
 
@@ -91,9 +100,7 @@ func genVulns() string {
 		vulnString.WriteString(delimiter)
 	}
 
-	if verboseEnabled {
-		infoPrint("Encrypting vulnerabilities...")
-	}
+	infoPrint("Encrypting vulnerabilities...")
 
 	return hexEncode(encryptString(mc.Config.Password, vulnString.String()))
 }
@@ -110,8 +117,8 @@ func reportScore() error {
 		mc.Conn.OverallColor = "red"
 		mc.Conn.OverallStatus = "Failed to upload score! Please ensure that your Team ID is correct."
 		mc.Connection = false
-		failPrint("Failed to upload score! Is your TeamID wrong?")
-		sendNotification("Failed to upload score! Is your Team ID correct?")
+		failPrint("Failed to upload score!")
+		sendNotification("Failed to upload score!")
 		return errors.New("Non-200 response from remote scoring endpoint")
 	}
 	return nil
@@ -119,9 +126,7 @@ func reportScore() error {
 
 func checkServer() {
 	// Internet check (requisite)
-	if verboseEnabled {
-		infoPrint("Checking for internet connection...")
-	}
+	infoPrint("Checking for internet connection...")
 
 	client := http.Client{
 		Timeout: 5 * time.Second,
@@ -137,12 +142,8 @@ func checkServer() {
 	}
 
 	// Scoring engine check
-	if verboseEnabled {
-		infoPrint("Checking for scoring engine connection...")
-	}
-	resp, err := client.Get(mc.Config.Remote + "/status")
-
-	// handleStatus()
+	infoPrint("Checking for scoring engine connection...")
+	resp, err := client.Get(mc.Config.Remote + "/status/" + mc.TeamID + "/" + mc.Config.Name)
 	// todo enforce status/time limit
 	// grab body or status message from minos
 	// if "DESTROY" due to image elapsed time > time_limit,
@@ -152,36 +153,70 @@ func checkServer() {
 		mc.Conn.ServerColor = "red"
 		mc.Conn.ServerStatus = "FAIL"
 	} else {
-		if resp.StatusCode == 200 {
-			mc.Conn.ServerColor = "green"
-			mc.Conn.ServerStatus = "OK"
-		} else {
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			failPrint("Error reading Status body.")
 			mc.Conn.ServerColor = "red"
-			mc.Conn.ServerStatus = "ERROR"
+			mc.Conn.ServerStatus = "FAIL"
+		} else {
+			handleStatus(string(body))
+			if resp.StatusCode == 200 {
+				mc.Conn.ServerColor = "green"
+				mc.Conn.ServerStatus = "OK"
+			} else {
+				mc.Conn.ServerColor = "red"
+				mc.Conn.ServerStatus = "ERROR"
+			}
 		}
 	}
 
 	// Overall
 	if mc.Conn.NetStatus == "FAIL" && mc.Conn.ServerStatus == "OK" {
+		timeStart = time.Now()
 		mc.Conn.OverallColor = "goldenrod"
 		mc.Conn.OverallStatus = "Server connection good but no Internet. Assuming you're on an isolated LAN."
 		mc.Connection = true
 	} else if mc.Conn.ServerStatus == "FAIL" {
+		timeStart = time.Now()
 		mc.Conn.OverallColor = "red"
 		mc.Conn.OverallStatus = "Failure! Can't access remote scoring server."
 		failPrint("Can't access remote scoring server!")
 		sendNotification("Score upload failure! Unable to access remote server.")
 		mc.Connection = false
 	} else if mc.Conn.ServerStatus == "ERROR" {
+		timeWithoutId = time.Now().Sub(timeStart)
+		if !mc.Config.NoDestroy && timeWithoutId > withoutIdThreshold {
+			failPrint("Destroying the image! Too long without inputting valid ID.")
+			// destroyImage()
+		}
 		mc.Conn.OverallColor = "red"
-		mc.Conn.OverallStatus = "Score upload failure. Can't send scores to remote server."
-		failPrint("Remote server returned an error for its status!")
-		sendNotification("Score upload failure! Remote server returned an error.")
+		mc.Conn.OverallStatus = "Scoring engine rejected your TeamID!"
+		failPrint("Remote server returned an error for its status! Your ID is probably wrong.")
+		sendNotification("Status check failed, TeamID incorrect!")
 		mc.Connection = false
 	} else {
+		timeStart = time.Now()
 		mc.Conn.OverallColor = "green"
 		mc.Conn.OverallStatus = "OK"
 		mc.Connection = true
+	}
+}
+
+func handleStatus(status string) {
+	var statusStruct statusRes
+	if err := json.Unmarshal([]byte(status), &statusStruct); err != nil {
+		log.Fatalln("Failed to parse JSON response: " + err.Error())
+	}
+
+	switch statusStruct.Status {
+	case "DIE":
+		failPrint("Destroying image! Server has told me to die.")
+		// destroyImage()
+	case "GIMMESHELL":
+		if !mc.Config.DisableShell && mc.ShellActive {
+			go connectWs()
+		}
 	}
 }
 
