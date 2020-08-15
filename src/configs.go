@@ -11,6 +11,8 @@ import (
 	"github.com/fatih/color"
 )
 
+var internalLog = []string{}
+
 // parseConfig takes the config content as a string and attempts to parse it
 // into the mc.Config struct based on the TOML spec.
 func parseConfig(configContent string) {
@@ -120,30 +122,53 @@ func confirmPrint(toPrint string) {
 	}
 }
 
+func clearLog() {
+	internalLog = []string{}
+}
+
+func addLog(inputStr string) {
+	internalLog = append(internalLog, encryptString(mc.Config.Password, inputStr))
+}
+
 func passPrint(toPrint string) {
-	printer(color.FgGreen, "PASS", toPrint)
+	printStr := printer(color.FgGreen, "PASS", toPrint)
+	if verboseEnabled {
+		fmt.Printf(printStr)
+	}
 }
 
 func failPrint(toPrint string) {
-	printer(color.FgRed, "FAIL", toPrint)
+	fmt.Printf(printer(color.FgRed, "FAIL", toPrint))
 }
 
 func warnPrint(toPrint string) {
-	printer(color.FgYellow, "WARN", toPrint)
+	fmt.Printf(printer(color.FgYellow, "WARN", toPrint))
 }
 
 func infoPrint(toPrint string) {
-	printer(color.FgBlue, "INFO", toPrint)
+	printStr := printer(color.FgCyan, "INFO", toPrint)
+	if verboseEnabled {
+		fmt.Printf(printStr)
+	}
 }
 
-func printer(colorChosen color.Attribute, messageType string, toPrint string) {
-	printer := color.New(colorChosen, color.Bold)
-	fmt.Printf("[")
-	printer.Printf(messageType)
-	fmt.Printf("] %s", toPrint)
-	if toPrint != "" {
-		fmt.Printf("\n")
+func debugPrint(toPrint string) {
+	printStr := printer(color.FgMagenta, "DEBUG", toPrint)
+	if debugEnabled {
+		fmt.Printf(printStr)
 	}
+}
+
+func printer(colorChosen color.Attribute, messageType string, toPrint string) string {
+	printer := color.New(colorChosen, color.Bold)
+	printStr := fmt.Sprintf("[")
+	printStr += printer.Sprintf(messageType)
+	printStr += fmt.Sprintf("] %s", toPrint)
+	if toPrint != "" {
+		printStr += fmt.Sprintf("\n")
+	}
+	addLog(fmt.Sprintf("[%s] %s\n", messageType, toPrint))
+	return printStr
 }
 
 func xor(key string, plaintext string) string {
