@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"math"
 	"net/http"
 	"net/url"
@@ -206,7 +205,7 @@ func checkServer() {
 func handleStatus(status string) {
 	var statusStruct statusRes
 	if err := json.Unmarshal([]byte(status), &statusStruct); err != nil {
-		log.Fatalln("Failed to parse JSON response: " + err.Error())
+		failPrint("Failed to parse JSON response (status): " + err.Error())
 	}
 
 	switch statusStruct.Status {
