@@ -30,7 +30,7 @@ var (
 
 // writeFile wraps ioutil's WriteFile function, and prints
 // the error the screen if one occurs.
-func writeFile(fileName string, fileContent string) {
+func writeFile(fileName, fileContent string) {
 	err := ioutil.WriteFile(fileName, []byte(fileContent), 0644)
 	if err != nil {
 		failPrint("Error writing file: " + err.Error())
