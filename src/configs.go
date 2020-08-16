@@ -159,7 +159,7 @@ func debugPrint(toPrint string) {
 	}
 }
 
-func printer(colorChosen color.Attribute, messageType string, toPrint string) string {
+func printer(colorChosen color.Attribute, messageType, toPrint string) string {
 	printer := color.New(colorChosen, color.Bold)
 	printStr := fmt.Sprintf("[")
 	printStr += printer.Sprintf(messageType)
@@ -171,7 +171,7 @@ func printer(colorChosen color.Attribute, messageType string, toPrint string) st
 	return printStr
 }
 
-func xor(key string, plaintext string) string {
+func xor(key, plaintext string) string {
 	ciphertext := make([]byte, len(plaintext))
 	for i := 0; i < len(plaintext); i++ {
 		ciphertext[i] = key[i%len(key)] ^ plaintext[i]
