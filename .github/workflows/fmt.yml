@@ -1,11 +1,11 @@
-name: CI
+name: Format
 
 on:
   - push
 
 jobs:
   build:
-    name: Build
+    name: Format
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
@@ -28,4 +28,5 @@ jobs:
             exit 0
           else
             exit 1
+            echo "formatting errors! please run gofumpt -extra -s -d . locally"
           fi
