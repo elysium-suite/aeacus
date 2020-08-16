@@ -25,8 +25,5 @@ jobs:
         run: |
           GO111MODULE=on go get -v -t -d mvdan.cc/gofumpt
           if [[ $(gofumpt -extra -s -d .) ]]; then
-            exit 0
-          else
             exit 1
-            echo "formatting errors! please run gofumpt -extra -s -d . locally"
           fi
