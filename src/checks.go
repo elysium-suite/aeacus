@@ -16,7 +16,7 @@ import (
 
 // processCheckWrapper takes the data from a check in the config
 // and runs the correct function with the correct parameters
-func processCheckWrapper(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
+func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool {
 	debugPrint("Handling check: " + checkType + " Arg1: " + arg1 + " Arg2: " + arg2 + " Arg3: " + arg3)
 	switch checkType {
 	case "Command":
@@ -176,7 +176,7 @@ func pathExists(pathName string) (bool, error) {
 }
 
 // fileContains searches for a given searchString in the provided fileName.
-func fileContains(fileName string, searchString string) (bool, error) {
+func fileContains(fileName, searchString string) (bool, error) {
 	fileContent, err := readFile(fileName)
 	return strings.Contains(strings.TrimSpace(fileContent), searchString), err
 }
@@ -186,7 +186,7 @@ func fileContains(fileName string, searchString string) (bool, error) {
 //
 // Newlines in regex may not work as expected, especially on Windows. It's
 // best to not use these (ex. ^ and $).
-func fileContainsRegex(fileName string, expressionString string) (bool, error) {
+func fileContainsRegex(fileName, expressionString string) (bool, error) {
 	fileContent, err := readFile(fileName)
 	if err != nil {
 		return false, err
@@ -199,7 +199,7 @@ func fileContainsRegex(fileName string, expressionString string) (bool, error) {
 }
 
 // dirContainsRegex returns true if any file in the directory matches the regular expression provided
-func dirContainsRegex(dirName string, expressionString string) (bool, error) {
+func dirContainsRegex(dirName, expressionString string) (bool, error) {
 	result, err := pathExists(dirName)
 	if err != nil || !result {
 		return false, errors.New("DirContainsRegex: file does not exist")
@@ -232,7 +232,7 @@ func dirContainsRegex(dirName string, expressionString string) (bool, error) {
 
 // fileEquals calculates the SHA1 sum of a file and compares it
 // with the hash provided in the check
-func fileEquals(fileName string, fileHash string) (bool, error) {
+func fileEquals(fileName, fileHash string) (bool, error) {
 	fileContent, err := readFile(fileName)
 	if err != nil {
 		return false, err

@@ -14,7 +14,7 @@ import (
 
 // processCheck (Windows) will process Windows-specific checks handed to it
 // by the processCheckWrapper function.
-func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
+func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 	switch checkType {
 	case "UserDetail":
 		if check.Message == "" {
@@ -230,7 +230,7 @@ func userExists(userName string) (bool, error) {
 	return true, nil
 }
 
-func userInGroup(userName string, groupName string) (bool, error) {
+func userInGroup(userName, groupName string) (bool, error) {
 	userInfo, err := getNetUserInfo(userName)
 	if err != nil {
 		return false, err
@@ -258,7 +258,7 @@ func firewallUp() (bool, error) {
 	return true, nil
 }
 
-func userDetail(userName string, detailName string, detailValue string) (bool, error) {
+func userDetail(userName, detailName, detailValue string) (bool, error) {
 	detailValue = strings.TrimSpace(detailValue)
 	lookingFor := false
 	if strings.ToLower(detailValue) == "yes" {
@@ -288,7 +288,7 @@ func userDetail(userName string, detailName string, detailValue string) (bool, e
 	return false, nil
 }
 
-func userRights(userOrGroup string, privilege string) (bool, error) {
+func userRights(userOrGroup, privilege string) (bool, error) {
 	// todo consider /mergedpolicy when windows domain is active?
 	// domain support is untested, it should be easy to add a domain
 	// flag in the config though. then just make sure you're not getting
@@ -341,7 +341,7 @@ func startupProgramExists(progName string) (bool, error) {
 	return true, nil
 }
 
-func securityPolicy(keyName string, keyValue string) (bool, error) {
+func securityPolicy(keyName, keyValue string) (bool, error) {
 	var desiredString string
 	if regKey, ok := secpolToKey[keyName]; ok {
 		return registryKey(regKey, keyValue, false)
@@ -390,7 +390,7 @@ func securityPolicy(keyName string, keyValue string) (bool, error) {
 	}
 }
 
-func registryKey(keyName string, keyValue string, existCheck bool) (bool, error) {
+func registryKey(keyName, keyValue string, existCheck bool) (bool, error) {
 	// Break down input
 	registryArgs := regexp.MustCompile("[\\\\]+").Split(keyName, -1)
 	registryHiveText := registryArgs[0]
