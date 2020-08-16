@@ -7,7 +7,7 @@ import (
 
 // processCheck (Linux) will process Linux-specific checks
 // handed to it by the processCheckWrapper function
-func processCheck(check *check, checkType string, arg1 string, arg2 string, arg3 string) bool {
+func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 	switch checkType {
 	case "GuestDisabledLDM":
 		if check.Message == "" {
@@ -133,7 +133,7 @@ func userExists(userName string) (bool, error) {
 	return command("id -u " + userName)
 }
 
-func userInGroup(userName string, groupName string) (bool, error) {
+func userInGroup(userName, groupName string) (bool, error) {
 	return command("groups " + userName + " | grep -q " + groupName + "")
 }
 
@@ -154,7 +154,7 @@ func guestDisabledLDM() (bool, error) {
 	return result, err
 }
 
-func packageVersion(packageName string, versionNumber string) (bool, error) {
+func packageVersion(packageName, versionNumber string) (bool, error) {
 	return command(`dpkg -l | awk '$2=="` + packageName + `" { print $3 }' | grep -q "` + versionNumber + `"`)
 }
 
