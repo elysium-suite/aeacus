@@ -170,7 +170,7 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		return err == nil && result
 	case "ServiceStatusNot":
 		if check.Message == "" {
-			check.Message = "The service " + arg1 + " is " + arg2  + " with the startup type set as " + arg3
+			check.Message = "The service " + arg1 + " is not " + arg2  + " with the startup type not set as " + arg3
 		}
 		result, err := serviceStatus(arg1, arg2, arg3)
 		return err == nil && !result
@@ -226,6 +226,7 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 	if err != nil {
 		return false, err
 	}
+	wantedStatus = strings.ToLower(wantedStatus)
 	if wantedStatus == "running" {
 		boolWantedStatus = true
 	} else if wantedStatus == "stopped" {
