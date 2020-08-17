@@ -12,12 +12,15 @@ import (
 	"github.com/judwhite/go-svc/svc"
 )
 
+var poshSession, err = createPoshEnv()
+
 func phocusStart(quit chan struct{}) {
 	app := genPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer poshSession.Exit()
 }
 
 // idgui is set using the flag package in order to grab its value before

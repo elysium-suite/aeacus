@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -169,21 +168,19 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 }
 
 func command(commandGiven string) (bool, error) {
-	cmd := rawCmd(commandGiven + "; if (!($?)) { Throw 'Error' }")
-	if err := cmd.Run(); err != nil {
-		if _, ok := err.(*exec.ExitError); ok {
-			return false, nil
-		}
+	stdout, stderr, err := rawCmd(commandGiven + "; if (!($?)) { Throw 'Error' }")
+	if err || stderr {
+		return false, err
 	}
 	return true, nil
 }
 
 func commandOutput(commandGiven, desiredOutput string) (bool, error) {
-	out, err := rawCmd(commandGiven).Output()
-	if err != nil {
+	stdout, stderr, err := rawCmd(commandGiven)
+	if err || stderr {
 		return false, err
 	}
-	outString := strings.TrimSpace(string(out))
+	outString := strings.TrimSpace(stdout)
 	if outString == desiredOutput {
 		return true, nil
 	}

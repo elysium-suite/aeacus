@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 
 	"github.com/gen2brain/beeep"
 	wapi "github.com/iamacarpet/go-win64api"
 	"github.com/iamacarpet/go-win64api/shared"
+	ps "github.com/safinsingh/go-powershell"
+	"github.com/safinsingh/go-powershell/backend"
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -83,45 +84,39 @@ func sendNotification(messageString string) {
 	}
 }
 
-// rawCmd returns a exec.Command object with the correct PowerShell flags.
-//
-// rawCmd uses PowerShell's ScriptBlock feature (along with -NoProfile to
-// speed things up, as well as some other flags) to run commands on the host
-// system and retrieve the return value.
-func rawCmd(commandGiven string) *exec.Cmd {
-	cmdInput := "powershell.exe -NonInteractive -NoProfile Invoke-Command -ScriptBlock { " + commandGiven + " }"
+// rawCmd executes a PowerShell command in the current session
+func rawCmd(commandGiven string) (string, string, error) {
+	stdout, stderr, err := shell.Execute(commandGiven)
 	debugPrint("rawCmd input: " + cmdInput)
-	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
+	return stdout, stderr, err
 }
 
 // shellCommand (Windows) executes a given command in a PowerShell environment
 // and prints an error if one occurred.
 func shellCommand(commandGiven string) {
-	cmd := rawCmd(commandGiven)
-	if err := cmd.Run(); err != nil {
-		if _, ok := err.(*exec.ExitError); ok {
-			if len(commandGiven) > 12 {
-				failPrint("Command \"" + commandGiven[:12] + "...\" errored out (code " + err.Error() + ").")
-			} else {
-				failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
-			}
+	_, _, err := rawCmd(commandGiven)
+	if err != nil {
+		if len(commandGiven) > 12 {
+			failPrint("Command \"" + commandGiven[:12] + "...\" errored out (code " + err.Error() + ").")
+		} else {
+			failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
 		}
 	}
+
 }
 
 // shellCommand (Windows) executes a given command in a PowerShell environment
 // and returns the commands output and its error (if one occurred).
 func shellCommandOutput(commandGiven string) (string, error) {
-	out, err := rawCmd(commandGiven).Output()
+	stdout, _, err := rawCmd(commandGiven)
 	if err != nil {
-		if len(commandGiven) > 9 {
-			failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
+		if len(commandGiven) > 12 {
+			failPrint("Command \"" + commandGiven[:12] + "...\" errored out (code " + err.Error() + ").")
 		} else {
 			failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
 		}
-		return "", err
 	}
-	return strings.TrimSpace(string(out)), err
+	return string(stdout)
 }
 
 func playAudio(wavPath string) {
@@ -241,4 +236,18 @@ func getLocalUser(userName string) (shared.LocalUser, error) {
 		}
 	}
 	return shared.LocalUser{}, nil
+}
+
+func createPoshEnv() (Shell, error) {
+	// choose a backend
+	back := &backend.Local{}
+
+	// start a local powershell process
+	shell, err := ps.New(back)
+	if err != nil {
+		return nil, err
+	}
+
+	return shell, nil
+
 }
