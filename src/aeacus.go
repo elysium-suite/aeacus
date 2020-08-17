@@ -49,6 +49,11 @@ func main() {
 				Aliases: []string{"y"},
 				Usage:   "Automatically answer 'yes' to any prompts",
 			},
+			&cli.BoolFlag{
+				Name:    "json",
+				Aliases: []string{"j"},
+				Usage:   "Use the JSON spec to parse configuration file",
+			},
 		},
 		Commands: []*cli.Command{
 			{
@@ -195,6 +200,9 @@ func parseFlags(c *cli.Context) {
 	}
 	if c.Bool("y") {
 		yesEnabled = true
+	}
+	if c.Bool("j") {
+		jsonEnabled = true
 	}
 }
 

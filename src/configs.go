@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -20,9 +21,16 @@ func parseConfig(configContent string) {
 		failPrint("Configuration is empty!")
 	}
 
-	if _, err := toml.Decode(configContent, &mc.Config); err != nil {
-		failPrint("Error decoding TOML: " + err.Error())
-		os.Exit(1)
+	if !jsonEnabled {
+		if _, err := toml.Decode(configContent, &mc.Config); err != nil {
+			failPrint("Error decoding TOML: " + err.Error())
+			os.Exit(1)
+		}
+	} else {
+		if err := json.Unmarshal([]byte(configContent), &mc.Config); err != nil {
+			failPrint("Error decoding JSON: " + err.Error())
+			os.Exit(1)
+		}
 	}
 
 	// If there's no remote, local must be enabled.

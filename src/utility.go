@@ -22,6 +22,7 @@ var (
 	verboseEnabled        = false
 	debugEnabled          = false
 	yesEnabled            = false
+	jsonEnabled           = false
 	mc                    = &metaConfig{}
 	timeStart             = time.Now()
 	timeWithoutId, _      = time.ParseDuration("0s")
