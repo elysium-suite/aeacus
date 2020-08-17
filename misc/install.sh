@@ -70,5 +70,7 @@ go get "github.com/go-toast/toast"
 go get "github.com/tadvi/systray"
 go get "golang.org/x/text/unicode"
 go get "github.com/judwhite/go-svc/svc"
-
+go get "github.com/gorilla/websocket"
+go get "github.com/safinsingh/go-powershell"
+go get "github.com/safinsingh/go-powershell/backend"
 source /etc/bash.bashrc
