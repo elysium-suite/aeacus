@@ -164,8 +164,16 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		return err == nil && !result
 	case "ServiceStatus":
 		if check.Message == "" {
-			check.Message = "The " + arg1 + " service is running and is "
+			check.Message = "The service " + arg1 + " is " + arg2  + " with the startup type set as " + arg3
 		}
+		result, err := serviceStatus(arg1, arg2, arg3)
+		return err == nil && result
+	case "ServiceStatusNot":
+		if check.Message == "" {
+			check.Message = "The service " + arg1 + " is " + arg2  + " with the startup type set as " + arg3
+		}
+		result, err := serviceStatus(arg1, arg2, arg3)
+		return err == nil && !result
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -212,12 +220,20 @@ func serviceUp(serviceName string) (bool, error) {
 	return serviceStatus.IsRunning, err
 }
 
-func serviceStatus(serviceName string, wantedStatus bool, startupType string) (bool, error) {
+func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) {
 	status, err := getLocalServiceStatus(serviceName)
+	var boolWantedStatus bool
 	if err != nil {
 		return false, err
 	}
-	if status.IsRunning == wantedStatus {
+	if wantedStatus == "running" {
+		boolWantedStatus = true
+	} else if wantedStatus == "stopped" {
+		boolWantedStatus = false
+	} else {
+		return false, nil
+	}
+	if status.IsRunning == boolWantedStatus {
 		check, err := commandOutput(`(Get-Service '`+serviceName+`').StartType`, startupType)
 		if err != nil {
 			return false, err

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/iamacarpet/go-win64api/shared"
     "fmt"
-
+    "strconv"
     wapi "github.com/iamacarpet/go-win64api"
 )
 
@@ -11,6 +11,9 @@ func main() {
     // serviceUp(`AdobeARMservice`)
     fmt.Println(getLocalServiceStatus(`AdobeARMservice`))
     serviceUpAndEnabled(`AdobeARMservice`)
+    stringree := "true"
+    boolstr, _ := strconv.ParseBool(stringree)
+    fmt.Println(boolstr)
 }
 
 func getLocalServiceStatus(serviceName string) (shared.Service, error) {
@@ -33,5 +36,6 @@ func serviceUpAndEnabled(serviceName string) {
     if err != nil {
         fmt.Println(`reeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`)
     }
-    
+    fmt.Println(err)
+    fmt.Println(serviceStatus)
 }

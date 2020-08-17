@@ -85,6 +85,7 @@ func printConfig() {
 	fmt.Println("Local:", mc.Config.Local)
 	fmt.Println("EndDate:", mc.Config.EndDate)
 	fmt.Println("NoDestroy:", mc.Config.NoDestroy)
+	fmt.Println("DisableShell:", mc.Config.DisableShell)
 	fmt.Println("Checks:")
 	for i, check := range mc.Config.Check {
 		fmt.Printf("\tCheck %d (%d points):\n", i+1, check.Points)
