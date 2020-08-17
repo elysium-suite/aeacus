@@ -212,16 +212,17 @@ func serviceUp(serviceName string) (bool, error) {
 	return serviceStatus.IsRunning, err
 }
 
-func serviceStatus(serviceName, startupType string) (bool, error) {
-	running, err := serviceUp(serviceName)
-	if running {
-		check, err := shellCommandOutput(`(Get-Service '`+serviceName+`').StartType`)
-		
+func serviceStatus(serviceName string, wantedStatus bool, startupType string) (bool, error) {
+	status, err := getLocalServiceStatus(serviceName)
+	if err != nil {
+		return false, err
+	}
+	if status.IsRunning == wantedStatus {
+		check, err := commandOutput(`(Get-Service '`+serviceName+`').StartType`, startupType)
 		if err != nil {
 			return false, err
 		}
-
-		if check == startupType {
+		if check {
 			return true, nil
 		}
 	}
