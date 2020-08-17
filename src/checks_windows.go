@@ -232,7 +232,7 @@ func userExists(userName string) (bool, error) {
 }
 
 func userInGroup(userName, groupName string) (bool, error) {
-	users, err := wapi.LocalGroupGetMembers()
+	users, err := wapi.LocalGroupGetMembers(groupName)
 	if err != nil {
 		return false, err
 	}
