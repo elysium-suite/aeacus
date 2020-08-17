@@ -242,3 +242,18 @@ func getLocalUser(userName string) (shared.LocalUser, error) {
 	}
 	return shared.LocalUser{}, nil
 }
+
+func getLocalServiceStatus(serviceName string) (shared.Service, error) {
+    serviceDataList, err := wapi.GetServices()
+    var serviceStatusData shared.Service
+	if err != nil {
+        failPrint("Couldn't get local service: " + err.Error())
+        return serviceStatusData, err
+    }
+    for _, v := range serviceDataList {
+        if v.SCName == serviceName {
+            serviceStatusData = v
+        }
+    }
+    return serviceStatusData, nil
+}

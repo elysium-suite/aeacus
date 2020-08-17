@@ -118,13 +118,13 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		if check.Message == "" {
 			check.Message = "Password for " + arg1 + " has been changed"
 		}
-		result, err := PasswordChanged(arg1, arg2)
+		result, err := passwordChanged(arg1, arg2)
 		return err == nil && result
 	case "PasswordChangedNot":
 		if check.Message == "" {
 			check.Message = "Password for " + arg1 + " has not been changed"
 		}
-		result, err := PasswordChanged(arg1, arg2)
+		result, err := passwordChanged(arg1, arg2)
 		return err == nil && !result
 	case "WindowsFeature":
 		if check.Message == "" {
@@ -162,6 +162,10 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		}
 		result, err := firefoxSetting(arg1, arg2)
 		return err == nil && !result
+	case "ServiceStatus":
+		if check.Message == "" {
+			check.Message = "The " + arg1 + " service is running and is "
+		}
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -204,10 +208,27 @@ func packageInstalled(packageName string) (bool, error) {
 }
 
 func serviceUp(serviceName string) (bool, error) {
-	return commandOutput("(Get-Service -Name '"+serviceName+"').Status", "Running")
+	serviceStatus, err := getLocalServiceStatus(serviceName)
+	return serviceStatus.IsRunning, err
 }
 
-func PasswordChanged(user, date string) (bool, error) {
+func serviceStatus(serviceName, startupType string) (bool, error) {
+	running, err := serviceUp(serviceName)
+	if running {
+		check, err := shellCommandOutput(`(Get-Service '`+serviceName+`').StartType`)
+		
+		if err != nil {
+			return false, err
+		}
+
+		if check == startupType {
+			return true, nil
+		}
+	}
+	return false, err
+}
+
+func passwordChanged(user, date string) (bool, error) {
 	return command(`Get-LocalUser " + user + " | select PasswordLastSet | Select-String "` + date + `"`)
 }
 
