@@ -237,7 +237,7 @@ func userInGroup(userName, groupName string) (bool, error) {
 		return false, err
 	}
 	for _, user := range users {
-		if user.Username == userName {
+		if user.Name == userName {
 			return true, nil
 		}
 	}
