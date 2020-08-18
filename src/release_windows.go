@@ -11,15 +11,14 @@ func writeDesktopFiles() {
 	infoPrint("Creating or emptying TeamID.txt file...")
 	cmdString = "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\TeamID.txt"
 	shellCommand(cmdString)
-	infoPrint("Writing TeamID shortcut to Desktop...")
+	infoPrint("Changing Permissions of TeamID")
 	powershellPermission := `
 	$ACL = Get-ACL C:\aeacus\TeamID.txt
 	$ACL.SetOwner([System.Security.Principal.NTAccount] $env:USERNAME)
 	Set-Acl -Path C:\aeacus\TeamID.txt -AclObject $ACL
 	`
 	shellCommand(powershellPermission)
-	infoPrint("Changing Permissions of TeamID")
-
+	infoPrint("Writing TeamID shortcut to Desktop...")
 	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Arguments = "-i yes"; $Shortcut.Save()`
 	shellCommand(cmdString)
 
