@@ -114,7 +114,8 @@ func installService() {
 	taskCreate := `
 	$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-File C:\aeacus\assets\TeamID.ps1"
 	$trigger = New-ScheduledTaskTrigger -AtLogon
-	Register-ScheduledTask -TaskName "TeamID" -Description "Scheduled Task to ensure Aeacus TeamID prompt is displayed when needed" -Action $action -Trigger $trigger
+	$principal = New-ScheduledTaskPrincipal -RunLevel Highest
+	Register-ScheduledTask -TaskName "TeamID" -Description "Scheduled Task to ensure Aeacus TeamID prompt is displayed when needed" -Action $action -Trigger $trigger -Principal $principal
 	`
 	shellCommand(taskCreate)
 }
