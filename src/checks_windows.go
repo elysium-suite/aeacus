@@ -169,7 +169,7 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 
 func command(commandGiven string) (bool, error) {
 	stdout, stderr, err := rawCmd(commandGiven + "; if (!($?)) { Throw 'Error' }")
-	if err || stderr {
+	if err != nil || stderr != "" {
 		return false, err
 	}
 	return true, nil
@@ -177,7 +177,7 @@ func command(commandGiven string) (bool, error) {
 
 func commandOutput(commandGiven, desiredOutput string) (bool, error) {
 	stdout, stderr, err := rawCmd(commandGiven)
-	if err || stderr {
+	if err != nil || stderr != "" {
 		return false, err
 	}
 	outString := strings.TrimSpace(stdout)
