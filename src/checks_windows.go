@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	wapi "github.com/iamacarpet/go-win64api"
 	"golang.org/x/sys/windows/registry"
 )
 
@@ -231,18 +232,16 @@ func userExists(userName string) (bool, error) {
 }
 
 func userInGroup(userName, groupName string) (bool, error) {
-	userInfo, err := getNetUserInfo(userName)
+	users, err := wapi.LocalGroupGetMembers(groupName)
 	if err != nil {
 		return false, err
 	}
-	re := regexp.MustCompile("(?m)[\r\n]+^.*Group.*$")
-	detailString := strings.TrimSpace(string(re.Find([]byte(userInfo))))
-	if detailString == "" {
-		// This is likely because an invalid user was tested.
-		failPrint("Group check output empty-- please ensure you entered a valid user.")
-		return false, errors.New("Error parsing net user output for Group")
+	for _, user := range users {
+		if user.Name == userName {
+			return true, nil
+		}
 	}
-	return strings.Contains(detailString, groupName), nil
+	return false, nil
 }
 
 func firewallUp() (bool, error) {
