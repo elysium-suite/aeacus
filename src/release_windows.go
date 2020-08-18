@@ -110,6 +110,13 @@ func installService() {
 	infoPrint("Setting service description...")
 	cmdString = `sc.exe description CSSClient "This is Aeacus's Competition Scoring System client. Don't stop or mess with this unless you want to not get points, and maybe have your registry deleted."`
 	shellCommand(cmdString)
+	infoPrint("Setting up TeamID scheduled task")
+	taskCreate := `
+	$action = New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "-File C:\aeacus\assets\TeamID.ps1"
+	$trigger = New-ScheduledTaskTrigger -AtLogon
+	Register-ScheduledTask -TaskName "TeamID" -Description "Scheduled Task to ensure Aeacus TeamID prompt is displayed when needed" -Action $action -Trigger $trigger
+	`
+	shellCommand(taskCreate)
 }
 
 func cleanUp() {
