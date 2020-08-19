@@ -232,22 +232,23 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 	case "stopped":
 		boolWantedStatus = false
 	default:
-		errMessage := "Unknown startup type found for " + serviceName
+		errMessage := "Unknown status type found for " + serviceName
 		failPrint(errMessage)
 		return false, errors.New(errMessage)
 	}
 	if status.IsRunning == boolWantedStatus {
 		serviceKey := `HKLM\SYSTEM\CurrentControlSet\Services\` + serviceName + `\Start`
 		var wantedStartupTypeNumber string
-		startupType = strings.ToLower(startupType)
-		if startupType == "automatic" {
+		switch startupType = strings.ToLower(startupType); startupType {
+		case "automatic":
 			wantedStartupTypeNumber = "2"
-		} else if startupType == "manual" {
+		case "manual":
 			wantedStartupTypeNumber = "3"
-		} else if startupType == "disabled" {
+		case "disabled":
 			wantedStartupTypeNumber = "4"
-		} else {
-			return false, nil
+		default:
+			failPrint("Unknown startup type found for " + serviceName)
+			return false, errors.New("Unknown status type found for " + serviceName)
 		}
 		check, err := registryKey(serviceKey, wantedStartupTypeNumber, false)
 		if err != nil {
