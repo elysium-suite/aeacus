@@ -11,15 +11,14 @@ func writeDesktopFiles() {
 	infoPrint("Creating or emptying TeamID.txt file...")
 	cmdString = "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\TeamID.txt"
 	shellCommand(cmdString)
-	infoPrint("Writing TeamID shortcut to Desktop...")
+	infoPrint("Changing Permissions of TeamID")
 	powershellPermission := `
 	$ACL = Get-ACL C:\aeacus\TeamID.txt
 	$ACL.SetOwner([System.Security.Principal.NTAccount] $env:USERNAME)
 	Set-Acl -Path C:\aeacus\TeamID.txt -AclObject $ACL
 	`
 	shellCommand(powershellPermission)
-	infoPrint("Changing Permissions of TeamID")
-
+	infoPrint("Writing TeamID shortcut to Desktop...")
 	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Arguments = "-i yes"; $Shortcut.Save()`
 	shellCommand(cmdString)
 
@@ -111,6 +110,14 @@ func installService() {
 	infoPrint("Setting service description...")
 	cmdString = `sc.exe description CSSClient "This is Aeacus's Competition Scoring System client. Don't stop or mess with this unless you want to not get points, and maybe have your registry deleted."`
 	shellCommand(cmdString)
+	infoPrint("Setting up TeamID scheduled task")
+	taskCreate := `
+	$action = New-ScheduledTaskAction -Execute "C:\aeacus\phocus.exe" -Argument "-i yes"
+	$trigger = New-ScheduledTaskTrigger -AtLogon
+	$principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel Highest
+	Register-ScheduledTask -TaskName "TeamID" -Description "Scheduled Task to ensure Aeacus TeamID prompt is displayed when needed" -Action $action -Trigger $trigger -Principal $principal
+	`
+	shellCommand(taskCreate)
 }
 
 func cleanUp() {

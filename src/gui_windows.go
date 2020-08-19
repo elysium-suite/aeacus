@@ -2,6 +2,8 @@ package main
 
 func launchIDPrompt() {
 	powerShellPrompt := `
+    $teamIDContent = Get-Content C:\aeacus\TeamID.txt
+    if ($teamIDContent -eq "YOUR-TEAMID-HERE") {
     Add-Type -AssemblyName System.Windows.Forms
     [System.Windows.Forms.Application]::EnableVisualStyles()
     
@@ -48,6 +50,7 @@ func launchIDPrompt() {
     }
 
     [void]$Form.ShowDialog()
+    }
     `
 	shellCommand(powerShellPrompt)
 }
