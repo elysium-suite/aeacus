@@ -4,7 +4,7 @@ func launchIDPrompt() {
 	teamID, err := shellCommandOutput(`
 		#!/bin/bash
 		teamid=$(
-			zenity --entry= \
+			zenity --entry \
 			--title="TeamID" \
 			--text="Enter your TeamID:"
 		)
