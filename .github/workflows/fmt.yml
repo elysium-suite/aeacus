@@ -23,7 +23,14 @@ jobs:
 
       - name: Format
         run: |
-          GO111MODULE=on go get -v -t -d mvdan.cc/gofumpt
-          if [[ $(gofumpt -extra -s -d .) ]]; then
+          GO111MODULE=on go get mvdan.cc/gofumpt
+          set -x
+          gofumpt -extra -s -d > format.diff
+          if [[ -s format.diff ]]; then
+            echo "Formatting failed:"
+            cat format.diff
             exit 1
+          else
+            echo "Formatting passed."
+            exit 0
           fi
