@@ -252,8 +252,9 @@ func getLocalServiceStatus(serviceName string) (shared.Service, error) {
     }
     for _, v := range serviceDataList {
         if v.SCName == serviceName {
-            serviceStatusData = v
+            return v, nil
         }
-    }
-    return serviceStatusData, nil
+	}
+	failPrint(`Specified service '`+serviceName+`' was not found on the system`)
+	return serviceStatusData, err
 }
