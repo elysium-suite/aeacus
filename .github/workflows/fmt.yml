@@ -24,6 +24,6 @@ jobs:
       - name: Format
         run: |
           GO111MODULE=on go get -v -t -d mvdan.cc/gofumpt
-          if [[ $($GOROOT/bin/gofumpt -extra -s -d .) ]]; then
+          if [[ $($GOPATH/bin/gofumpt -extra -s -d .) ]]; then
             exit 1
           fi
