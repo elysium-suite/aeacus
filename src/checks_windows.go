@@ -232,7 +232,9 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 	} else if wantedStatus == "stopped" {
 		boolWantedStatus = false
 	} else {
-		return false, nil
+		errMessage := `Unknown startup type found for `+serviceName
+		failPrint(errMessage)
+		return false, errors.New(errMessage)
 	}
 	if status.IsRunning == boolWantedStatus {
 		serviceKey := `HKLM\SYSTEM\CurrentControlSet\Services\` + serviceName
