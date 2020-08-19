@@ -27,6 +27,10 @@ jobs:
           set -x
           gofumpt -extra -s -d > format.diff
           if [[ -s format.diff ]]; then
+            echo "Formatting failed:"
             cat format.diff
             exit 1
+          else
+            echo "Formatting passed."
+            exit 0
           fi
