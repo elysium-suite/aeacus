@@ -23,7 +23,7 @@ jobs:
 
       - name: Format
         run: |
-          GO111MODULE=on go get -v -t -d mvdan.cc/gofumpt
-          if [[ $($GOPATH/bin/gofumpt -extra -s -d .) ]]; then
+          GO111MODULE=on go get mvdan.cc/gofumpt
+          if [[ $(gofumpt -extra -s -d .) ]]; then
             exit 1
           fi
