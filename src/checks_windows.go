@@ -237,7 +237,7 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 		return false, errors.New(errMessage)
 	}
 	if status.IsRunning == boolWantedStatus {
-		serviceKey := `HKLM\SYSTEM\CurrentControlSet\Services\` + serviceName
+		serviceKey := `HKLM\SYSTEM\CurrentControlSet\Services\` + serviceName + `\Start`
 		var wantedStartupTypeNumber string
 		startupType = strings.ToLower(startupType)
 		if startupType == "automatic" {
