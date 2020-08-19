@@ -235,7 +235,20 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 		return false, nil
 	}
 	if status.IsRunning == boolWantedStatus {
-		check, err := commandOutput(`(Get-Service '`+serviceName+`').StartType`, startupType)
+		serviceKey := `HKLM\SYSTEM\CurrentControlSet\Services\` + serviceName
+		var wantedStartupTypeNumber string
+		startupType = strings.ToLower(startupType)
+		if startupType == "automatic" {
+			wantedStartupTypeNumber = "2"
+		} else if startupType == "manual" {
+			wantedStartupTypeNumber = "3"
+		} else if startupType == "disabled" {
+			wantedStartupTypeNumber = "4"
+		} else {
+			return false, nil
+		}
+		check, err := registryKey(serviceKey, wantedStartupTypeNumber, false)
+		// check, err := commandOutput(`(Get-Service '`+serviceName+`').StartType`, startupType)
 		if err != nil {
 			return false, err
 		}
