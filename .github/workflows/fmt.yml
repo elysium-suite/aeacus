@@ -24,6 +24,8 @@ jobs:
       - name: Format
         run: |
           GO111MODULE=on go get mvdan.cc/gofumpt
-          if [[ $(gofumpt -extra -s -d .) ]]; then
+          gofumpt -extra -s -d > format.diff
+          if [[ -s format.diff ]]; then
+            cat format.diff
             exit 1
           fi
