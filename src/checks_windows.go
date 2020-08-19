@@ -226,13 +226,13 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 	if err != nil {
 		return false, err
 	}
-	wantedStatus = strings.ToLower(wantedStatus)
-	if wantedStatus == "running" {
+	switch wantedStatus = strings.ToLower(wantedStatus); wantedStatus {
+	case "running":
 		boolWantedStatus = true
-	} else if wantedStatus == "stopped" {
+	case "stopped":
 		boolWantedStatus = false
-	} else {
-		errMessage := `Unknown startup type found for `+serviceName
+	default:
+		errMessage := "Unknown startup type found for " + serviceName
 		failPrint(errMessage)
 		return false, errors.New(errMessage)
 	}
@@ -250,7 +250,6 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 			return false, nil
 		}
 		check, err := registryKey(serviceKey, wantedStartupTypeNumber, false)
-		// check, err := commandOutput(`(Get-Service '`+serviceName+`').StartType`, startupType)
 		if err != nil {
 			return false, err
 		}
