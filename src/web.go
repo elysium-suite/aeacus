@@ -33,6 +33,7 @@ func genReport(img imageData) {
 
 	if mc.Config.Remote != "" {
 		htmlFile.WriteString(`<a href="` + mc.Config.Remote + `">Click here to view the public scoreboard</a><br>`)
+		htmlFile.WriteString(`<a href="` + mc.Config.Remote + `/announcements` + `">Click here to view the announcements</a><br>`)
 
 		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + mc.Conn.OverallColor + `">` + mc.Conn.OverallStatus + `<span></h3>`)
 
