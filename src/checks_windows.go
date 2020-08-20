@@ -119,13 +119,13 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		if check.Message == "" {
 			check.Message = "Password for " + arg1 + " has been changed"
 		}
-		result, err := PasswordChanged(arg1, arg2)
+		result, err := passwordChanged(arg1, arg2)
 		return err == nil && result
 	case "PasswordChangedNot":
 		if check.Message == "" {
 			check.Message = "Password for " + arg1 + " has not been changed"
 		}
-		result, err := PasswordChanged(arg1, arg2)
+		result, err := passwordChanged(arg1, arg2)
 		return err == nil && !result
 	case "WindowsFeature":
 		if check.Message == "" {
@@ -162,6 +162,18 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 			check.Message = "Firefox preference " + arg1 + " is not set to " + arg2
 		}
 		result, err := firefoxSetting(arg1, arg2)
+		return err == nil && !result
+	case "ServiceStatus":
+		if check.Message == "" {
+			check.Message = "The service " + arg1 + " is " + arg2  + " with the startup type set as " + arg3
+		}
+		result, err := serviceStatus(arg1, arg2, arg3)
+		return err == nil && result
+	case "ServiceStatusNot":
+		if check.Message == "" {
+			check.Message = "The service " + arg1 + " is not " + arg2  + " with the startup type not set as " + arg3
+		}
+		result, err := serviceStatus(arg1, arg2, arg3)
 		return err == nil && !result
 	default:
 		failPrint("No check type " + checkType)
@@ -205,10 +217,52 @@ func packageInstalled(packageName string) (bool, error) {
 }
 
 func serviceUp(serviceName string) (bool, error) {
-	return commandOutput("(Get-Service -Name '"+serviceName+"').Status", "Running")
+	serviceStatus, err := getLocalServiceStatus(serviceName)
+	return serviceStatus.IsRunning, err
 }
 
-func PasswordChanged(user, date string) (bool, error) {
+func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) {
+	status, err := getLocalServiceStatus(serviceName)
+	var boolWantedStatus bool
+	if err != nil {
+		return false, err
+	}
+	switch wantedStatus = strings.ToLower(wantedStatus); wantedStatus {
+	case "running":
+		boolWantedStatus = true
+	case "stopped":
+		boolWantedStatus = false
+	default:
+		errMessage := "Unknown status type found for " + serviceName
+		failPrint(errMessage)
+		return false, errors.New(errMessage)
+	}
+	if status.IsRunning == boolWantedStatus {
+		serviceKey := `HKLM\SYSTEM\CurrentControlSet\Services\` + serviceName + `\Start`
+		var wantedStartupTypeNumber string
+		switch startupType = strings.ToLower(startupType); startupType {
+		case "automatic":
+			wantedStartupTypeNumber = "2"
+		case "manual":
+			wantedStartupTypeNumber = "3"
+		case "disabled":
+			wantedStartupTypeNumber = "4"
+		default:
+			failPrint("Unknown startup type found for " + serviceName)
+			return false, errors.New("Unknown status type found for " + serviceName)
+		}
+		check, err := registryKey(serviceKey, wantedStartupTypeNumber, false)
+		if err != nil {
+			return false, err
+		}
+		if check {
+			return true, nil
+		}
+	}
+	return false, err
+}
+
+func passwordChanged(user, date string) (bool, error) {
 	return command(`Get-LocalUser " + user + " | select PasswordLastSet | Select-String "` + date + `"`)
 }
 
