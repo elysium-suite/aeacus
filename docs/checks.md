@@ -179,6 +179,16 @@ arg2='644'
 
 ### Windows-Specific Checks
 
+**ServiceStatus**: pass if service status and service startup type is the same as specified
+```
+type="ServiceStatus"
+arg1="TermService"
+arg2="Running"
+arg3="Automatic"
+```
+
+> This check uses the windows API to check the service current status and the windows registry for the startuptype
+
 > todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
 
 **PasswordChanged**: pass if user password has changed after the given date
