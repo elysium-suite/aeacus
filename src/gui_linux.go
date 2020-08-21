@@ -2,7 +2,6 @@ package main
 
 import (
 	"strings"
-	"fmt"
 )
 
 func launchIDPrompt() {
@@ -18,7 +17,7 @@ func launchIDPrompt() {
 	`)
 
 	if (len(teamID)<2) {
-		fmt.Println("There was no teamID entered!")
+		infoPrint("There was no teamID entered!")
 		sendNotification("Error saving TeamID!")
 	}
 
