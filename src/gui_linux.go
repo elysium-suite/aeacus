@@ -1,7 +1,8 @@
 package main
 
 import (
-    "strings"
+	"strings"
+	"fmt"
 )
 
 func launchIDPrompt() {
@@ -15,6 +16,11 @@ func launchIDPrompt() {
 		)
 		echo $teamid
 	`)
+
+	if (len(teamID)<2) {
+		fmt.Println("There was no teamID entered!")
+		sendNotification("Error saving TeamID!")
+	}
 
     strippedTeamID := strings.Replace(teamID, " ", "", -1)
 
