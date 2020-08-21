@@ -26,6 +26,7 @@ jobs:
           GO111MODULE=on go get mvdan.cc/gofumpt
           set -x
           gofumpt -extra -s -d > format.diff
+          ls -la
           if [[ -s format.diff ]]; then
             echo "Formatting failed:"
             cat format.diff
