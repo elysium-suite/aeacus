@@ -16,12 +16,12 @@ func launchIDPrompt() {
 		echo $teamid
 	`)
 
-	if (len(teamID)<2) {
+	if len(teamID) < 2 {
 		infoPrint("There was no teamID entered!")
 		sendNotification("Error saving TeamID!")
 	}
 
-    strippedTeamID := strings.Replace(teamID, " ", "", -1)
+	strippedTeamID := strings.Replace(teamID, " ", "", -1)
 
 	if err == nil {
 		writeFile(mc.DirPath+"TeamID.txt", strippedTeamID)
