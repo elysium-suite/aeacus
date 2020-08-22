@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
-	"bytes"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -46,7 +46,7 @@ func WriteConfig(sourceFile, destFile string) {
 	obfuscateConfig()
 	buf := new(bytes.Buffer)
 	if err := toml.NewEncoder(buf).Encode(mc.Config); err != nil {
-	    failPrint(err.Error())
+		failPrint(err.Error())
 		os.Exit(1)
 		return
 	}
@@ -123,7 +123,7 @@ func obfuscateConfig() {
 	for i, check := range mc.Config.Check {
 		obfuscateData(&mc.Config.Check[i].Message)
 		if check.Pass != nil {
-			for x, _ := range check.Pass {
+			for x := range check.Pass {
 				obfuscateData(&mc.Config.Check[i].Pass[x].Type)
 				obfuscateData(&mc.Config.Check[i].Pass[x].Arg1)
 				obfuscateData(&mc.Config.Check[i].Pass[x].Arg2)
@@ -132,7 +132,7 @@ func obfuscateConfig() {
 			}
 		}
 		if check.PassOverride != nil {
-			for x, _ := range check.Pass {
+			for x := range check.Pass {
 				obfuscateData(&mc.Config.Check[i].PassOverride[x].Type)
 				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg1)
 				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg2)
@@ -141,7 +141,7 @@ func obfuscateConfig() {
 			}
 		}
 		if check.Fail != nil {
-			for x, _ := range check.Fail {
+			for x := range check.Fail {
 				obfuscateData(&mc.Config.Check[i].Fail[x].Type)
 				obfuscateData(&mc.Config.Check[i].Fail[x].Arg1)
 				obfuscateData(&mc.Config.Check[i].Fail[x].Arg2)

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-    "strings"
+	"strings"
 )
 
 func LaunchIDPrompt() {
@@ -16,7 +16,7 @@ func LaunchIDPrompt() {
 		echo $teamid
 	`)
 
-    strippedTeamID := strings.Replace(teamID, " ", "", -1)
+	strippedTeamID := strings.Replace(teamID, " ", "", -1)
 
 	if err == nil {
 		writeFile(mc.DirPath+"TeamID.txt", strippedTeamID)

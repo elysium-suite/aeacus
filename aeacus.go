@@ -8,8 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/urfave/cli/v2"
 	"github.com/elysium-suite/aeacus/cmd"
+	"github.com/urfave/cli/v2"
 )
 
 //////////////////////////////////////////////////////////////////

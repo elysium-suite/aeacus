@@ -130,11 +130,11 @@ func serviceUp(serviceName string) (bool, error) {
 }
 
 func userExists(userName string) (bool, error) {
-	return fileContains("/etc/passwd", userName + ":x:")
+	return fileContains("/etc/passwd", userName+":x:")
 }
 
 func userInGroup(userName, groupName string) (bool, error) {
-	return commandContains("groups " + userName, groupName)
+	return commandContains("groups "+userName, groupName)
 }
 
 func firewallUp() (bool, error) {
@@ -167,7 +167,7 @@ func autoCheckUpdatesEnabled() (bool, error) {
 }
 
 func permissionIs(filePath, permissionToCheck string) (bool, error) {
-	return commandOutput(`stat -c '%a' ` + filePath, permissionToCheck)
+	return commandOutput(`stat -c '%a' `+filePath, permissionToCheck)
 }
 
 func firefoxSetting(param, value string) (bool, error) {

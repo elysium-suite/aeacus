@@ -12,4 +12,5 @@ require (
 	github.com/urfave/cli/v2 v2.2.0
 	golang.org/x/sys v0.0.0-20200622182413-4b0db7f3f76b
 	golang.org/x/text v0.3.3
+	mvdan.cc/gofumpt v0.0.0-20200802201014-ab5a8192947d // indirect
 )

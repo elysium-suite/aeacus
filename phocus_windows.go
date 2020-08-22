@@ -4,10 +4,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"sync"
-	"fmt"
 	"time"
 
 	"github.com/elysium-suite/aeacus/cmd"
