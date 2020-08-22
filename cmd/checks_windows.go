@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"encoding/binary"
@@ -189,18 +189,6 @@ func command(commandGiven string) (bool, error) {
 		}
 	}
 	return true, nil
-}
-
-func commandOutput(commandGiven, desiredOutput string) (bool, error) {
-	out, err := rawCmd(commandGiven).Output()
-	if err != nil {
-		return false, err
-	}
-	outString := strings.TrimSpace(string(out))
-	if outString == desiredOutput {
-		return true, nil
-	}
-	return false, nil
 }
 
 func packageInstalled(packageName string) (bool, error) {

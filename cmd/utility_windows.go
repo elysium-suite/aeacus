@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"bytes"
@@ -129,9 +129,9 @@ func playAudio(wavPath string) {
 	shellCommand(commandText)
 }
 
-// createFQs is a quality of life function that creates Forensic Question files
+// CreateFQs is a quality of life function that creates Forensic Question files
 // on the Desktop, pre-populated with a template.
-func createFQs(numFqs int) {
+func CreateFQs(numFqs int) {
 	for i := 1; i <= numFqs; i++ {
 		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
 		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)

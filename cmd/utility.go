@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"io/ioutil"
@@ -11,22 +11,38 @@ import (
 )
 
 const (
-	aeacusVersion = "1.5.0"
-	scoringConf   = "scoring.conf"
-	scoringData   = "scoring.dat"
-	linuxDir      = "/opt/aeacus/"
-	windowsDir    = "C:\\aeacus\\"
+	AeacusVersion = "1.5.0"
+	ScoringConf   = "scoring.conf"
+	ScoringData   = "scoring.dat"
+	LinuxDir      = "/opt/aeacus/"
+	WindowsDir    = "C:\\aeacus\\"
 )
 
 var (
+	YesEnabled            = false
 	verboseEnabled        = false
 	debugEnabled          = false
-	yesEnabled            = false
 	mc                    = &metaConfig{}
 	timeStart             = time.Now()
 	timeWithoutId, _      = time.ParseDuration("0s")
 	withoutIdThreshold, _ = time.ParseDuration("30m")
 )
+
+// timeCheck calls destroyImage if the configured EndDate for the image has
+// passed. Its purpose is to dissuade or prevent people using an image after
+// the round ends.
+func timeCheck() {
+	if mc.Config.EndDate != "" {
+		endDate, err := time.Parse("2006/01/02 15:04:05 MST", mc.Config.EndDate)
+		if err != nil {
+			failPrint("Your EndDate value in the configuration is invalid.")
+		} else {
+			if time.Now().After(endDate) {
+				destroyImage()
+			}
+		}
+	}
+}
 
 // writeFile wraps ioutil's WriteFile function, and prints
 // the error the screen if one occurs.

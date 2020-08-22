@@ -14,7 +14,7 @@ EOF
 
 # Force script to be run as root
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run this script as root!"
+  echo "Please run this script as root! It's very short-- please feel free to audit its source code."
   exit 1
 fi
 
@@ -32,43 +32,18 @@ source /etc/profile
 echo "[+] Installing git..."
 apt install -y git
 
-# Install BleachBit (to clear cache and history)
-echo "[+] Installing BleachBit..."
-apt install -y bleachbit
-
-# Grab dependencies
-echo "[+] Getting general dependencies..."
-go get "github.com/urfave/cli"
-go get "github.com/BurntSushi/toml/cmd/tomlv"
-go get "github.com/fatih/color"
-go get "github.com/gorilla/websocket"
-
 # Add convenient aliases for building
-if ! grep -q "aeacus-build" /etc/bash.bashrc; then
-  echo "[+] Adding aliases..."
+if ! grep -q "aeacus-build" /etc/profile; then
+    echo "[+] Adding aliases..."
 
-  # aeacus-build-linux --> build aeacus and phocus
-  echo "alias aeacus-build-linux=\"go build -o ./aeacus ./src; go build -tags phocus -o ./phocus ./src\"" >>/etc/bash.bashrc
+    # aeacus-build-linux --> build aeacus and phocus, stripped
+    echo "alias aeacus-build-linux=\"go build -ldflags '-s -w '; go build -ldflags '-w -s' -tags phocus -o  ./phocus\"" >> /etc/profile
 
-  # aeacus-build-linux-production --> build aeacus and phocus, stripped
-  echo "alias aeacus-build-linux-production=\"go build -ldflags '-s -w ' -o ./aeacus ./src; go build -ldflags '-w -s' -tags phocus -o  ./phocus ./src\"" >>/etc/bash.bashrc
-
-  # aeacus-build-windows --> build aeacus and phocus (for windows)
-  echo "alias aeacus-build-windows=\"GOOS=windows go build -o ./aeacus.exe ./src; GOOS=windows go build -tags phocus -o ./phocus.exe ./src\"" >>/etc/bash.bashrc
-
-  # aeacus-build-windows-production --> build aeacus and phocus, stripped
-  echo "alias aeacus-build-windows-production=\"GOOS=windows go build -ldflags '-s -w ' -o ./aeacus.exe ./src; GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe ./src\"" >>/etc/bash.bashrc
+    # aeacus-build-windows --> build aeacus and phocus, stripped
+    echo "alias aeacus-build-windows=\"GOOS=windows go build -ldflags '-s -w '; GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe\"" >> /etc/profile
 fi
 
 # Windows dependencies (will cause errors on Linux systems due to build constraints)
-echo "[+] Getting Windows-specific dependencies..."
-go get "github.com/iamacarpet/go-win64api"
-go get "github.com/go-ole/go-ole"
-go get "golang.org/x/sys/windows"
-go get "github.com/gen2brain/beeep"
-go get "github.com/go-toast/toast"
-go get "github.com/tadvi/systray"
-go get "golang.org/x/text/unicode"
-go get "github.com/judwhite/go-svc/svc"
 
-source /etc/bash.bashrc
+echo "[+] Make sure to start a new session or source /etc/profile!"
+echo "[+] Done!"

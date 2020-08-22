@@ -5,6 +5,8 @@ package main
 import (
 	"log"
 	"os"
+
+	"github.com/elysium-suite/aeacus/cmd"
 )
 
 func main() {
@@ -15,7 +17,7 @@ func main() {
 		os.Exit(1)
 	}
 	*/
-	app := genPhocusApp()
+	app := cmd.GenPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)

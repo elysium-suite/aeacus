@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -56,7 +56,9 @@ func genReport(img imageData) {
 
 	// for each point:
 	for _, point := range img.Points {
+		deobfuscateData(&point.Message)
 		htmlFile.WriteString(fmt.Sprintf("%s - %d pts<br>", point.Message, point.Points))
+		obfuscateData(&point.Message)
 	}
 
 	htmlFile.WriteString(footer)
@@ -65,7 +67,7 @@ func genReport(img imageData) {
 	writeFile(mc.DirPath+"assets/ScoringReport.html", htmlFile.String())
 }
 
-func genReadMe() {
+func GenReadMe() {
 	header := `
 <!DOCTYPE html>
 <html>

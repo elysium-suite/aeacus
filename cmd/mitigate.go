@@ -1,5 +1,5 @@
-package main
+package cmd
 
-func mitigateVulns() {
+func MitigateVulns() {
 	warnPrint("This doesn't do anything yet! Sorry.")
 }

@@ -1,10 +1,10 @@
-package main
+package cmd
 
 import (
     "strings"
 )
 
-func launchIDPrompt() {
+func LaunchIDPrompt() {
 	teamID, err := shellCommandOutput(`
 		#!/bin/bash
 		teamid=$(
@@ -26,7 +26,7 @@ func launchIDPrompt() {
 	}
 }
 
-func launchConfigGui() {
+func LaunchConfigGui() {
 	warnPrint("The script doesn't currently have the ability to add multiple check or fail conditions-- you must still do these manually.")
 	_, err := shellCommandOutput("bash ./misc/gui_linux.sh")
 	if err == nil {

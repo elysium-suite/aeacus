@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -46,7 +46,6 @@ func scoreImage() {
 		}
 		genReport(mc.Image)
 	}
-	clearLog()
 
 	// Check if points increased/decreased
 	prevPoints, err := readFile(mc.DirPath + "previous.txt")
@@ -104,6 +103,10 @@ func scoreChecks() {
 // whether or not the check passes. It does this concurrently.
 func scoreCheck(index int, check check) {
 	status := true
+	emptyMessage := true
+	if check.Message == "" {
+		emptyMessage = false
+	}
 
 	// If a fail condition passes, the check fails, no other checks required.
 	if len(check.Fail) > 0 {
@@ -123,13 +126,24 @@ func scoreCheck(index int, check check) {
 		status = checkPass(&check)
 	}
 
+	if !emptyMessage {
+		obfuscateData(&check.Message)
+	}
 	if status {
 		if check.Points >= 0 {
-			passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
+			if verboseEnabled {
+				deobfuscateData(&check.Message)
+				passPrint(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
+				obfuscateData(&check.Message)
+			}
 			mc.Image.Points = append(mc.Image.Points, scoreItem{check.Message, check.Points})
 			mc.Image.Contribs += check.Points
 		} else {
-			failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
+			if verboseEnabled {
+				deobfuscateData(&check.Message)
+				failPrint(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
+				obfuscateData(&check.Message)
+			}
 			mc.Image.Penalties = append(mc.Image.Penalties, scoreItem{check.Message, check.Points})
 			mc.Image.Detracts += check.Points
 		}
@@ -140,7 +154,6 @@ func scoreCheck(index int, check check) {
 func checkFails(check *check) bool {
 	for _, condition := range check.Fail {
 		failStatus := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		debugPrint(fmt.Sprint("Result of fail check was ", failStatus))
 		if failStatus {
 			return true
 		}
@@ -151,7 +164,6 @@ func checkFails(check *check) bool {
 func checkPassOverrides(check *check) bool {
 	for _, condition := range check.PassOverride {
 		status := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
-		debugPrint(fmt.Sprint("Result of pass override was ", status))
 		if status {
 			return true
 		}
@@ -162,10 +174,9 @@ func checkPassOverrides(check *check) bool {
 func checkPass(check *check) bool {
 	status := true
 	passStatus := []bool{}
-	for i, condition := range check.Pass {
+	for _, condition := range check.Pass {
 		passItemStatus := processCheckWrapper(check, condition.Type, condition.Arg1, condition.Arg2, condition.Arg3)
 		passStatus = append(passStatus, passItemStatus)
-		debugPrint(fmt.Sprint("Result of component pass check was ", passStatus[i]))
 	}
 
 	// For multiple pass conditions, will only be true if ALL of them are
@@ -175,7 +186,6 @@ func checkPass(check *check) bool {
 			break
 		}
 	}
-	debugPrint(fmt.Sprint("Result of all pass check was ", status))
 	return status
 }
 

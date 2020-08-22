@@ -1,17 +1,16 @@
-package main
+package cmd
 
 import (
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
+	"bytes"
 	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fatih/color"
 )
-
-var internalLog = []string{}
 
 // parseConfig takes the config content as a string and attempts to parse it
 // into the mc.Config struct based on the TOML spec.
@@ -21,7 +20,7 @@ func parseConfig(configContent string) {
 	}
 
 	if _, err := toml.Decode(configContent, &mc.Config); err != nil {
-		failPrint("Error decoding TOML: " + err.Error())
+		failPrint("error decoding TOML: " + err.Error())
 		os.Exit(1)
 	}
 
@@ -31,36 +30,43 @@ func parseConfig(configContent string) {
 	}
 }
 
-// writeConfig reads the plaintext configuration from sourceFile, and writes
+// WriteConfig reads the plaintext configuration from sourceFile, and writes
 // the encrypted configuration into the destFile name passed.
-func writeConfig(sourceFile, destFile string) {
-	if verboseEnabled {
-		infoPrint("Reading configuration from " + mc.DirPath + sourceFile + "...")
-	}
+func WriteConfig(sourceFile, destFile string) {
+	infoPrint("Reading configuration from " + mc.DirPath + sourceFile + "...")
 
 	configFile, err := readFile(mc.DirPath + sourceFile)
 	if err != nil {
 		failPrint("Can't open scoring configuration file (" + sourceFile + "): " + err.Error())
 		os.Exit(1)
 	}
-	encryptedConfig, err := encryptConfig(configFile)
+	parseConfig(configFile)
+	configFile = ""
+
+	obfuscateConfig()
+	buf := new(bytes.Buffer)
+	if err := toml.NewEncoder(buf).Encode(mc.Config); err != nil {
+	    failPrint(err.Error())
+		os.Exit(1)
+		return
+	}
+
+	encryptedConfig, err := encryptConfig(buf.String())
 	if err != nil {
 		failPrint("Encrypting config failed: " + err.Error())
 		os.Exit(1)
 	} else if verboseEnabled {
 		infoPrint("Writing data to " + mc.DirPath + "...")
 	}
+
 	writeFile(mc.DirPath+destFile, encryptedConfig)
 }
 
 // readData is a wrapper around decryptData, taking the scoring data fileName,
 // and reading its content. It returns the decrypt config.
 func readData(fileName string) (string, error) {
-	if verboseEnabled {
-		infoPrint("Decrypting data from " + mc.DirPath + fileName + "...")
-	}
-	// Read in the encrypted configuration file.
-	dataFile, err := readFile(mc.DirPath + scoringData)
+	// Read in the encrypted configuration filei
+	dataFile, err := readFile(mc.DirPath + ScoringData)
 	if err != nil {
 		return "", err
 	} else if dataFile == "" {
@@ -76,7 +82,7 @@ func readData(fileName string) (string, error) {
 // printConfig offers a printed representation of the config, as parsed
 // by readData and parseConfig.
 func printConfig() {
-	passPrint("Configuration " + mc.DirPath + scoringConf + " check passed!")
+	passPrint("Configuration " + mc.DirPath + ScoringConf + " check passed!")
 	fmt.Println("Title:", mc.Config.Title)
 	fmt.Println("Name:", mc.Config.Name)
 	fmt.Println("OS:", mc.Config.OS)
@@ -111,9 +117,44 @@ func printConfig() {
 	}
 }
 
+func obfuscateConfig() {
+	infoPrint("Obfuscating configuraiton...")
+	obfuscateData(&mc.Config.Password)
+	for i, check := range mc.Config.Check {
+		obfuscateData(&mc.Config.Check[i].Message)
+		if check.Pass != nil {
+			for x, _ := range check.Pass {
+				obfuscateData(&mc.Config.Check[i].Pass[x].Type)
+				obfuscateData(&mc.Config.Check[i].Pass[x].Arg1)
+				obfuscateData(&mc.Config.Check[i].Pass[x].Arg2)
+				obfuscateData(&mc.Config.Check[i].Pass[x].Arg3)
+				obfuscateData(&mc.Config.Check[i].Pass[x].Arg4)
+			}
+		}
+		if check.PassOverride != nil {
+			for x, _ := range check.Pass {
+				obfuscateData(&mc.Config.Check[i].PassOverride[x].Type)
+				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg1)
+				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg2)
+				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg3)
+				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg4)
+			}
+		}
+		if check.Fail != nil {
+			for x, _ := range check.Fail {
+				obfuscateData(&mc.Config.Check[i].Fail[x].Type)
+				obfuscateData(&mc.Config.Check[i].Fail[x].Arg1)
+				obfuscateData(&mc.Config.Check[i].Fail[x].Arg2)
+				obfuscateData(&mc.Config.Check[i].Fail[x].Arg3)
+				obfuscateData(&mc.Config.Check[i].Fail[x].Arg4)
+			}
+		}
+	}
+}
+
 // confirmPrint will prompt the user with the given toPrint string, and
 // exit the program if N or n is input.
-func confirmPrint(toPrint string) {
+func ConfirmPrint(toPrint string) {
 	printer(color.FgYellow, "CONF", "")
 	fmt.Print(toPrint + " [Y/n]: ")
 	var resp string
@@ -121,14 +162,6 @@ func confirmPrint(toPrint string) {
 	if strings.ToLower(strings.TrimSpace(resp)) == "n" {
 		os.Exit(1)
 	}
-}
-
-func clearLog() {
-	internalLog = []string{}
-}
-
-func addLog(inputStr string) {
-	internalLog = append(internalLog, encryptString(mc.Config.Password, inputStr))
 }
 
 func passPrint(toPrint string) {
@@ -146,16 +179,16 @@ func warnPrint(toPrint string) {
 	fmt.Printf(printer(color.FgYellow, "WARN", toPrint))
 }
 
-func infoPrint(toPrint string) {
-	printStr := printer(color.FgCyan, "INFO", toPrint)
-	if verboseEnabled {
+func debugPrint(toPrint string) {
+	printStr := printer(color.FgMagenta, "DEBUG", toPrint)
+	if debugEnabled {
 		fmt.Printf(printStr)
 	}
 }
 
-func debugPrint(toPrint string) {
-	printStr := printer(color.FgMagenta, "DEBUG", toPrint)
-	if debugEnabled {
+func infoPrint(toPrint string) {
+	printStr := printer(color.FgCyan, "INFO", toPrint)
+	if verboseEnabled {
 		fmt.Printf(printStr)
 	}
 }
@@ -168,7 +201,6 @@ func printer(colorChosen color.Attribute, messageType, toPrint string) string {
 	if toPrint != "" {
 		printStr += fmt.Sprintf("\n")
 	}
-	addLog(fmt.Sprintf("[%s] %s\n", messageType, toPrint))
 	return printStr
 }
 
@@ -182,4 +214,12 @@ func xor(key, plaintext string) string {
 
 func hexEncode(inputString string) string {
 	return hex.EncodeToString([]byte(inputString))
+}
+
+func hexDecode(inputString string) (string, error) {
+	result, err := hex.DecodeString(inputString)
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
 }

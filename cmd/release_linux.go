@@ -1,8 +1,8 @@
-package main
+package cmd
 
-// writeDesktopFiles creates TeamID.txt and its shortcut, as well as links
+// WriteDesktopFiles creates TeamID.txt and its shortcut, as well as links
 // to the ScoringReport, ReadMe, and other needed files.
-func writeDesktopFiles() {
+func WriteDesktopFiles() {
 	infoPrint("Creating or emptying TeamID.txt...")
 	shellCommand("echo 'YOUR-TEAMID-HERE' > " + mc.DirPath + "TeamID.txt")
 	shellCommand("chmod 666 " + mc.DirPath + "TeamID.txt")
@@ -13,10 +13,10 @@ func writeDesktopFiles() {
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
 }
 
-// configureAutologin configures the auto-login capability for LightDM and
+// ConfigureAutologin configures the auto-login capability for LightDM and
 // GDM3, so that the image automatically logs in to the main user's account
 // on boot.
-func configureAutologin() {
+func ConfigureAutologin() {
 	lightdm, _ := pathExists("/usr/share/lightdm")
 	gdm, _ := pathExists("/etc/gdm3/")
 	if lightdm {
@@ -30,12 +30,12 @@ func configureAutologin() {
 	}
 }
 
-func installFont() {
+func InstallFont() {
 	infoPrint("Skipping font install for Linux...")
 }
 
-// installService for Linux installs and starts the CSSClient init.d service.
-func installService() {
+// InstallService for Linux installs and starts the CSSClient init.d service.
+func InstallService() {
 	infoPrint("Installing service...")
 	shellCommand("cp " + mc.DirPath + "misc/CSSClient /etc/init.d/")
 	shellCommand("chmod +x /etc/init.d/CSSClient")
@@ -46,7 +46,11 @@ func installService() {
 // cleanUp for Linux is primarily focused on removing cached files, history,
 // and other pieces of forensic evidence. It also removes the non-required
 // files in the aeacus directory.
-func cleanUp() {
+func CleanUp() {
+
+	infoPrint("Installing BleachBit...")
+	shellCommand("apt install -y bleachbit")
+
 	findPaths := "/bin /etc /home /opt /root /sbin /srv /usr /mnt /var"
 
 	infoPrint("Changing perms to 755 in " + mc.DirPath + "...")

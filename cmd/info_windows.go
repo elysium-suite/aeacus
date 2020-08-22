@@ -1,11 +1,11 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"os"
 )
 
-func getInfo(infoType string) {
+func GetInfo(infoType string) {
 	switch infoType {
 	case "packages":
 		packageList, _ := getPackages()

@@ -2,7 +2,7 @@
 // If a checkType does not match one specified, it is handed off to
 // processCheck for the OS-specific checks.
 
-package main
+package cmd
 
 import (
 	"crypto/sha1"
@@ -17,7 +17,10 @@ import (
 // processCheckWrapper takes the data from a check in the config
 // and runs the correct function with the correct parameters
 func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool {
-	debugPrint("Handling check: " + checkType + " Arg1: " + arg1 + " Arg2: " + arg2 + " Arg3: " + arg3)
+	deobfuscateData(&checkType)
+	deobfuscateData(&arg1)
+	deobfuscateData(&arg2)
+	deobfuscateData(&arg3)
 	switch checkType {
 	case "Command":
 		if check.Message == "" {
@@ -42,6 +45,18 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 			check.Message = "Command \"" + arg1 + "\" did not have the output \"" + arg2 + "\""
 		}
 		result, err := commandOutput(arg1, arg2)
+		return err == nil && !result
+	case "CommandContains":
+		if check.Message == "" {
+			check.Message = "Command \"" + arg1 + "\" contained output \"" + arg2 + "\""
+		}
+		result, err := commandContains(arg1, arg2)
+		return err == nil && result
+	case "CommandContainsNot":
+		if check.Message == "" {
+			check.Message = "Command \"" + arg1 + "\" output did not contain \"" + arg2 + "\""
+		}
+		result, err := commandContains(arg1, arg2)
 		return err == nil && !result
 	case "FileExists":
 		if check.Message == "" {
@@ -166,6 +181,30 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 	default:
 		return processCheck(check, checkType, arg1, arg2, arg3)
 	}
+}
+
+func commandOutput(commandGiven, desiredOutput string) (bool, error) {
+	out, err := rawCmd(commandGiven).Output()
+	if err != nil {
+		return false, err
+	}
+	outString := strings.TrimSpace(string(out))
+	if outString == desiredOutput {
+		return true, nil
+	}
+	return false, nil
+}
+
+func commandContains(commandGiven, desiredContains string) (bool, error) {
+	out, err := rawCmd(commandGiven).Output()
+	if err != nil {
+		return false, err
+	}
+	outString := strings.TrimSpace(string(out))
+	if strings.Contains(outString, desiredContains) {
+		return true, nil
+	}
+	return false, nil
 }
 
 // pathExists is a wrapper around os.Stat and os.IsNotExist, and determines

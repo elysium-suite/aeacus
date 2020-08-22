@@ -1,6 +1,6 @@
-package main
+package cmd
 
-func writeDesktopFiles() {
+func WriteDesktopFiles() {
 	firefoxBinary := `C:\Program Files (x86)\Mozilla Firefox\firefox.exe`
 	infoPrint("Writing ScoringReport.html shortcut to Desktop...")
 	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\assets\ScoringReport.html"; $Shortcut.Save()`
@@ -25,7 +25,7 @@ func writeDesktopFiles() {
 	// domain compatibility? doubt
 }
 
-func configureAutologin() {
+func ConfigureAutologin() {
 	infoPrint("Setting Up autologin for " + mc.Config.User + "...")
 	powershellAutoLogin := `
 	function Test-RegistryValue {
@@ -71,7 +71,7 @@ func configureAutologin() {
 	shellCommand(powershellAutoLogin)
 }
 
-func installFont() {
+func InstallFont() {
 	infoPrint("Installing Raleway font for Winform...")
 	powershellFontInstall := `
 	$SourceDir   = "C:\aeacus\assets\Raleway"
@@ -103,7 +103,7 @@ func installFont() {
 	shellCommand(powershellFontInstall)
 }
 
-func installService() {
+func InstallService() {
 	infoPrint("Installing service with sc.exe...")
 	cmdString := `sc.exe create CSSClient binPath= "C:\aeacus\phocus.exe" start= "auto" DisplayName= "CSSClient"`
 	shellCommand(cmdString)
@@ -120,7 +120,7 @@ func installService() {
 	shellCommand(taskCreate)
 }
 
-func cleanUp() {
+func CleanUp() {
 	infoPrint("Removing scoring.conf and ReadMe.conf...")
 	shellCommand("Remove-Item -Force C:\\aeacus\\scoring.conf")
 	shellCommand("Remove-Item -Force C:\\aeacus\\ReadMe.conf")
@@ -131,14 +131,14 @@ func cleanUp() {
 	infoPrint("Clearing recently used...")
 	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
 	infoPrint("Clearing run.exe command history...")
-	clearRunScript := `$path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" 
-	$arr = (Get-Item -Path $path).Property 
-	foreach($item in $arr) 
-	{ 
-	   if($item -ne "MRUList") 
-	   { 
-		 Remove-ItemProperty -Path $path -Name $item -ErrorAction SilentlyContinue 
-	   } 
+	clearRunScript := `$path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU"
+	$arr = (Get-Item -Path $path).Property
+	foreach($item in $arr)
+	{
+	   if($item -ne "MRUList")
+	   {
+		 Remove-ItemProperty -Path $path -Name $item -ErrorAction SilentlyContinue
+	   }
 	}`
 	shellCommand(clearRunScript)
 	infoPrint("Removing Command History for Powershell")

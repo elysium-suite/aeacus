@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"crypto/aes"
@@ -71,11 +71,6 @@ func genUpdate() string {
 	writeString(&update, "challenge", genChallenge())
 	writeString(&update, "vulns", genVulns())
 	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
-	var debugLog string
-	for _, logItem := range internalLog {
-		debugLog += logItem + debugDelimiter
-	}
-	writeString(&update, "debug", debugLog)
 	infoPrint("Encrypting score update...")
 	return hexEncode(encryptString(mc.Config.Password, update.String()))
 }

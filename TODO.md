@@ -13,12 +13,26 @@
 
 - security
 
+  - rsa pub/privkey infra for encrypting scoring config !!! (thanks alvin)
   - disable net/http using HTTP_PROXY environmental variable
+  - obfuscate nonencrypted config args to obfuscate types of call
+    - right now they're empty
+  - add fake reg/file retrives to obfuscate real calls on windwos
+  - add fake file retrieves/read to obfuscate calls on linux
+  - anti-tracing and anti-debugging
+    - delete system if tracing detected
+    - use syscall PTRACEME and see if it errors out (or similar)
+    - check if any ebpf blobs are loaded into kernel
+    - refuse to run if not signed (? how to implement)
+
+- QoL
+    - spellcheck/typo alert in config
+    - if arg number is wrong, alert them (ex. no arg2 when its required)
 
 - checks to implement
 
   - windows startup programs
-  - windows and linux updates and auto-updating status (apt only for linux)
+  - windows and linux updates
   - windows (Make less janky)
   - windows service-specific hardening and checks
   - windows DEP

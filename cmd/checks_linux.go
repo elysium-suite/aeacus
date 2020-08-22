@@ -1,8 +1,7 @@
-package main
+package cmd
 
 import (
 	"os/exec"
-	"strings"
 )
 
 // processCheck (Linux) will process Linux-specific checks
@@ -105,40 +104,41 @@ func command(commandGiven string) (bool, error) {
 		if _, ok := err.(*exec.ExitError); ok {
 			return false, nil
 		}
+		return false, err
 	}
 	return true, nil
 }
 
-func commandOutput(commandGiven, desiredOutput string) (bool, error) {
-	out, err := rawCmd(commandGiven).Output()
-	if err != nil {
+func commandInterface(progName string, c ...string) (bool, error) {
+	cmd := exec.Command(progName, c...)
+	if err := cmd.Run(); err != nil {
+		if _, ok := err.(*exec.ExitError); ok {
+			return false, nil
+		}
 		return false, err
 	}
-	outString := strings.TrimSpace(string(out))
-	if outString == desiredOutput {
-		return true, nil
-	}
-	return false, nil
+	return true, nil
 }
 
 func packageInstalled(packageName string) (bool, error) {
-	return command("dpkg -s " + packageName)
+	return commandInterface("/usr/bin/dpkg", "-s", packageName)
 }
 
 func serviceUp(serviceName string) (bool, error) {
-	return command("systemctl is-active " + serviceName)
+	// TODO: detect and use other init systems
+	return commandInterface("/usr/bin/systemctl", "is-active", serviceName)
 }
 
 func userExists(userName string) (bool, error) {
-	return command("id -u " + userName)
+	return fileContains("/etc/passwd", userName + ":x:")
 }
 
 func userInGroup(userName, groupName string) (bool, error) {
-	return command("groups " + userName + " | grep -q " + groupName + "")
+	return commandContains("groups " + userName, groupName)
 }
 
 func firewallUp() (bool, error) {
-	return command("ufw status | grep -q 'Status: active'")
+	return commandOutput("ufw status", "Status: active")
 }
 
 func passwordChanged(user, hash string) (bool, error) {
@@ -159,7 +159,7 @@ func packageVersion(packageName, versionNumber string) (bool, error) {
 }
 
 func kernelVersion(version string) (bool, error) {
-	return command("uname -r | grep -q " + version)
+	return commandContains("uname -r", version)
 }
 
 func autoCheckUpdatesEnabled() (bool, error) {
@@ -167,7 +167,7 @@ func autoCheckUpdatesEnabled() (bool, error) {
 }
 
 func permissionIs(filePath, permissionToCheck string) (bool, error) {
-	return command(`stat -c '%a' ` + filePath + ` | grep -q ` + permissionToCheck)
+	return commandOutput(`stat -c '%a' ` + filePath, permissionToCheck)
 }
 
 func firefoxSetting(param, value string) (bool, error) {

@@ -7,13 +7,15 @@ import (
 	"log"
 	"os"
 	"sync"
+	"fmt"
 	"time"
 
+	"github.com/elysium-suite/aeacus/cmd"
 	"github.com/judwhite/go-svc/svc"
 )
 
 func phocusStart(quit chan struct{}) {
-	app := genPhocusApp()
+	app := cmd.GenPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
@@ -43,7 +45,7 @@ func main() {
 // the production binary outside of the Windows service.
 func (p *program) Init(env svc.Environment) error {
 	if !env.IsWindowsService() && !*idgui {
-		failPrint("Sorry! Don't run this binary yourself. It's probably already running as a Windows service (CSSClient).")
+		fmt.Println("Sorry! Don't run this binary yourself. It's probably already running as a Windows service (CSSClient).")
 		time.Sleep(5 * time.Second)
 		os.Exit(1)
 	}
@@ -75,6 +77,6 @@ func (p *program) Stop() error {
 }
 
 func launchIDPromptWrapper(quit chan struct{}) {
-	launchIDPrompt()
+	cmd.LaunchIDPrompt()
 	os.Exit(0) // This is temporary solution
 }

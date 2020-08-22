@@ -12,7 +12,7 @@
 // At the very least, edit some strings. Add some ciphers and operations if
 // you're feeling spicy.
 
-package main
+package cmd
 
 import (
 	"bytes"
@@ -28,11 +28,14 @@ const (
 	randomHashTwo = "NowThatsWhatICallARandomString"
 )
 
+var (
+	byteKey    = []byte{0x53, 0xf7, 0xb1, 0xcd, 0x26, 0x7a, 0x6f, 0x9a, 0xa5, 0x61, 0xb0, 0x97, 0x21}
+)
+
 // encryptConfig takes the plainText config and returns an encrypted string
 // that should be written to the encrypted scoring data file.
 func encryptConfig(plainText string) (string, error) {
-	infoPrint("Encrypting configuration...")
-
+	debugPrint("Encrypting data...")
 	// Generate key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
 
@@ -43,7 +46,6 @@ func encryptConfig(plainText string) (string, error) {
 	// Write zlib compressed data into encryptedFile
 	_, err := writer.Write([]byte(plainText))
 	if err != nil {
-		debugPrint("Unable to zlib compress scoring data: " + err.Error())
 		return "", err
 	}
 	writer.Close()
@@ -54,6 +56,7 @@ func encryptConfig(plainText string) (string, error) {
 
 // decryptConfig is used to decrypt the scoring data file.
 func decryptConfig(cipherText string) (string, error) {
+	debugPrint("Decrypting data...")
 	// Create our key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
 
@@ -63,8 +66,7 @@ func decryptConfig(cipherText string) (string, error) {
 	// Create the zlib reader.
 	reader, err := zlib.NewReader(bytes.NewReader([]byte(cipherText)))
 	if err != nil {
-		debugPrint("Error creating archive reader for scoring data.")
-		return "", errors.New("Error creating zLib reader")
+		return "", errors.New("error creating zlib reader")
 	}
 	defer reader.Close()
 
@@ -72,16 +74,55 @@ func decryptConfig(cipherText string) (string, error) {
 	dataBuffer := bytes.NewBuffer(nil)
 	_, err = io.Copy(dataBuffer, reader)
 	if err != nil {
-		failPrint("Error decompressing scoring data.")
-		return "", errors.New("Error decompressing zlib data.")
+		failPrint("error decompressing scoring data")
+		return "", errors.New("error decompressing zlib data")
 	}
 
 	// Check that decryptedConfig is not empty.
 	decryptedConfig := string(dataBuffer.Bytes())
 	if decryptedConfig == "" {
-		debugPrint("Scoring data is empty!")
-		return "", errors.New("Decrypted config is empty!")
+		return "", errors.New("decrypted config is empty")
 	}
 
 	return decryptedConfig, err
+}
+
+// tossKey is responsible for changing up the byteKey.
+func tossKey() []byte {
+	// Add your cool byte array manipulations here!
+	return byteKey
+}
+
+// obfuscateData encodes the configuration when writing to ScoringData.
+// This also makes manipulation of data in use harder, since there is
+// a very small opportunity for catching plaintext data, and very tough
+// to decode the decrypted ScoringData without source code.
+func obfuscateData(datum *string) {
+	var err error
+	if *datum == "" {
+		return
+	}
+	if *datum, err = encryptConfig(*datum); err == nil {
+		*datum = hexEncode(xor(string(tossKey()), *datum))
+	} else {
+		failPrint("crypto: failed to obufscate datum: " + err.Error())
+	}
+}
+
+// deobfuscateData decodes configuration data.
+func deobfuscateData(datum *string) {
+	var err error
+	if *datum == "" {
+		return
+	}
+	*datum, err = hexDecode(*datum)
+	if err != nil {
+		println(*datum)
+		failPrint("crypto: failed to deobfuscate datum hex: " + err.Error())
+		return
+	}
+	*datum = xor(string(tossKey()), *datum)
+	if *datum, err = decryptConfig(*datum); err != nil {
+		failPrint("crypto: failed to deobufscate datum: " + err.Error())
+	}
 }

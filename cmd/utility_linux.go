@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"crypto/md5"
@@ -51,7 +51,7 @@ func checkTrace() {
 
 // createFQs is a quality of life function that creates Forensic Question files
 // on the Desktop, pre-populated with a template.
-func createFQs(numFqs int) {
+func CreateFQs(numFqs int) {
 	for i := 1; i <= numFqs; i++ {
 		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
 		shellCommand("echo 'QUESTION:' > /home/" + mc.Config.User + "/Desktop/" + fileName)
@@ -62,7 +62,6 @@ func createFQs(numFqs int) {
 
 // rawCmd returns a exec.Command object for Linux shell commands.
 func rawCmd(commandGiven string) *exec.Cmd {
-	debugPrint("rawCmd input: sh -c " + commandGiven)
 	return exec.Command("/bin/sh", "-c", commandGiven)
 }
 

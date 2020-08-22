@@ -1,19 +1,19 @@
-package main
+package cmd
 
-func launchIDPrompt() {
+func LaunchIDPrompt() {
 	powerShellPrompt := `
     $teamIDContent = Get-Content C:\aeacus\TeamID.txt
     if ($teamIDContent -eq "YOUR-TEAMID-HERE") {
     Add-Type -AssemblyName System.Windows.Forms
     [System.Windows.Forms.Application]::EnableVisualStyles()
-    
+
     $Form                            = New-Object system.Windows.Forms.Form
     $Form.ClientSize                 = New-Object System.Drawing.Point(520,265)
     $Form.text                       = "Aeacus"
     $Form.TopMost                    = $true
     $Form.Icon                       = "C:\aeacus\assets\logo.ico"
     $Form.BackgroundImage            = [system.drawing.image]::FromFile("C:\aeacus\assets\TeamIDbackground.png")
-    
+
     $Label1                          = New-Object system.Windows.Forms.Label
     $Label1.text                     = "Enter Your Unique Team ID"
     $Label1.AutoSize                 = $true
@@ -23,14 +23,14 @@ func launchIDPrompt() {
     $Label1.Font                     = New-Object System.Drawing.Font('Raleway',16,[System.Drawing.FontStyle]([System.Drawing.FontStyle]::Bold))
     $Label1.BackColor                = [System.Drawing.Color]::FromName("Transparent")
     $Label1.ForeColor                = [System.Drawing.ColorTranslator]::FromHtml("#ffffff")
-    
+
     $TextBox1                        = New-Object system.Windows.Forms.TextBox
     $TextBox1.multiline              = $false
     $TextBox1.width                  = 333
     $TextBox1.height                 = 38
     $TextBox1.location               = New-Object System.Drawing.Point(80,109)
     $TextBox1.Font                   = New-Object System.Drawing.Font('Consolas',12)
-    
+
     $Button1                         = New-Object system.Windows.Forms.Button
     $Button1.text                    = "Validate"
     $Button1.width                   = 110
@@ -39,7 +39,7 @@ func launchIDPrompt() {
     $Button1.Font                    = New-Object System.Drawing.Font('Raleway',10)
     $Button1.Image                   = [System.Drawing.Image]::FromFile("C:\aeacus\assets\Buttonbackground.png")
     $Button1.ForeColor               = [System.Drawing.ColorTranslator]::FromHtml("#ffffff")
-    
+
     $Form.controls.AddRange(@($Label1,$TextBox1,$Button1))
     $Button1.Add_Click({ setID })
 
@@ -55,6 +55,6 @@ func launchIDPrompt() {
 	shellCommand(powerShellPrompt)
 }
 
-func launchConfigGui() {
+func LaunchConfigGui() {
 	warnPrint("This feature is not supported yet on Windows.")
 }
