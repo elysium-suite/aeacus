@@ -231,13 +231,13 @@ Once you install `go` (make sure you use a recent version), you can build with t
 
 - Building for `Linux`:
     ```
-    go build -ldflags '-w -s' -o ./aeacus ./src
-    go build -ldflags '-w -s' -tags phocus -o ./phocus ./src
+    go build -ldflags '-w -s' -o ./aeacus .
+    go build -ldflags '-w -s' -tags phocus -o ./phocus .
     ```
 - Building for `Windows`:
     ```
-    GOOS=windows go build -ldflags '-w -s' -o ./aeacus.exe ./src
-    GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe ./src
+    GOOS=windows go build -ldflags '-w -s' -o ./aeacus.exe .
+    GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe .
     ```
 
 For your convenience, we provide these aliases in the install script:
