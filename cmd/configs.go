@@ -140,7 +140,7 @@ func obfuscateConfig() {
 			}
 		}
 		if check.PassOverride != nil {
-			for x := range check.Pass {
+			for x := range check.PassOverride {
 				obfuscateData(&mc.Config.Check[i].PassOverride[x].Type)
 				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg1)
 				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg2)
