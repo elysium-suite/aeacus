@@ -99,5 +99,5 @@ func cleanUp() {
 
 	infoPrint("Clearing firefox cache and browsing history...")	
 	shellCommand("sudo apt-get install bleachbit")
-  shellCommand("bleachbit --clean firefox.url_history; bleachbit --clean firefox.cache")
+  	shellCommand("bleachbit --clean firefox.url_history; bleachbit --clean firefox.cache")
 }
