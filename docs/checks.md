@@ -15,12 +15,20 @@ arg1='grep "pam_history.so" /etc/pam.d/common-password'
 
 > **Note!** Each of these check types can be used for either `Pass` or `Fail` conditions, and there can be multiple conditions per check.
 
-**CommandOutput**: pass if command output matches
+**CommandOutput**: pass if command output matches exactly. if error, never passes
 
 ```
 type='CommandOutput'
 arg1='(Get-NetFirewallProfile -Name Domain).Enabled'
 arg2='True'
+```
+
+**CommandContains**: pass if command output contains string. if error, never passes
+
+```
+type='CommandContains'
+arg1='firewall status'
+arg2='Active'
 ```
 
 **FileExists**: pass if specified file exists
