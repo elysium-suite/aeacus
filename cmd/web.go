@@ -49,7 +49,9 @@ func genReport(img imageData) {
 
 	// for each penalty
 	for _, penalty := range img.Penalties {
+		deobfuscateData(&penalty.Message)
 		htmlFile.WriteString(fmt.Sprintf("%s - %.0f pts<br>", penalty.Message, math.Abs(float64(penalty.Points))))
+		obfuscateData(&penalty.Message)
 	}
 
 	htmlFile.WriteString(fmt.Sprintf(`</span> </p> <h3> %d out of %d scored security issues fixed, for a gain of %d points:</h3><p>`, len(img.Points), img.ScoredVulns, img.Contribs))

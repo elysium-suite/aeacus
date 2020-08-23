@@ -45,7 +45,7 @@ func readTeamID() {
 
 // genChallenge generates a crypto challenge for the CSS endpoint
 func genChallenge() string {
-	// I'm aware this is sus, but right now there's no implemented way to generate a key between aeacus and minos on the fly.
+	// Should actually use this for something
 	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
 	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
 	chalString := hexEncode(xor(randomHash1, randomHash2))
@@ -72,7 +72,10 @@ func genUpdate() string {
 	writeString(&update, "vulns", genVulns())
 	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
 	infoPrint("Encrypting score update...")
-	return hexEncode(encryptString(mc.Config.Password, update.String()))
+	deobfuscateData(&mc.Config.Password)
+	finishedUpdate := hexEncode(encryptString(mc.Config.Password, update.String()))
+	obfuscateData(&mc.Config.Password)
+	return finishedUpdate
 }
 
 func genVulns() string {
@@ -85,18 +88,25 @@ func genVulns() string {
 
 	// Build vuln string
 	for _, penalty := range mc.Image.Penalties {
+		deobfuscateData(&penalty.Message)
 		vulnString.WriteString(fmt.Sprintf("%s - N%.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
+		obfuscateData(&penalty.Message)
 		vulnString.WriteString(delimiter)
 	}
 
 	for _, point := range mc.Image.Points {
+		deobfuscateData(&point.Message)
 		vulnString.WriteString(fmt.Sprintf("%s - %d pts", point.Message, point.Points))
+		obfuscateData(&point.Message)
 		vulnString.WriteString(delimiter)
 	}
 
 	infoPrint("Encrypting vulnerabilities...")
 
-	return hexEncode(encryptString(mc.Config.Password, vulnString.String()))
+	deobfuscateData(&mc.Config.Password)
+	finishedVulns := hexEncode(encryptString(mc.Config.Password, vulnString.String()))
+	obfuscateData(&mc.Config.Password)
+	return finishedVulns
 }
 
 func reportScore() error {
