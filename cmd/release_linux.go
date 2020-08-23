@@ -49,7 +49,7 @@ func InstallService() {
 // files in the aeacus directory.
 func CleanUp() {
 	infoPrint("Installing BleachBit...")
-	shellCommand("apt install -y bleachbit")
+	shellCommand("apt-get install -y bleachbit")
 
 	findPaths := "/bin /etc /home /opt /root /sbin /srv /usr /mnt /var"
 

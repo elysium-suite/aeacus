@@ -19,7 +19,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Update package list
-apt update
+apt-get update
 
 # Install golang
 echo "[+] Installing golang..."
@@ -29,7 +29,7 @@ echo "export PATH=$PATH:/usr/local/go/bin" >>/etc/profile
 
 # Install git (for go get)
 echo "[+] Installing git..."
-apt install -y git
+apt-get install -y git
 
 # Finalize
 echo "[+] Dependencies installed successfully!"
