@@ -22,4 +22,6 @@ jobs:
           go get -v -t -d ./...
 
       - name: Build
-        run: sh misc/actions.sh
+        run: |
+          go get mvdan.cc/garble
+          make

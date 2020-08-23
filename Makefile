@@ -1,13 +1,36 @@
-.DEFAULT_GOAL := linux-secure
+.DEFAULT_GOAL := all
 
-linux:
-	go build -o ./aeacus ./src; go build -tags phocus -o ./phocus ./src
+all:
+	GOOS=windows garble build -ldflags '-s -w' -tags phocus -o ./phocus.exe . && \
+	GOOS=windows garble build -ldflags '-s -w' -o ./aeacus.exe . && \
+	echo "Windows production build successful!" && \
+	GOOS=linux garble build -ldflags '-s -w' -tags phocus -o ./phocus . && \
+	GOOS=linux garble build -ldflags '-s -w' -o ./aeacus . && \
+	echo "Linux production build successful!"
 
-linux-secure:
-	go build -ldflags '-s -w ' -o ./aeacus ./src; go build -ldflags '-w -s' -tags phocus -o  ./phocus ./src
+all-dev:
+	GOOS=windows go build -tags phocus -o ./phocus.exe . && \
+	GOOS=windows go build -o ./aeacus.exe . && \
+	echo "Windows development build successful!" && \
+	GOOS=linux go build -tags phocus -o ./phocus . && \
+	GOOS=linux go build -o ./aeacus . && \
+	echo "Linux development build successful!"
 
-windows:
-	GOOS=windows go build -o ./aeacus.exe ./src; GOOS=windows go build -tags phocus -o ./phocus.exe ./src
+lin:
+	GOOS=linux garble build -ldflags '-s -w' -tags phocus -o ./phocus . && \
+	GOOS=linux garble build -ldflags '-s -w' -o ./aeacus . && \
+	echo "Linux production build successful!"
 
-windows-secure:
-	GOOS=windows go build -ldflags '-s -w ' -o ./aeacus.exe ./src; GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe ./src
+lin-dev:
+	GOOS=linux go build -tags phocus -o ./phocus . && \
+	GOOS=linux go build -o ./aeacus . && \
+	echo "Linux development build successful!"
+
+win:
+	GOOS=windows garble build -ldflags '-s -w' -tags phocus -o ./phocus.exe . && \
+	GOOS=windows garble build -ldflags '-s -w' -o ./aeacus.exe . && \
+	echo "Windows production build successful!"
+
+win-dev:
+	GOOS=windows go build -tags phocus -o ./phocus.exe . && GOOS=windows go build -o ./aeacus.exe . && \
+	echo "Windows development build successful!"
