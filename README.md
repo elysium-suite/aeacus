@@ -1,6 +1,6 @@
-# aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/sourque/aeacus)](https://goreportcard.com/report/github.com/sourque/aeacus) ![build](https://github.com/sourque/aeacus/workflows/Build/badge.svg) ![test](https://github.com/sourque/aeacus/workflows/Test/badge.svg) ![format](https://github.com/sourque/aeacus/workflows/Format/badge.svg)
+# aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/elysium-suite/aeacus)](https://goreportcard.com/report/github.com/elysium-suite/aeacus) ![build](https://github.com/elysium-suite/aeacus/workflows/Build/badge.svg) ![test](https://github.com/elysium-suite/aeacus/workflows/Test/badge.svg) ![format](https://github.com/elysium-suite/aeacus/workflows/Format/badge.svg)
 
-<img align="right" width="200" src="assets/logo.png"/>
+<img align="right" width="200" src="assets/img/logo.png"/>
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 
@@ -8,7 +8,7 @@
 
 0. **Extract the release** into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
 
-   > You should try compiling it yourself! If not, you can [download the releases here](https://github.com/sourque/aeacus/releases).
+   > You should try compiling it yourself! If not, you can [download the releases here](https://github.com/elysium-suite/aeacus/releases).
 
 1. **Set up the environment.**
 
@@ -47,11 +47,11 @@
 
 #### Scoring Report:
 
-![Scoring Report](misc/ScoringReport.png)
+![Scoring Report](./misc/gh/ScoringReport.png)
 
 #### ReadMe:
 
-![ReadMe](misc/ReadMe.png)
+![ReadMe](./misc/gh/ReadMe.png)
 
 ## Features
 
@@ -67,7 +67,7 @@ All checks (with examples and notes) [are documented here](docs/checks.md).
 
 ## Configuration
 
-The configuration is written in TOML. See the below example:
+The configuration is written in TOML. All fields are optional unless otherwise specified. See the below example:
 
 ```
 name = "ubuntu-18-supercool" # Image name
@@ -163,16 +163,6 @@ points = -5 # This check is now a penalty, because it has negative points
 
 ```
 
-## Information Gathering
-
-The `aeacus` binary supports gathering information on Windows in cases where it's tough to gather what the scoring system can see.
-
-Print information with `./aeacus info type` where `type` is one the following:
-
-### Windows
-
-- `packages` (shows installed programs)
-
 ## ReadMe Configuration
 
 Put your README in `ReadMe.conf`. It's pretty self explanatory. Here's a template:
@@ -184,6 +174,7 @@ Uncomplicated Firewall (UFW) is the only company
 approved Firewall for use on Linux machines at this time.
 </p>
 
+<!-- You can add as many <p></p> notes as you want! This HTML is simply imported into the existing ReadMe template. -->
 <p>
 Congratulations! You just recruited a promising new team member. Create a new Standard user account named "bobbington" with a temporary password of your choosing.
 </p>
@@ -215,25 +206,36 @@ niceUser
 </pre>
 ```
 
+## Information Gathering
+
+The `aeacus` binary supports gathering information on Windows in cases where it's tough to gather what the scoring system can see.
+
+Print information with `./aeacus info type` where `type` is one the following:
+
+### Windows
+
+- `packages` (shows installed programs)
+
 ## Remote Endpoint
 
-The authors of this project recommend using [sarpedon](https://github.com/sourque/sarpedon) as the remote scoring endpoint.
+The authors of this project recommend using [sarpedon](https://github.com/elysium-suite/sarpedon) as the remote scoring endpoint.
 
 ## Tips and Tricks
 
-- Easily change the branding by replacing `assets/logo.png`.
+- Easily change the branding by replacing `assets/img/logo.png`.
 - On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities.
 
 ## Compiling
 
-After setting up an environment (sorry, only Linux dev environments supported) with `misc/install.sh`, you can use these janky but handy aliases:
+Once you install `go` (make sure you use a recent version) and `garble` (`GO111MODULE=on go get mvdan.cc/garble`), you can build with these commands:
 
-- `aeacus-build-linux`: builds aeacus and phocus for linux
-- `aeacus-build-linux-production`: stripped version of the above, to make reverse engineering a bit harder
-- `aeacus-build-windows`: builds aeacus and phocus for windows
-- `aeacus-build-windows-production`: stripped version
+- Building for `Linux`: `make lin`
+- Building for `Windows`: `make win`
 
-If you want to do a bit more, you should obfuscate the build to make reverse engineering mode difficult (ex. with [garble](https://github.com/mvdan/garble) or [gobfuscate](https://github.com/unixpickle/gobfuscate)).
+### Development compliation
+
+- Building for `Linux`: `make lin-dev`
+- Building for `Windows`: `make win-dev`
 
 ## Contributing and Disclaimer
 
@@ -241,6 +243,6 @@ A huge thanks to the project contributors for help adding code and features, and
 
 If you have anything you would like to add or fix, please make a pull request! No improvement or fix is too small, and help is always appreciated.
 
-Thanks to the CyberPatriot program for putting together such a cool competition, and for the inspiration to make this project.
+Thanks to UTSA CIAS and the CyberPatriot program for putting together such a cool competition, and for the inspiration to make this project.
 
 This project is in no way affiliated with or endorsed by the Air Force Association, University of Texas San Antonio, or the CyberPatriot program.
