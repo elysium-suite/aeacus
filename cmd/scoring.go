@@ -61,10 +61,10 @@ func scoreImage() {
 		} else {
 			if prevScore < mc.Image.Score {
 				sendNotification("You gained points!")
-				playAudio(mc.DirPath + "assets/gain.wav")
+				playAudio(mc.DirPath + "assets/wav/gain.wav")
 			} else if prevScore > mc.Image.Score {
 				sendNotification("You lost points!")
-				playAudio(mc.DirPath + "assets/alarm.wav")
+				playAudio(mc.DirPath + "assets/wav/alarm.wav")
 			}
 		}
 	} else {

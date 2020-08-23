@@ -36,7 +36,7 @@ func sendNotification(messageString string) {
 			else # Ubuntu <= 16
 			    display="unix:abstract=$(cat /run/user/$uid/dbus-session | cut -d '=' -f3)"
 			fi
-			sudo -u $user DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$display notify-send -i ` + mc.DirPath + `assets/logo.png "Aeacus SE" "` + messageString + `"`)
+			sudo -u $user DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=$display notify-send -i ` + mc.DirPath + `assets/img/logo.png "Aeacus SE" "` + messageString + `"`)
 	}
 }
 

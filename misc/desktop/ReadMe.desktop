@@ -5,4 +5,4 @@ Type=Application
 Terminal=false
 Exec=/usr/bin/firefox /opt/aeacus/assets/ReadMe.html
 Name=ReadMe
-Icon=/opt/aeacus/assets/logo.png
+Icon=/opt/aeacus/assets/img/logo.png

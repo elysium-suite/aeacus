@@ -8,7 +8,7 @@ func WriteDesktopFiles() {
 	shellCommand("chmod 666 " + mc.DirPath + "TeamID.txt")
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " " + mc.DirPath + "TeamID.txt")
 	infoPrint("Writing shortcuts to Desktop...")
-	shellCommand("cp " + mc.DirPath + "misc/*.desktop /home/" + mc.Config.User + "/Desktop/")
+	shellCommand("cp " + mc.DirPath + "misc/desktop/*.desktop /home/" + mc.Config.User + "/Desktop/")
 	shellCommand("chmod +x /home/" + mc.Config.User + "/Desktop/*.desktop")
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
 }
@@ -30,6 +30,7 @@ func ConfigureAutologin() {
 	}
 }
 
+// InstallFont is skipped for Linux Builds
 func InstallFont() {
 	infoPrint("Skipping font install for Linux...")
 }
@@ -37,13 +38,13 @@ func InstallFont() {
 // InstallService for Linux installs and starts the CSSClient init.d service.
 func InstallService() {
 	infoPrint("Installing service...")
-	shellCommand("cp " + mc.DirPath + "misc/CSSClient /etc/init.d/")
+	shellCommand("cp " + mc.DirPath + "misc/dev/CSSClient /etc/init.d/")
 	shellCommand("chmod +x /etc/init.d/CSSClient")
 	shellCommand("systemctl enable CSSClient")
 	shellCommand("systemctl start CSSClient")
 }
 
-// cleanUp for Linux is primarily focused on removing cached files, history,
+// CleanUp for Linux is primarily focused on removing cached files, history,
 // and other pieces of forensic evidence. It also removes the non-required
 // files in the aeacus directory.
 func CleanUp() {
@@ -59,8 +60,8 @@ func CleanUp() {
 	shellCommand("find " + findPaths + " -iname '*.viminfo*' -delete -iname '*.swp' -delete")
 
 	infoPrint("Symlinking .bash_history and .zsh_history to /dev/null...")
-	shellCommand("find " + findPaths + " -iname '*.bash_history' -exec ln -sf /dev/null {} \\;")
-	shellCommand("find " + findPaths + " -name '.zsh_history' -exec ln -sf /dev/null {} \\;")
+	shellCommand(`find " + findPaths + " -iname '*.bash_history' -exec ln -sf /dev/null {} \;`)
+	shellCommand(`"find " + findPaths + " -name '.zsh_history' -exec ln -sf /dev/null {} \;`)
 
 	infoPrint("Removing .local files...")
 	shellCommand("rm -rf /root/.local /home/*/.local/")
@@ -98,7 +99,7 @@ func CleanUp() {
 	shellCommand("rm " + mc.DirPath + "aeacus")
 
 	infoPrint("Overwriting timestamps to obfuscate changes...")
-	shellCommand("find /etc /home /var -exec  touch --date='2012-12-12 12:12' {} \\; 2>/dev/null")
+	shellCommand(`find /etc /home /var -exec  touch --date='2012-12-12 12:12' {} \; 2>/dev/null`)
 
 	infoPrint("Clearing firefox cache and browsing history...")
 	shellCommand("bleachbit --clean firefox.url_history; bleachbit --clean firefox.cache")

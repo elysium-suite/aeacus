@@ -72,10 +72,10 @@ func ConfigureAutologin() {
 }
 
 func InstallFont() {
-	infoPrint("Installing Raleway font for Winform...")
+	infoPrint("Installing Raleway font for ID Prompt...")
 	powershellFontInstall := `
-	$SourceDir   = "C:\aeacus\assets\Raleway"
-	$Source      = "C:\aeacus\assets\Raleway\*"
+	$SourceDir   = "C:\aeacus\assets\fonts\Raleway"
+	$Source      = "C:\aeacus\assets\fonts\Raleway\*"
 	$Destination = (New-Object -ComObject Shell.Application).Namespace(0x14)
 	$TempFolder  = "C:\Windows\Temp\Fonts"
 

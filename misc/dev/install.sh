@@ -26,24 +26,12 @@ echo "[+] Installing golang..."
 wget -O ~/go1.14.5.linux-amd64.tar.gz https://golang.org/dl/go1.14.5.linux-amd64.tar.gz
 tar -C /usr/local -xzf ~/go1.14.5.linux-amd64.tar.gz
 echo "export PATH=$PATH:/usr/local/go/bin" >>/etc/profile
-source /etc/profile
 
 # Install git (for go get)
 echo "[+] Installing git..."
 apt install -y git
 
-# Add convenient aliases for building
-if ! grep -q "aeacus-build" /etc/profile; then
-    echo "[+] Adding aliases..."
-
-    # aeacus-build-linux --> build aeacus and phocus, stripped
-    echo "alias aeacus-build-linux=\"go build -ldflags '-s -w '; go build -ldflags '-w -s' -tags phocus -o  ./phocus\"" >> /etc/profile
-
-    # aeacus-build-windows --> build aeacus and phocus, stripped
-    echo "alias aeacus-build-windows=\"GOOS=windows go build -ldflags '-s -w '; GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe\"" >> /etc/profile
-fi
-
-# Windows dependencies (will cause errors on Linux systems due to build constraints)
-
-echo "[+] Make sure to start a new session or source /etc/profile!"
-echo "[+] Done!"
+# Finalize
+echo "[+] Dependencies installed successfully!"
+echo "Run \`source /etc/profile\` to add \`go\` to your PATH"
+echo "Check out the \`Makefile\` to see what targets you can build Aeacus for!"

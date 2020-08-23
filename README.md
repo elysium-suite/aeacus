@@ -1,6 +1,6 @@
 # aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/elysium-suite/aeacus)](https://goreportcard.com/report/github.com/elysium-suite/aeacus) ![build](https://github.com/elysium-suite/aeacus/workflows/Build/badge.svg) ![test](https://github.com/elysium-suite/aeacus/workflows/Test/badge.svg) ![format](https://github.com/elysium-suite/aeacus/workflows/Format/badge.svg)
 
-<img align="right" width="200" src="assets/logo.png"/>
+<img align="right" width="200" src="assets/img/logo.png"/>
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 
@@ -47,11 +47,11 @@
 
 #### Scoring Report:
 
-![Scoring Report](misc/ScoringReport.png)
+![Scoring Report](./misc/gh/ScoringReport.png)
 
 #### ReadMe:
 
-![ReadMe](misc/ReadMe.png)
+![ReadMe](./misc/gh/ReadMe.png)
 
 ## Features
 
@@ -222,7 +222,7 @@ The authors of this project recommend using [sarpedon](https://github.com/elysiu
 
 ## Tips and Tricks
 
-- Easily change the branding by replacing `assets/logo.png`.
+- Easily change the branding by replacing `assets/img/logo.png`.
 - On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities.
 
 ## Compiling

@@ -5,4 +5,4 @@ Type=Application
 Terminal=false
 Exec=/opt/aeacus/phocus p
 Name=Team ID
-Icon=/opt/aeacus/assets/logo.png
+Icon=/opt/aeacus/assets/img/logo.png
