@@ -211,7 +211,7 @@ func commandContains(commandGiven, desiredContains string) (bool, error) {
 // whether a file or folder exists.
 func pathExists(pathName string) (bool, error) {
 	_, err := os.Stat(pathName)
-	return !os.IsNotExist(err), nil
+	return !os.IsNotExist(err), nil // TODO is not not IsNotExist instead of nil
 }
 
 // fileContains searches for a given searchString in the provided fileName.

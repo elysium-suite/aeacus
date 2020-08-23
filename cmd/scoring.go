@@ -111,7 +111,7 @@ func scoreCheck(index int, check check) {
 	// If a fail condition passes, the check fails, no other checks required.
 	if len(check.Fail) > 0 {
 		status = checkFails(&check)
-		if !status {
+		if status {
 			return
 		}
 	}

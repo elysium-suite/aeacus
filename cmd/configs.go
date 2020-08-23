@@ -17,6 +17,7 @@ import (
 func parseConfig(configContent string) {
 	if configContent == "" {
 		failPrint("Configuration is empty!")
+		os.Exit(1)
 	}
 
 	if _, err := toml.Decode(configContent, &mc.Config); err != nil {
@@ -27,6 +28,13 @@ func parseConfig(configContent string) {
 	// If there's no remote, local must be enabled.
 	if mc.Config.Remote == "" {
 		mc.Config.Local = true
+	}
+
+	if mc.Config.Remote != "" {
+		if mc.Config.Name == "" {
+			failPrint("Need image name in config if remote is enabled.")
+			os.Exit(1)
+		}
 	}
 }
 
@@ -118,7 +126,7 @@ func printConfig() {
 }
 
 func obfuscateConfig() {
-	infoPrint("Obfuscating configuraiton...")
+	infoPrint("Obfuscating configuration...")
 	obfuscateData(&mc.Config.Password)
 	for i, check := range mc.Config.Check {
 		obfuscateData(&mc.Config.Check[i].Message)

@@ -276,10 +276,12 @@ func userExists(userName string) (bool, error) {
 func userInGroup(userName, groupName string) (bool, error) {
 	users, err := wapi.LocalGroupGetMembers(groupName)
 	if err != nil {
-		return false, err
+		// Error is returned if group is empty.
+		return false, nil
 	}
 	for _, user := range users {
-		if user.Name == userName {
+		justName := strings.Split(user.Name, `\`)[1]
+		if userName == user.Name || userName == justName {
 			return true, nil
 		}
 	}
@@ -387,15 +389,19 @@ func securityPolicy(keyName, keyValue string) (bool, error) {
 	if regKey, ok := secpolToKey[keyName]; ok {
 		return registryKey(regKey, keyValue, false)
 	} else {
-		output, err := getSecedit()
+		seceditOutput, err := getSecedit()
 		if err != nil {
 			return false, err
+		}
+		re := regexp.MustCompile("(?m)[\r\n]+^.*" + keyName + ".*$")
+		output := strings.TrimSpace(string(re.Find([]byte(seceditOutput))))
+		if output == "" {
+			return false, errors.New("securitypolicy item not found")
 		}
 		if keyName == "NewAdministratorName" || keyName == "NewGuestName" {
 			// These two are strings, not numbers, so they have ""
 			desiredString = keyName + " = " + keyValue
 		} else if keyName == "MinimumPasswordAge" ||
-			keyName == "MinimumPasswordAge" ||
 			keyName == "MinimumPasswordLength" ||
 			keyName == "LockoutDuration" ||
 			keyName == "ResetLockoutCount" {
@@ -407,7 +413,7 @@ func securityPolicy(keyName, keyValue string) (bool, error) {
 			}
 			for c := intKeyValue; c <= 999; c++ {
 				desiredString = keyName + " = " + strconv.Itoa(c)
-				if strings.Contains(output, desiredString) {
+				if output == desiredString {
 					return true, err
 				}
 			}
@@ -420,14 +426,14 @@ func securityPolicy(keyName, keyValue string) (bool, error) {
 			}
 			for c := intKeyValue; c > 0; c-- {
 				desiredString = keyName + " = " + strconv.Itoa(c)
-				if strings.Contains(output, desiredString) {
+				if output == desiredString {
 					return true, nil
 				}
 			}
 		} else {
 			desiredString = keyName + " = " + keyValue
 		}
-		return strings.Contains(output, desiredString), nil
+		return output == desiredString, nil
 	}
 }
 

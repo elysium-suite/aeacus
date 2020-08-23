@@ -22,7 +22,6 @@ var secpolToKey = map[string]string{
 	"SealSecureChannel":            "MACHINE\\System\\CurrentControlSet\\Services\\Netlogon\\Parameters\\SealSecureChannel",
 	"SignSecureChannel":            "MACHINE\\System\\CurrentControlSet\\Services\\Netlogon\\Parameters\\SignSecureChannel",
 	"DisablePasswordChange":        "MACHINE\\System\\CurrentControlSet\\Services\\Netlogon\\Parameters\\DisablePasswordChange",
-	"MaximumPasswordAge":           "MACHINE\\System\\CurrentControlSet\\Services\\Netlogon\\Parameters\\MaximumPasswordAge",
 	"RequireStrongKey":             "MACHINE\\System\\CurrentControlSet\\Services\\Netlogon\\Parameters\\RequireStrongKey",
 	"DontDisplayLockedUserId":      "MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System, value=DontDisplayLockedUserId",
 	"DisableCAD":                   "MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\DisableCAD",
