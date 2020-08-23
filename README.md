@@ -227,7 +227,7 @@ The authors of this project recommend using [sarpedon](https://github.com/elysiu
 
 ## Compiling
 
-Once you install `go` (make sure you use a recent version), you can build with these commands:
+Once you install `go` (make sure you use a recent version) and `garble` (`GO111MODULE=on go get mvdan.cc/garble`), you can build with these commands:
 
 - Building for `Linux`: `make lin`
 - Building for `Windows`: `make win`
