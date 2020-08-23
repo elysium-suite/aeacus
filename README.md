@@ -229,22 +229,13 @@ The authors of this project recommend using [sarpedon](https://github.com/elysiu
 
 Once you install `go` (make sure you use a recent version), you can build with these commands:
 
-- Building for `Linux`:
-    ```
-    go build -ldflags '-w -s' -o ./aeacus .
-    go build -ldflags '-w -s' -tags phocus -o ./phocus .
-    ```
-- Building for `Windows`:
-    ```
-    GOOS=windows go build -ldflags '-w -s' -o ./aeacus.exe .
-    GOOS=windows go build -ldflags '-w -s' -tags phocus -o ./phocus.exe .
-    ```
+- Building for `Linux`: `make lin`
+- Building for `Windows`: `make win`
 
-For your convenience, we provide these aliases in the install script:
-- `aeacus-build-linux`
-- `aeacus-build-windows`
+### Development compliation
 
-Obfuscate the build with [garble](https://github.com/mvdan/garble) or [gobfuscate](https://github.com/unixpickle/gobfuscate).
+- Building for `Linux`: `make lin-dev`
+- Building for `Windows`: `make win-dev`
 
 ## Contributing and Disclaimer
 

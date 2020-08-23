@@ -22,4 +22,4 @@ jobs:
           go get -v -t -d ./...
 
       - name: Build
-        run: sh misc/actions.sh
+        run: make
