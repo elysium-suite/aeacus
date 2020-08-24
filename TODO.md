@@ -29,6 +29,14 @@
 - QoL
     - spellcheck/typo alert in config
     - if arg number is wrong, alert them (ex. no arg2 when its required)
+    - TESTS!!!
+        - TESTS!!!
+        - TESTS!!!
+        - TESTS!!!
+        - TESTS!!!
+        - TESTS!!!
+        - TESTS!!!
+        - TESTS!!!
 
 - checks to implement
 
@@ -42,6 +50,7 @@
 
   - windows
     - Detect if firefox.exe is in x86 Program Files or just Program Files
+    - clear regedit opening
 
 - cool/stretch goal
 

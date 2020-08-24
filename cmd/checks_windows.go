@@ -345,7 +345,7 @@ func userRights(userOrGroup, privilege string) (bool, error) {
 	re := regexp.MustCompile("(?m)[\r\n]+^.*" + privilege + ".*$")
 	privilegeString := string(re.Find([]byte(seceditOutput)))
 	if privilegeString == "" {
-		return false, errors.New("Invalid privilege")
+		return false, nil
 	}
 	if strings.Contains(privilegeString, userOrGroup) {
 		// Sometimes, Windows just puts their user or group name instead of the SID. Real cool
