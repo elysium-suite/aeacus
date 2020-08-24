@@ -60,8 +60,8 @@ func CleanUp() {
 	shellCommand("find " + findPaths + " -iname '*.viminfo*' -delete -iname '*.swp' -delete")
 
 	infoPrint("Symlinking .bash_history and .zsh_history to /dev/null...")
-	shellCommand(`find " + findPaths + " -iname '*.bash_history' -exec ln -sf /dev/null {} \;`)
-	shellCommand(`"find " + findPaths + " -name '.zsh_history' -exec ln -sf /dev/null {} \;`)
+	shellCommand(`find ` + findPaths + ` -iname '*.bash_history' -exec ln -sf /dev/null {} \;`)
+	shellCommand(`find ` + findPaths + ` -name '.zsh_history' -exec ln -sf /dev/null {} \;`)
 
 	infoPrint("Removing .local files...")
 	shellCommand("rm -rf /root/.local /home/*/.local/")
