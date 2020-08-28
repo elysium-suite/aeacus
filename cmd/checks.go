@@ -230,7 +230,14 @@ func fileContainsRegex(fileName, expressionString string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	matched, err := regexp.Match(expressionString, []byte(fileContent))
+	matched := false
+	found := false
+	for _, line := range strings.Split(fileContent, "\n") {
+		found, err = regexp.Match(expressionString, []byte(line))
+		if found {
+			matched = found
+		}
+	}
 	if err != nil {
 		failPrint("There's an error with your regular expression for fileContainsRegex: " + err.Error())
 	}
@@ -243,25 +250,31 @@ func dirContainsRegex(dirName, expressionString string) (bool, error) {
 	if err != nil || !result {
 		return false, errors.New("DirContainsRegex: file does not exist")
 	}
+
 	var files []string
 	err = filepath.Walk(dirName, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			files = append(files, path)
 		}
+
 		if len(files) > 10000 {
 			failPrint("Recursive indexing has exceeded limit, erroring out.")
 			return errors.New("Indexed too many files in recursive search")
 		}
+
 		return nil
 	})
+
 	if err != nil {
 		return false, err
 	}
+
 	for _, file := range files {
 		result, err := fileContainsRegex(file, expressionString)
 		if err != nil {
 			return false, err
 		}
+
 		if result {
 			return result, nil
 		}
