@@ -124,3 +124,10 @@ func connectWs() {
 		}
 	}
 }
+
+func boolToString(b bool) string {
+	if b == true {
+		return "true"
+	}
+	return "false"
+}

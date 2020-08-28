@@ -2,13 +2,6 @@ package cmd
 
 import "testing"
 
-func boolToString(b bool) string {
-	if b == true {
-		return "true"
-	}
-	return "false"
-}
-
 func TestCommandOutput(t *testing.T) {
 	out, err := commandOutput(`echo 1`, "1")
 	if err != nil || out != true {
