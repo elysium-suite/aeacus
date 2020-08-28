@@ -516,7 +516,7 @@ func registryKey(keyName, keyValue string, existCheck bool) (bool, error) {
 	case 4: // DWORD
 		registryValue = strconv.FormatUint(uint64(binary.LittleEndian.Uint32(registrySlice)), 10)
 	default:
-		failPrint("Unknown registry type: " + string(valType))
+		failPrint("Unknown registry type: " + fmt.Sprint(valType))
 	}
 
 	// fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
