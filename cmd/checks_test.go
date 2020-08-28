@@ -15,6 +15,7 @@ func TestCommandOutput(t *testing.T) {
 		t.Error("commandOutput(`echo 1`, \"1\") got " + boolToString(out) + ", want `true`")
 	}
 }
+
 func TestCommandContains(t *testing.T) {
 	out, err := commandContains(`echo hello world`, "hello")
 	if err != nil || out != true {
