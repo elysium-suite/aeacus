@@ -10,6 +10,7 @@
   - improve scoring.conf example crypto (add aes-gcm, obfuscate key, etc)
   - fix windows service quit WaitGroup (phocus_windows.go)
   - ^^ THIS IS LARGELY FIXED. I count null bytes to detect unicode vs ansi. However, when the text read is only one character (for example, `b`), it will fail if unicode
+  - binary reg checks
 
 - security
 

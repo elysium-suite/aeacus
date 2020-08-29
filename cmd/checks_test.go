@@ -45,8 +45,12 @@ func TestDirContainsRegex(t *testing.T) {
 }
 
 func TestFileEquals(t *testing.T) {
-	out, err := fileEquals("../misc/tests/TestFileContains.txt", "a594c7d7d9065ad2e37a57cc065a8b5c75a6cd90")
-	if err != nil || out != true {
-		t.Error("fileEquals(\"../misc/tests/TestFileContains.txt\", \"a594c7d7d9065ad2e37a57cc065a8b5c75a6cd90\") got " + boolToString(out) + ", want `true`. Error " + err.Error())
+	fileName := "../misc/tests/TestFileContains.txt"
+	hashText := "a594c7d7d9065ad2e37a57cc065a8b5c75a6cd90"
+	out, err := fileEquals(fileName, hashText)
+	if err != nil {
+		t.Error("fileEquals for file", fileName, "hash", hashText, err.Error())
+	} else if out != true {
+		t.Error("fileEquals for file", fileName, "hash", hashText, "got false, want true")
 	}
 }
