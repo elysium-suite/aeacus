@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"os"
+    "io/ioutil"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -285,12 +286,12 @@ func dirContainsRegex(dirName, expressionString string) (bool, error) {
 // fileEquals calculates the SHA1 sum of a file and compares it
 // with the hash provided in the check
 func fileEquals(fileName, fileHash string) (bool, error) {
-	fileContent, err := readFile(fileName)
+	fileContent, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return false, err
 	}
 	hasher := sha1.New()
 	hasher.Write([]byte(fileContent))
 	hash := hex.EncodeToString(hasher.Sum(nil))
-	return hash == fileHash, err
+	return hash == fileHash, nil
 }
