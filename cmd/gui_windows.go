@@ -4,7 +4,7 @@ func LaunchIDPrompt() {
 	powerShellPrompt := `
     Start-Service -Name CSSClient -ErrorAction SilentlyContinue
     $teamIDContent = Get-Content C:\aeacus\TeamID.txt
-    if ($teamIDContent -match "YOUR-TEAMID-HERE") {
+    if ($teamIDContent -eq "YOUR-TEAMID-HERE") {
     Add-Type -AssemblyName System.Windows.Forms
     [System.Windows.Forms.Application]::EnableVisualStyles()
 
