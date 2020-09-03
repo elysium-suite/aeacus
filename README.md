@@ -165,7 +165,7 @@ points = -5 # This check is now a penalty, because it has negative points
 
 ## ReadMe Configuration
 
-Put your README in `ReadMe.conf`. It's pretty self explanatory. Here's a template:
+Put your README in `ReadMe.conf`. It's pretty self-explanatory. Here's a template:
 
 ```
 <!-- Put your comments/additions to the normal ReadMe here! -->
