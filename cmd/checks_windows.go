@@ -545,7 +545,7 @@ func firefoxSetting(param, value string) (bool, error) {
 		}
 
 	} else if bit32 {
-		check, err := dirContainsRegex(`C:\Program Files (x86)\Mozilla Firefox\defaults\pref`, `pref("general.config.filename"`)
+		check, err := dirContainsRegex(`C:\Program Files (x86)\Mozilla Firefox\defaults\pref`, `"general.config.filename"`)
 		if err != nil {
 			return res, err
 		}
