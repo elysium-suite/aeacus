@@ -21,7 +21,12 @@ jobs:
         run: |
           go get -v -t -d ./...
 
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: rune-rs
+
       - name: Build
         run: |
           go get mvdan.cc/garble
-          make
+          rune
