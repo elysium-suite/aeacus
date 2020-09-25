@@ -33,7 +33,6 @@ var byteKey = []byte{0x53, 0xf7, 0xb1, 0xcd, 0x26, 0x7a, 0x6f, 0x9a, 0xa5, 0x61,
 // encryptConfig takes the plainText config and returns an encrypted string
 // that should be written to the encrypted scoring data file.
 func encryptConfig(plainText string) (string, error) {
-	debugPrint("Encrypting data...")
 	// Generate key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
 
@@ -54,7 +53,6 @@ func encryptConfig(plainText string) (string, error) {
 
 // decryptConfig is used to decrypt the scoring data file.
 func decryptConfig(cipherText string) (string, error) {
-	debugPrint("Decrypting data...")
 	// Create our key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
 
@@ -95,32 +93,36 @@ func tossKey() []byte {
 // This also makes manipulation of data in use harder, since there is
 // a very small opportunity for catching plaintext data, and very tough
 // to decode the decrypted ScoringData without source code.
-func obfuscateData(datum *string) {
+func obfuscateData(datum *string) error {
 	var err error
 	if *datum == "" {
-		return
+		return errors.New("empty datum given to obfuscateData")
 	}
 	if *datum, err = encryptConfig(*datum); err == nil {
 		*datum = hexEncode(xor(string(tossKey()), *datum))
 	} else {
 		failPrint("crypto: failed to obufscate datum: " + err.Error())
+		return err
 	}
+	return nil
 }
 
 // deobfuscateData decodes configuration data.
-func deobfuscateData(datum *string) {
+func deobfuscateData(datum *string) error {
 	var err error
 	if *datum == "" {
-		return
+		return errors.New("empty datum given to deobfuscateData")
 	}
 	*datum, err = hexDecode(*datum)
 	if err != nil {
 		println(*datum)
 		failPrint("crypto: failed to deobfuscate datum hex: " + err.Error())
-		return
+		return err
 	}
 	*datum = xor(string(tossKey()), *datum)
 	if *datum, err = decryptConfig(*datum); err != nil {
 		failPrint("crypto: failed to deobufscate datum: " + err.Error())
+		return err
 	}
+	return nil
 }
