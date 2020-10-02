@@ -24,8 +24,8 @@ var (
 	debugEnabled          = false
 	mc                    = &metaConfig{}
 	timeStart             = time.Now()
-	timeWithoutId, _      = time.ParseDuration("0s")
-	withoutIdThreshold, _ = time.ParseDuration("30m")
+	timeWithoutID, _      = time.ParseDuration("0s")
+	withoutIDThreshold, _ = time.ParseDuration("30m")
 )
 
 // timeCheck calls destroyImage if the configured EndDate for the image has

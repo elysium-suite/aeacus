@@ -1,5 +1,6 @@
 package cmd
 
+// LaunchIDPrompt launches an ID Prompt on Windows using PowerShell
 func LaunchIDPrompt() {
 	powerShellPrompt := `
     Start-Service -Name CSSClient -ErrorAction SilentlyContinue
@@ -56,6 +57,7 @@ func LaunchIDPrompt() {
 	shellCommand(powerShellPrompt)
 }
 
+// LaunchConfigGui (WIP) launches a configuration GUI on Windows
 func LaunchConfigGui() {
 	warnPrint("This feature is not supported yet on Windows.")
 }
