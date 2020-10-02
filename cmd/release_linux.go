@@ -24,7 +24,7 @@ func ConfigureAutologin() {
 		shellCommand(`echo "autologin-user=` + mc.Config.User + `" >> /usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf`)
 	} else if gdm {
 		infoPrint("GDM3 detected for autologin.")
-		shellCommand(`echo -e "AutomaticLogin=True\nAutomaticLogin=` + mc.Config.User + `" >> /etc/gdm3/custom.conf`)
+		shellCommand(`echo -e "AutomaticLoginEnable=True\nAutomaticLogin=` + mc.Config.User + `" >> /etc/gdm3/daemon.conf`)
 	} else {
 		failPrint("Unable to configure autologin! Please do so manually.")
 	}
