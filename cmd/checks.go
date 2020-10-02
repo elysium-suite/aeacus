@@ -259,7 +259,7 @@ func dirContainsRegex(dirName, expressionString string) (bool, error) {
 	}
 	for _, file := range files {
 		result, err := fileContainsRegex(file, expressionString)
-		if err != nil {
+		if os.IsPermission(err) {
 			return false, err
 		}
 		if result {
