@@ -36,6 +36,8 @@ func phocusEnvironment() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// GenPhocusApp generates a basic CLI interface that is
+// OS-independent
 func GenPhocusApp() *cli.App {
 	return &cli.App{
 		Name:  "phocus",

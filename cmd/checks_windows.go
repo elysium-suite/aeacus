@@ -388,53 +388,52 @@ func securityPolicy(keyName, keyValue string) (bool, error) {
 	var desiredString string
 	if regKey, ok := secpolToKey[keyName]; ok {
 		return registryKey(regKey, keyValue, false)
-	} else {
-		seceditOutput, err := getSecedit()
-		if err != nil {
-			return false, err
-		}
-		re := regexp.MustCompile("(?m)[\r\n]+^.*" + keyName + ".*$")
-		output := strings.TrimSpace(string(re.Find([]byte(seceditOutput))))
-		if output == "" {
-			return false, errors.New("securitypolicy item not found")
-		}
-		if keyName == "NewAdministratorName" || keyName == "NewGuestName" {
-			// These two are strings, not numbers, so they have ""
-			desiredString = keyName + " = " + keyValue
-		} else if keyName == "MinimumPasswordAge" ||
-			keyName == "MinimumPasswordLength" ||
-			keyName == "LockoutDuration" ||
-			keyName == "ResetLockoutCount" {
-			// Fields where the arg should be X or higher (up to 999)
-			intKeyValue, err := strconv.Atoi(keyValue)
-			if err != nil {
-				failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
-				return false, errors.New("Invalid keyValue")
-			}
-			for c := intKeyValue; c <= 999; c++ {
-				desiredString = keyName + " = " + strconv.Itoa(c)
-				if output == desiredString {
-					return true, err
-				}
-			}
-		} else if keyName == "MaximumPasswordAge" || keyName == "LockoutBadCount" {
-			// Fields where arg should be X or lower but NOT 0
-			intKeyValue, err := strconv.Atoi(keyValue)
-			if err != nil {
-				failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
-				return false, errors.New("Invalid keyValue")
-			}
-			for c := intKeyValue; c > 0; c-- {
-				desiredString = keyName + " = " + strconv.Itoa(c)
-				if output == desiredString {
-					return true, nil
-				}
-			}
-		} else {
-			desiredString = keyName + " = " + keyValue
-		}
-		return output == desiredString, nil
 	}
+	seceditOutput, err := getSecedit()
+	if err != nil {
+		return false, err
+	}
+	re := regexp.MustCompile("(?m)[\r\n]+^.*" + keyName + ".*$")
+	output := strings.TrimSpace(string(re.Find([]byte(seceditOutput))))
+	if output == "" {
+		return false, errors.New("securitypolicy item not found")
+	}
+	if keyName == "NewAdministratorName" || keyName == "NewGuestName" {
+		// These two are strings, not numbers, so they have ""
+		desiredString = keyName + " = " + keyValue
+	} else if keyName == "MinimumPasswordAge" ||
+		keyName == "MinimumPasswordLength" ||
+		keyName == "LockoutDuration" ||
+		keyName == "ResetLockoutCount" {
+		// Fields where the arg should be X or higher (up to 999)
+		intKeyValue, err := strconv.Atoi(keyValue)
+		if err != nil {
+			failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
+			return false, errors.New("Invalid keyValue")
+		}
+		for c := intKeyValue; c <= 999; c++ {
+			desiredString = keyName + " = " + strconv.Itoa(c)
+			if output == desiredString {
+				return true, err
+			}
+		}
+	} else if keyName == "MaximumPasswordAge" || keyName == "LockoutBadCount" {
+		// Fields where arg should be X or lower but NOT 0
+		intKeyValue, err := strconv.Atoi(keyValue)
+		if err != nil {
+			failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
+			return false, errors.New("Invalid keyValue")
+		}
+		for c := intKeyValue; c > 0; c-- {
+			desiredString = keyName + " = " + strconv.Itoa(c)
+			if output == desiredString {
+				return true, nil
+			}
+		}
+	} else {
+		desiredString = keyName + " = " + keyValue
+	}
+	return output == desiredString, nil
 }
 
 func registryKey(keyName, keyValue string, existCheck bool) (bool, error) {
@@ -463,10 +462,9 @@ func registryKey(keyName, keyValue string, existCheck bool) (bool, error) {
 	default:
 		if existCheck {
 			return false, nil
-		} else {
-			failPrint("Unknown registry hive: " + registryHiveText)
-			return false, errors.New("Unknown registry hive" + registryHiveText)
 		}
+		failPrint("Unknown registry hive: " + registryHiveText)
+		return false, errors.New("Unknown registry hive" + registryHiveText)
 	}
 
 	// Actually get the key
@@ -474,10 +472,9 @@ func registryKey(keyName, keyValue string, existCheck bool) (bool, error) {
 	if err != nil {
 		if existCheck {
 			return false, nil
-		} else {
-			warnPrint("Registry opening key failed (and that's probably fine): " + err.Error())
-			return false, err
 		}
+		warnPrint("Registry opening key failed (and that's probably fine): " + err.Error())
+		return false, err
 	}
 	defer k.Close()
 
@@ -491,14 +488,12 @@ func registryKey(keyName, keyValue string, existCheck bool) (bool, error) {
 		// for RegistryKey or RegistryKeyNot, so we return an error.
 		if existCheck {
 			return false, nil
-		} else {
-			warnPrint("Registry opening key failed (and that's probably fine): " + err.Error())
-			return false, err
 		}
-	} else {
-		if existCheck {
-			return true, nil
-		}
+		warnPrint("Registry opening key failed (and that's probably fine): " + err.Error())
+		return false, err
+	}
+	if existCheck {
+		return true, nil
 	}
 
 	registrySlice = registrySlice[:regLength]

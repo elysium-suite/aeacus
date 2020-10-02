@@ -1,5 +1,6 @@
 package cmd
 
+// WriteDesktopFiles writes default scoring engine files to the desktop
 func WriteDesktopFiles() {
 	firefoxBinary := `C:\Program Files (x86)\Mozilla Firefox\firefox.exe`
 	infoPrint("Writing ScoringReport.html shortcut to Desktop...")
@@ -25,6 +26,7 @@ func WriteDesktopFiles() {
 	// domain compatibility? doubt
 }
 
+// ConfigureAutologin allows the current user to log in automatically
 func ConfigureAutologin() {
 	infoPrint("Setting Up autologin for " + mc.Config.User + "...")
 	powershellAutoLogin := `
@@ -71,6 +73,7 @@ func ConfigureAutologin() {
 	shellCommand(powershellAutoLogin)
 }
 
+// InstallFont installs the Raleway font for ID Prompt
 func InstallFont() {
 	infoPrint("Installing Raleway font for ID Prompt...")
 	powershellFontInstall := `
@@ -103,6 +106,7 @@ func InstallFont() {
 	shellCommand(powershellFontInstall)
 }
 
+// InstallService installs the Aeacus service on Windows
 func InstallService() {
 	infoPrint("Installing service with sc.exe...")
 	cmdString := `sc.exe create CSSClient binPath= "C:\aeacus\phocus.exe" start= "auto" DisplayName= "CSSClient"`
@@ -120,6 +124,8 @@ func InstallService() {
 	shellCommand(taskCreate)
 }
 
+// CleanUp clears out sensitive files left behind by
+// image developers or the scoring engine itself
 func CleanUp() {
 	infoPrint("Removing scoring.conf and ReadMe.conf...")
 	shellCommand("Remove-Item -Force C:\\aeacus\\scoring.conf")

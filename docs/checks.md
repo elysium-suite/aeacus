@@ -165,6 +165,7 @@ arg2='1:2.17.1-1ubuntu0.4'
 type='KernelVersion'
 arg1='5.4.0-42-generic'
 ```
+
 > `KernelVersion` checks `uname -r`.
 
 **AutoCheckUpdatesEnabled**: pass if the system is configured to automatically check for updates
@@ -188,6 +189,7 @@ arg2='644'
 ### Windows-Specific Checks
 
 **ServiceStatus**: pass if service status and service startup type is the same as specified
+
 ```
 type="ServiceStatus"
 arg1="TermService"
@@ -200,11 +202,13 @@ arg3="Automatic"
 > todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
 
 **PasswordChanged**: pass if user password has changed after the given date
+
 ```
 type='PasswordChanged'
 arg1='user'
 arg2='01/17/2019 20:57:41'
 ```
+
 > You should take the value from `Get-LocalUser user | select PasswordLastSet` and use it as `arg2`.
 
 **WindowsFeature**: pass if Feature Enabled

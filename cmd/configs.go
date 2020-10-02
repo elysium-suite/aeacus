@@ -160,7 +160,7 @@ func obfuscateConfig() {
 	}
 }
 
-// confirmPrint will prompt the user with the given toPrint string, and
+// ConfirmPrint will prompt the user with the given toPrint string, and
 // exit the program if N or n is input.
 func ConfirmPrint(toPrint string) {
 	printer(color.FgYellow, "CONF", "")

@@ -189,8 +189,8 @@ func checkServer() {
 		sendNotification("Score upload failure! Unable to access remote server.")
 		mc.Connection = false
 	} else if mc.Conn.ServerStatus == "ERROR" {
-		timeWithoutId = time.Now().Sub(timeStart)
-		if !mc.Config.NoDestroy && timeWithoutId > withoutIdThreshold {
+		timeWithoutID = time.Now().Sub(timeStart)
+		if !mc.Config.NoDestroy && timeWithoutID > withoutIDThreshold {
 			failPrint("Destroying the image! Too long without inputting valid ID.")
 			// destroyImage()
 		}

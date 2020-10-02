@@ -1,4 +1,5 @@
-############################################################
+#!/usr/bin/env bash
+
 cat <<EOF
 
  .oooo.    .ooooo.   .oooo.    .ooooo.  oooo  oooo   .oooo.o
@@ -8,7 +9,6 @@ d8(  888  888    .o d8(  888  888   .o8  888   888  o.  )88b
 \`Y888""8o \`Y8bod8P' \`Y888""8o \`Y8bod8P'  \`V88V"V8P' 8""888P'
 
 EOF
-############################################################
 
 # This script sets up the development environment on a Linux (Debian-based) box.
 

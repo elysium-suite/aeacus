@@ -8,7 +8,6 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -286,7 +285,7 @@ func dirContainsRegex(dirName, expressionString string) (bool, error) {
 // fileEquals calculates the SHA1 sum of a file and compares it
 // with the hash provided in the check
 func fileEquals(fileName, fileHash string) (bool, error) {
-	fileContent, err := ioutil.ReadFile(fileName)
+	fileContent, err := readFile(fileName)
 	if err != nil {
 		return false, err
 	}

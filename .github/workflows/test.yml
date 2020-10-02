@@ -26,4 +26,4 @@ jobs:
           go get -v -t -d ./...
 
       - name: Test
-        run: cd cmd && go test -v .
+        run: go test -v ./cmd

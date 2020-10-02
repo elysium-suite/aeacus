@@ -25,19 +25,21 @@
     - use syscall PTRACEME and see if it errors out (or similar)
     - check if any ebpf blobs are loaded into kernel
     - refuse to run if not signed (? how to implement)
- - verified vulns on other side (have vuln list on server as well)
+
+- verified vulns on other side (have vuln list on server as well)
 
 - QoL
-    - spellcheck/typo alert in config
-    - if arg number is wrong, alert them (ex. no arg2 when its required)
+
+  - spellcheck/typo alert in config
+  - if arg number is wrong, alert them (ex. no arg2 when its required)
+  - TESTS!!!
     - TESTS!!!
-        - TESTS!!!
-        - TESTS!!!
-        - TESTS!!!
-        - TESTS!!!
-        - TESTS!!!
-        - TESTS!!!
-        - TESTS!!!
+    - TESTS!!!
+    - TESTS!!!
+    - TESTS!!!
+    - TESTS!!!
+    - TESTS!!!
+    - TESTS!!!
 
 - checks to implement
 
