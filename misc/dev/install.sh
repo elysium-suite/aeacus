@@ -23,8 +23,8 @@ apt-get update
 
 # Install golang
 echo "[+] Installing golang..."
-wget -O ~/go1.14.5.linux-amd64.tar.gz https://golang.org/dl/go1.14.5.linux-amd64.tar.gz
-tar -C /usr/local -xzf ~/go1.14.5.linux-amd64.tar.gz
+wget -O ~/go1.15.2.linux-amd64.tar.gz https://golang.org/dl/go1.15.2.linux-amd64.tar.gz
+tar -C /usr/local -xzf ~/go1.15.2.linux-amd64.tar.gz
 echo "export PATH=$PATH:/usr/local/go/bin" >>/etc/profile
 
 # Install git (for go get)
