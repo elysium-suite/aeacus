@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+// GetInfo is a helper function to retrieve
+// generic information about the system
 func GetInfo(infoType string) {
 	switch infoType {
 	case "packages":

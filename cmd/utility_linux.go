@@ -67,7 +67,7 @@ func rawCmd(commandGiven string) *exec.Cmd {
 
 // shellCommand executes a given command in a sh environment, and prints an
 // error if one occurred.
-func shellCommand(commandGiven string) {
+func shellCommand(commandGiven string) error {
 	cmd := rawCmd(commandGiven)
 	if err := cmd.Run(); err != nil {
 		if _, ok := err.(*exec.ExitError); ok {
@@ -77,7 +77,9 @@ func shellCommand(commandGiven string) {
 				failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
 			}
 		}
+		return err
 	}
+	return nil
 }
 
 // shellCommandOutput executes a given command in a sh environment, and
