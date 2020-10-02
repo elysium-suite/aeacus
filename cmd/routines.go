@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// readScoringData is a convenience function around readData and decodeString,
+// ReadScoringData is a convenience function around readData and decodeString,
 // which parses the encrypted scoring configuration file.
 func ReadScoringData() error {
 	infoPrint("Decrypting data from " + mc.DirPath + ScoringData + "...")
@@ -26,7 +26,7 @@ func ReadScoringData() error {
 	return nil
 }
 
-// checkConfig parses and checks the validity of the current ScoringConf file.
+// CheckConfig parses and checks the validity of the current ScoringConf file.
 func CheckConfig(fileName string) {
 	fileContent, err := readFile(mc.DirPath + fileName)
 	if err != nil {
@@ -38,7 +38,7 @@ func CheckConfig(fileName string) {
 	obfuscateConfig()
 }
 
-// fillConstants determines the correct constants, such as DirPath, for the
+// FillConstants determines the correct constants, such as DirPath, for the
 // given runtime and environment.
 func FillConstants() {
 	if runtime.GOOS == "linux" {
@@ -51,6 +51,7 @@ func FillConstants() {
 	}
 }
 
+// ScoreImage is the main function for scoring the image
 func ScoreImage() {
 	checkTrace()
 	timeCheck()
@@ -58,7 +59,7 @@ func ScoreImage() {
 	scoreImage()
 }
 
-// runningPermsCheck is a convenience function wrapper around
+// RunningPermsCheck is a convenience function wrapper around
 // adminCheck, which prints an error indicating that admin
 // permissions are needed.
 func RunningPermsCheck() {
