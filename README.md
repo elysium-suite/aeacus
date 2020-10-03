@@ -4,7 +4,7 @@
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 
-To get started quickly, checkout [`cerberus`](https://github.com/elysium-suite/cerberus), a GUI wrapper for aeacus to assist with image development and vulnerability configuration.
+To get started quickly, check out [`cerberus`](https://github.com/elysium-suite/cerberus), a GUI wrapper for aeacus to assist with image development and vulnerability configuration.
 
 ## Installation
 
