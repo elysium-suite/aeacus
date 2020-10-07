@@ -135,7 +135,7 @@ func GenReadMe() {
 			<div class="main">
 				<div class="text">
 					<p align="center">
-						<img src="./img/logo.png" "width="180">
+						<img src="./img/logo.png" "width="180px">
 					</p>
 `
 
