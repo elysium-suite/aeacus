@@ -55,7 +55,7 @@ arg2='ANSWER: SomeCoolAnswer'
 **FileContainsRegex**: pass if file contains regex string
 
 ```
-type='FileContains'
+type='FileContainsRegex'
 arg1='C:\Users\coolUser\Desktop\Forensic Question 1.txt'
 arg2='ANSWER:\sCool[a-zA-Z]+VariedAnswer'
 ```
