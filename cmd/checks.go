@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -162,7 +163,7 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 		return err == nil && result
 	case "UserInGroupNot":
 		if check.Message == "" {
-			check.Message = "User " + arg1 + " is not in group \"" + arg2 + "\""
+			check.Message = "User " + arg1 + " removed or is not in group \"" + arg2 + "\""
 		}
 		result, err := userInGroup(arg1, arg2)
 		return err == nil && !result
@@ -198,6 +199,9 @@ func commandOutput(commandGiven, desiredOutput string) (bool, error) {
 func commandContains(commandGiven, desiredContains string) (bool, error) {
 	out, err := rawCmd(commandGiven).Output()
 	if err != nil {
+		if _, ok := err.(*exec.ExitError); ok {
+			return false, nil
+		}
 		return false, err
 	}
 	outString := strings.TrimSpace(string(out))
