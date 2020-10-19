@@ -55,10 +55,14 @@
     - Detect if firefox.exe is in x86 Program Files or just Program Files
     - clear regedit opening
 
-- cool/stretch goal
-
-  - make binary pattern in background of score report personally identifiable (like, it's their ID or something)
 
 - hard/long term
   - verify binary
   - replace shell checks with lower-level more reliable things, winAPI, whatever
+
+- bugs
+    Release bug:
+        Obscure Check 3 stopped working after release, works with aeacus --verbose score but not post release with phocus
+    Profile bug:
+        When scoring the image there are certain PowerShell commands run which run without the -noprofile argument and so the profile ends up getting run  about 3 times or so.
+        Doesn't seem to be caused by the command output checks bc I had 4 of them and the profile was only run 3 times, but I could be wrong
