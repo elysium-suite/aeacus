@@ -10,16 +10,16 @@ To get started quickly, check out [`cerberus`](https://github.com/elysium-suite/
 
 0. **Extract the release** into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
 
-   > You should try compiling it yourself! If not, you can [download the releases here](https://github.com/elysium-suite/aeacus/releases).
+    > You should try compiling it yourself! If not, you can [download the releases here](https://github.com/elysium-suite/aeacus/releases).
 
 1. **Set up the environment.**
 
-   - Put your **config** in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
+    - Put your **config** in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
 
-     - _Don't have a config? See the example at the bottom of this README._
+        - _Don't have a config? See the example at the bottom of this README._
 
-   - Put your **README data** in `ReadMe.conf`.
-   - Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
+    - Put your **README data** in `ReadMe.conf`.
+    - Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
 
 2. **Check that your config is valid.**
 
@@ -57,9 +57,9 @@ To get started quickly, check out [`cerberus`](https://github.com/elysium-suite/
 
 ## Features
 
-- Robust yet simple vulnerability scorer
-- Image deployment (cleanup, README, etc)
-- Remote score reporting
+-   Robust yet simple vulnerability scorer
+-   Image deployment (cleanup, README, etc)
+-   Remote score reporting
 
 > Note: `aeacus` ships with very weak crypto on purpose. You need to implement your own crypto functions. See the [Adding Crypto](/docs/crypto.md) for more information.
 
@@ -71,7 +71,7 @@ All checks (with examples and notes) [are documented here](docs/checks.md).
 
 The configuration is written in TOML. All fields are optional unless otherwise specified. See the below example:
 
-```
+```toml
 name = "ubuntu-18-supercool" # Image name
 title = "CoolCyberStuff Practice Round" # Round title
 os = "Ubuntu 18.04" # OS, used for README
@@ -169,25 +169,25 @@ points = -5 # This check is now a penalty, because it has negative points
 
 Put your README in `ReadMe.conf`. It's pretty self-explanatory. Here's a template:
 
-```
+```html
 <!-- Put your comments/additions to the normal ReadMe here! -->
 <p>
-Uncomplicated Firewall (UFW) is the only company
-approved Firewall for use on Linux machines at this time.
+	Uncomplicated Firewall (UFW) is the only company approved Firewall for use on Linux
+	machines at this time.
 </p>
 
 <!-- You can add as many <p></p> notes as you want! This HTML is simply imported into the existing ReadMe template. -->
 <p>
-Congratulations! You just recruited a promising new team member. Create a new Standard user account named "bobbington" with a temporary password of your choosing.
+	Congratulations! You just recruited a promising new team member. Create a new
+	Standard user account named "bobbington" with a temporary password of your choosing.
 </p>
 
 <!-- Put your critical services here! -->
 <p><b>Critical Services:</b></p>
-    <ul>
-        <li>OpenSSH Server (sshd)</li>
-        <li>Other cool service</li>
-    </ul>
-
+<ul>
+	<li>OpenSSH Server (sshd)</li>
+	<li>Other cool service</li>
+</ul>
 
 <!-- Put your users here! -->
 <h2>Authorized Administrators and Users</h2>
@@ -216,7 +216,7 @@ Print information with `./aeacus info type` where `type` is one the following:
 
 ### Windows
 
-- `packages` (shows installed programs)
+-   `packages` (shows installed programs)
 
 ## Remote Endpoint
 
@@ -224,20 +224,20 @@ The authors of this project recommend using [sarpedon](https://github.com/elysiu
 
 ## Tips and Tricks
 
-- Easily change the branding by replacing `assets/img/logo.png`.
-- On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities.
+-   Easily change the branding by replacing `assets/img/logo.png`.
+-   On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities.
 
 ## Compiling
 
 Once you install `go` (make sure you use a recent version) and `garble` (`GO111MODULE=on go get mvdan.cc/garble`), you can build with these commands:
 
-- Building for `Linux`: `make lin`
-- Building for `Windows`: `make win`
+-   Building for `Linux`: `make lin`
+-   Building for `Windows`: `make win`
 
 ### Development compliation
 
-- Building for `Linux`: `make lin-dev`
-- Building for `Windows`: `make win-dev`
+-   Building for `Linux`: `make lin-dev`
+-   Building for `Windows`: `make win-dev`
 
 ## Contributing and Disclaimer
 
