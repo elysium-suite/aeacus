@@ -38,11 +38,11 @@ win-dev:
 release:
 	clear && \
 	echo "Building obfuscated binaries..." && \
-	CGO_ENABLED=0 GOOS=windows garble build -ldflags '-s -w' -tags phocus -o ./phocus.exe . && \
-	CGO_ENABLED=0 GOOS=windows garble build -ldflags '-s -w' -o ./aeacus.exe . && \
+	CGO_ENABLED=0 GOOS=windows go build -ldflags '-s -w' -tags phocus -o ./phocus.exe . && \
+	CGO_ENABLED=0 GOOS=windows go build -ldflags '-s -w' -o ./aeacus.exe . && \
 	echo "Windows production build successful!" && \
-	CGO_ENABLED=0 GOOS=linux garble build -ldflags '-s -w' -tags phocus -o ./phocus . && \
-	CGO_ENABLED=0 GOOS=linux garble build -ldflags '-s -w' -o ./aeacus . && \
+	CGO_ENABLED=0 GOOS=linux go build -ldflags '-s -w' -tags phocus -o ./phocus . && \
+	CGO_ENABLED=0 GOOS=linux go build -ldflags '-s -w' -o ./aeacus . && \
 	echo "Linux production build successful!" && \
 	mkdir aeacus-win32/ && mkdir aeacus-linux/ && \
 	mv aeacus.exe aeacus-win32/aeacus.exe && \

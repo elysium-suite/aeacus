@@ -19,8 +19,13 @@ import (
 )
 
 var (
-	delimiter      = "|-S#-|"
-	debugDelimiter = "|-D#-|"
+	delimiter = "|-S#-|"
+)
+
+const (
+	FAIL  = "FAIL"
+	GREEN = "green"
+	RED   = "red"
 )
 
 func readTeamID() {
@@ -29,13 +34,13 @@ func readTeamID() {
 	if err != nil {
 		failPrint("TeamID.txt does not exist!")
 		sendNotification("TeamID.txt does not exist!")
-		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallColor = RED
 		mc.Conn.OverallStatus = "Your TeamID files does not exist! Failed to upload scores."
 		mc.Connection = false
 	} else if fileContent == "" {
 		failPrint("TeamID.txt is empty!")
 		sendNotification("TeamID.txt is empty!")
-		mc.Conn.OverallStatus = "red"
+		mc.Conn.OverallStatus = RED
 		mc.Conn.OverallStatus = "Your TeamID is empty! Failed to upload scores."
 		mc.Connection = false
 	} else {
@@ -44,15 +49,18 @@ func readTeamID() {
 }
 
 // genChallenge generates a crypto challenge for the CSS endpoint
-func genChallenge() string {
+func genChallenge() (string, error) {
 	// Should actually use this for something
 	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
 	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
 	chalString := hexEncode(xor(randomHash1, randomHash2))
 	hasher := sha256.New()
-	hasher.Write([]byte(mc.Config.Password))
+	_, err := hasher.Write([]byte(mc.Config.Password))
+	if err != nil {
+		return "", err
+	}
 	key := hexEncode(string(hasher.Sum(nil)))
-	return hexEncode(xor(key, chalString))
+	return hexEncode(xor(key, chalString)), nil
 }
 
 func writeString(stringToWrite *strings.Builder, key, value string) {
@@ -62,20 +70,24 @@ func writeString(stringToWrite *strings.Builder, key, value string) {
 	stringToWrite.WriteString(delimiter)
 }
 
-func genUpdate() string {
+func genUpdate() (string, error) {
 	var update strings.Builder
 	// Write values for score update
 	writeString(&update, "team", mc.TeamID)
 	writeString(&update, "image", mc.Config.Name)
 	writeString(&update, "score", strconv.Itoa(mc.Image.Score))
-	writeString(&update, "challenge", genChallenge())
+	chall, err := genChallenge()
+	if err != nil {
+		return "", err
+	}
+	writeString(&update, "challenge", chall)
 	writeString(&update, "vulns", genVulns())
 	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
 	infoPrint("Encrypting score update...")
 	deobfuscateData(&mc.Config.Password)
 	finishedUpdate := hexEncode(encryptString(mc.Config.Password, update.String()))
 	obfuscateData(&mc.Config.Password)
-	return finishedUpdate
+	return finishedUpdate, nil
 }
 
 func genVulns() string {
@@ -110,15 +122,20 @@ func genVulns() string {
 }
 
 func reportScore() error {
+	update, err := genUpdate()
+	if err != nil {
+		failPrint(err.Error())
+		return err
+	}
 	resp, err := http.PostForm(mc.Config.Remote+"/update",
-		url.Values{"update": {genUpdate()}})
+		url.Values{"update": {update}})
 	if err != nil {
 		failPrint(err.Error())
 		return err
 	}
 
 	if resp.StatusCode != 200 {
-		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallColor = RED
 		mc.Conn.OverallStatus = "Failed to upload score! Please ensure that your Team ID is correct."
 		mc.Connection = false
 		failPrint("Failed to upload score!")
@@ -138,10 +155,10 @@ func checkServer() {
 	_, err := client.Get("http://example.org")
 
 	if err != nil {
-		mc.Conn.NetColor = "red"
-		mc.Conn.NetStatus = "FAIL"
+		mc.Conn.NetColor = RED
+		mc.Conn.NetStatus = FAIL
 	} else {
-		mc.Conn.NetColor = "green"
+		mc.Conn.NetColor = GREEN
 		mc.Conn.NetStatus = "OK"
 	}
 
@@ -154,54 +171,54 @@ func checkServer() {
 	// destroy image
 
 	if err != nil {
-		mc.Conn.ServerColor = "red"
-		mc.Conn.ServerStatus = "FAIL"
+		mc.Conn.ServerColor = RED
+		mc.Conn.ServerStatus = FAIL
 	} else {
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			failPrint("Error reading Status body.")
-			mc.Conn.ServerColor = "red"
-			mc.Conn.ServerStatus = "FAIL"
+			mc.Conn.ServerColor = RED
+			mc.Conn.ServerStatus = FAIL
 		} else {
 			handleStatus(string(body))
 			if resp.StatusCode == 200 {
-				mc.Conn.ServerColor = "green"
+				mc.Conn.ServerColor = GREEN
 				mc.Conn.ServerStatus = "OK"
 			} else {
-				mc.Conn.ServerColor = "red"
+				mc.Conn.ServerColor = RED
 				mc.Conn.ServerStatus = "ERROR"
 			}
 		}
 	}
 
 	// Overall
-	if mc.Conn.NetStatus == "FAIL" && mc.Conn.ServerStatus == "OK" {
+	if mc.Conn.NetStatus == FAIL && mc.Conn.ServerStatus == "OK" {
 		timeStart = time.Now()
 		mc.Conn.OverallColor = "goldenrod"
 		mc.Conn.OverallStatus = "Server connection good but no Internet. Assuming you're on an isolated LAN."
 		mc.Connection = true
-	} else if mc.Conn.ServerStatus == "FAIL" {
+	} else if mc.Conn.ServerStatus == FAIL {
 		timeStart = time.Now()
-		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallColor = RED
 		mc.Conn.OverallStatus = "Failure! Can't access remote scoring server."
 		failPrint("Can't access remote scoring server!")
 		sendNotification("Score upload failure! Unable to access remote server.")
 		mc.Connection = false
 	} else if mc.Conn.ServerStatus == "ERROR" {
-		timeWithoutID = time.Now().Sub(timeStart)
+		timeWithoutID = time.Since(timeStart)
 		if !mc.Config.NoDestroy && timeWithoutID > withoutIDThreshold {
 			failPrint("Destroying the image! Too long without inputting valid ID.")
 			// destroyImage()
 		}
-		mc.Conn.OverallColor = "red"
+		mc.Conn.OverallColor = RED
 		mc.Conn.OverallStatus = "Scoring engine rejected your TeamID!"
 		failPrint("Remote server returned an error for its status! Your ID is probably wrong.")
 		sendNotification("Status check failed, TeamID incorrect!")
 		mc.Connection = false
 	} else {
 		timeStart = time.Now()
-		mc.Conn.OverallColor = "green"
+		mc.Conn.OverallColor = GREEN
 		mc.Conn.OverallStatus = "OK"
 		mc.Connection = true
 	}
@@ -233,7 +250,10 @@ func handleStatus(status string) {
 func encryptString(password, plainText string) string {
 	// Create a sha256sum hash of the password provided.
 	hasher := sha256.New()
-	hasher.Write([]byte(password))
+	_, err := hasher.Write([]byte(password))
+	if err != nil {
+		// wat
+	}
 	key := hasher.Sum(nil)
 
 	// Pad plainText to be a 16-byte block.
@@ -276,7 +296,9 @@ func encryptString(password, plainText string) string {
 func decryptString(password, ciphertext string) string {
 	// Create a sha256sum hash of the password provided.
 	hasher := sha256.New()
-	hasher.Write([]byte(password))
+	if _, err := hasher.Write([]byte(password)); err != nil {
+		// idk??
+	}
 	key := hasher.Sum(nil)
 
 	// Grab the IV from the first 12 bytes of the file.

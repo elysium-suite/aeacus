@@ -12,7 +12,7 @@ import (
 // which parses the encrypted scoring configuration file.
 func ReadScoringData() error {
 	infoPrint("Decrypting data from " + mc.DirPath + ScoringData + "...")
-	decryptedData, err := readData(ScoringData)
+	decryptedData, err := readData()
 	if err != nil {
 		failPrint("error reading in scoring data: " + err.Error())
 		return err
