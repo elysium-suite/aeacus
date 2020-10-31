@@ -18,9 +18,7 @@ import (
 	"time"
 )
 
-var (
-	delimiter = "|-S#-|"
-)
+var delimiter = "|-S#-|"
 
 const (
 	FAIL  = "FAIL"

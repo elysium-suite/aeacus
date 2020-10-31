@@ -19,16 +19,16 @@ import (
 // and runs the correct function with the correct parameters
 func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool {
 	if err := deobfuscateData(&checkType); err != nil {
-		//wat
+		// wat
 	}
 	if err := deobfuscateData(&arg1); err != nil {
-		//wat
+		// wat
 	}
 	if err := deobfuscateData(&arg2); err != nil {
-		//wat
+		// wat
 	}
 	if err := deobfuscateData(&arg3); err != nil {
-		//wat
+		// wat
 	}
 	switch checkType {
 	case "Command":
