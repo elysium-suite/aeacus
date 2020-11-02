@@ -1,9 +1,5 @@
 package cmd
 
-import (
-	"strings"
-)
-
 func LaunchIDPrompt() {
 	err := shellCommand(`zenity --entry --title="TeamID" --text "Enter your TeamID:" --width=200 >/opt/aeacus/TeamID.txt`)
 	if err != nil {
