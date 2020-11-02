@@ -1,27 +1,8 @@
 package cmd
 
-import (
-	"strings"
-)
-
 func LaunchIDPrompt() {
-	teamID, err := shellCommandOutput(`
-		#!/bin/bash
-		teamid=$(
-			zenity --entry \
-			--title="TeamID" \
-			--text "Enter your TeamID:" \
-	--width=700
-		)
-		echo $teamid
-	`)
-
-	strippedTeamID := strings.Replace(teamID, " ", "", -1)
-
-	if err == nil {
-		writeFile(mc.DirPath+"TeamID.txt", strippedTeamID)
-	} else {
-		failPrint("Error saving TeamID!")
+	err := shellCommand(`zenity --entry --title="TeamID" --text "Enter your TeamID:" --width=200 >/opt/aeacus/TeamID.txt`)
+	if err != nil {
 		sendNotification("Error saving TeamID!")
 	}
 }
