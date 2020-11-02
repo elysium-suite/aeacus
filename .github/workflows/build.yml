@@ -25,6 +25,4 @@ jobs:
         run: go get -v -t -d ./...
 
       - name: Build
-        run: |
-          go get mvdan.cc/garble
-          make
+        run: go build .
