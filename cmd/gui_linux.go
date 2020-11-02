@@ -11,7 +11,7 @@ func LaunchIDPrompt() {
 			zenity --entry \
 			--title="TeamID" \
 			--text "Enter your TeamID:" \
-            --width=700
+	--width=700
 		)
 		echo $teamid
 	`)

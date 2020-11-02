@@ -14,8 +14,8 @@ EOF
 
 # Force script to be run as root
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run this script as root! It's very short-- please feel free to audit its source code."
-  exit 1
+	echo "Please run this script as root! It's very short-- please feel free to audit its source code."
+	exit 1
 fi
 
 # Update package list

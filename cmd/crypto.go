@@ -24,11 +24,11 @@ import (
 // These hashes are used for XORing the plaintext. Again-- not
 // cryptographically genius.
 const (
-	randomHashOne = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-	randomHashTwo = "NowThatsWhatICallARandomString"
+	randomHashOne = "bc1f55699832f80b63da0de463c0f4b030ee3e219371b29cab292b2e439194bc8e517051f0e3dc44a858134e1757fda0445d3a2203ac1e383d20f491105ed5d279b418b85fdc6c2f3003791568af9d85ce7a5b0bf0be90f259e52f089a3ee5682eac0c2b53af5be18fb85c9de8980c2fb32a14fb7fa971881463655fa3dd817d"
+	randomHashTwo = "1b29cab292b2e439194bc8e517051f0e3dc44a858134e1757fda0445d3a2203ac1e383d20f491105ed51b29cab292b2e439194bc8e517051f0e3dc44a858134e1757fda0445d3a2203ac1e383d20f491105ed5d279b418b85fdc6c2f3003791568af9d85ce7a5b0bf0bd279b418b85fdc6c2f3003791568af9d85ce7a5b0bf0b"
 )
 
-var byteKey = []byte{0x53, 0xf7, 0xb1, 0xcd, 0x26, 0x7a, 0x6f, 0x9a, 0xa5, 0x61, 0xb0, 0x97, 0x21}
+var byteKey = []byte{0x23, 0xf3, 0x24, 0x32, 0x54, 0x76, 0x37, 0x37, 0x86, 0x12, 0x26, 0x07, 0x43, 0x12, 0x26, 0x07, 0x43}
 
 // encryptConfig takes the plainText config and returns an encrypted string
 // that should be written to the encrypted scoring data file.
@@ -75,7 +75,7 @@ func decryptConfig(cipherText string) (string, error) {
 	}
 
 	// Check that decryptedConfig is not empty.
-	decryptedConfig := string(dataBuffer.Bytes())
+	decryptedConfig := dataBuffer.String()
 	if decryptedConfig == "" {
 		return "", errors.New("decrypted config is empty")
 	}
