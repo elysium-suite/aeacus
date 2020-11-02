@@ -16,7 +16,7 @@ import (
 )
 
 // processCheckWrapper takes the data from a check in the config
-// and runs the correct function with the correct parameters
+// and runs the correct function with the correct parameters.
 func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool {
 	if err := deobfuscateData(&checkType); err != nil {
 		Wat(err)

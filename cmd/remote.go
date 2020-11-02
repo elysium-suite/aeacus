@@ -82,9 +82,13 @@ func genUpdate() (string, error) {
 	writeString(&update, "vulns", genVulns())
 	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
 	infoPrint("Encrypting score update...")
-	deobfuscateData(&mc.Config.Password)
+	if err := deobfuscateData(&mc.Config.Password); err != nil {
+		Wat(err)
+	}
 	finishedUpdate := hexEncode(encryptString(mc.Config.Password, update.String()))
-	obfuscateData(&mc.Config.Password)
+	if err := obfuscateData(&mc.Config.Password); err != nil {
+		Wat(err)
+	}
 	return finishedUpdate, nil
 }
 
@@ -98,16 +102,24 @@ func genVulns() string {
 
 	// Build vuln string
 	for _, penalty := range mc.Image.Penalties {
-		deobfuscateData(&penalty.Message)
+		if err := deobfuscateData(&penalty.Message); err != nil {
+			Wat(err)
+		}
 		vulnString.WriteString(fmt.Sprintf("%s - N%.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
-		obfuscateData(&penalty.Message)
+		if err := obfuscateData(&penalty.Message); err != nil {
+			Wat(err)
+		}
 		vulnString.WriteString(delimiter)
 	}
 
 	for _, point := range mc.Image.Points {
-		deobfuscateData(&point.Message)
+		if err := deobfuscateData(&point.Message); err != nil {
+			Wat(err)
+		}
 		vulnString.WriteString(fmt.Sprintf("%s - %d pts", point.Message, point.Points))
-		obfuscateData(&point.Message)
+		if err := obfuscateData(&point.Message); err != nil {
+			Wat(err)
+		}
 		vulnString.WriteString(delimiter)
 	}
 
