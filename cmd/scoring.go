@@ -21,7 +21,7 @@ func scoreImage() {
 			if mc.Connection {
 				err := reportScore()
 				if err != nil {
-					// uhh
+					Wat(err)
 				}
 			}
 		}

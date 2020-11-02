@@ -128,66 +128,66 @@ func printConfig() {
 func obfuscateConfig() {
 	infoPrint("Obfuscating configuration...")
 	if err := obfuscateData(&mc.Config.Password); err != nil {
-		// wut
+		Wat(err)
 	}
 	for i, check := range mc.Config.Check {
 		if err := obfuscateData(&mc.Config.Check[i].Message); err != nil {
-			// wut
+			Wat(err)
 		}
 		if check.Pass != nil {
 			for x := range check.Pass {
 				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Type); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Arg1); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Arg2); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Arg3); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Arg4); err != nil {
-					// wut
+					Wat(err)
 				}
 			}
 		}
 		if check.PassOverride != nil {
 			for x := range check.PassOverride {
 				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Type); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg1); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg2); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg3); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg4); err != nil {
-					// wut
+					Wat(err)
 				}
 			}
 		}
 		if check.Fail != nil {
 			for x := range check.Fail {
 				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Type); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Arg1); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Arg2); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Arg3); err != nil {
-					// wut
+					Wat(err)
 				}
 				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Arg4); err != nil {
-					// wut
+					Wat(err)
 				}
 			}
 		}

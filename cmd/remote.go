@@ -250,7 +250,7 @@ func encryptString(password, plainText string) string {
 	hasher := sha256.New()
 	_, err := hasher.Write([]byte(password))
 	if err != nil {
-		// wat
+		Wat(err)
 	}
 	key := hasher.Sum(nil)
 
@@ -295,7 +295,7 @@ func decryptString(password, ciphertext string) string {
 	// Create a sha256sum hash of the password provided.
 	hasher := sha256.New()
 	if _, err := hasher.Write([]byte(password)); err != nil {
-		// idk??
+		Wat(err)
 	}
 	key := hasher.Sum(nil)
 
