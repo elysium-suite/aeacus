@@ -3,7 +3,6 @@ package cmd
 func LaunchIDPrompt() {
 	err := shellCommand(`zenity --entry --title="TeamID" --text "Enter your TeamID:" --width=200 >/opt/aeacus/TeamID.txt`)
 	if err != nil {
-		failPrint("Error saving TeamID!")
 		sendNotification("Error saving TeamID!")
 	}
 }
