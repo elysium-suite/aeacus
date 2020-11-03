@@ -31,7 +31,9 @@ func phocusEnvironment() {
 	// Make sure phocus is not being traced or debugged.
 	checkTrace()
 	// Read in scoring data from the scoring data file.
-	ReadScoringData()
+	if err := ReadScoringData(); err != nil {
+		// uhh
+	}
 	// Seed the random function for scoring at random intervals.
 	rand.Seed(time.Now().UnixNano())
 }

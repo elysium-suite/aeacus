@@ -294,7 +294,7 @@ func firewallUp() (bool, error) {
 		// This is kind of jank and kind of slow
 		cmdText := "(Get-NetFirewallProfile -Name '" + profile + "').Enabled"
 		result, err := commandOutput(cmdText, "True")
-		if result == false || err != nil {
+		if !result || err != nil {
 			return result, err
 		}
 	}
@@ -355,7 +355,7 @@ func userRights(userOrGroup, privilege string) (bool, error) {
 	if len(privStringSplit) != 3 {
 		return false, errors.New("Error splitting privilege")
 	}
-	privStringSplit = strings.Split(string(privStringSplit[2]), ",")
+	privStringSplit = strings.Split(privStringSplit[2], ",")
 	for _, sidValue := range privStringSplit {
 		sidValue = strings.TrimSpace(sidValue)
 		userForSid := strings.Split(sidToLocalUser(sidValue[1:]), "\\")
@@ -381,6 +381,7 @@ func scheduledTaskExists(taskName string) (bool, error) {
 func startupProgramExists(progName string) (bool, error) {
 	// need to work out the implementation on this one too...
 	// multiple startup locations
+	// rot
 	return true, nil
 }
 
@@ -438,7 +439,7 @@ func securityPolicy(keyName, keyValue string) (bool, error) {
 
 func registryKey(keyName, keyValue string, existCheck bool) (bool, error) {
 	// Break down input
-	registryArgs := regexp.MustCompile("[\\\\]+").Split(keyName, -1)
+	registryArgs := regexp.MustCompile(`[\\]+`).Split(keyName, -1)
 	registryHiveText := registryArgs[0]
 	keyPath := fmt.Sprintf(strings.Join(registryArgs[1:len(registryArgs)-1], "\\")) // idk??
 	keyLoc := registryArgs[len(registryArgs)-1]
@@ -534,9 +535,9 @@ func firefoxSetting(param, value string) (bool, error) {
 		}
 
 		if check {
-			res, err = dirContainsRegex(`C:\Program Files\Mozilla Firefox`, `"`+param+`",`+value)
+			res, _ = dirContainsRegex(`C:\Program Files\Mozilla Firefox`, `"`+param+`",`+value)
 		} else {
-			res, err = dirContainsRegex(`C:\Users\`+mc.Config.User+`\AppData\Roaming\Mozilla\Firefox\Profiles`, `"`+param+`",`+value)
+			res, _ = dirContainsRegex(`C:\Users\`+mc.Config.User+`\AppData\Roaming\Mozilla\Firefox\Profiles`, `"`+param+`",`+value)
 		}
 
 	} else if bit32 {

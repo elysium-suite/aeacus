@@ -81,57 +81,57 @@ func GenReadMe() {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Aeacus README</title>
 	<style>
-        body {
-            background-image: url("./img/background.png");
-            background-size: cover;
-            font-family: Helvetica, Arial, sans-serif;
-        }
+		body {
+			background-image: url("./img/background.png");
+			background-size: cover;
+			font-family: Helvetica, Arial, sans-serif;
+		}
 
-        h1 {
-	        text-align: center;
-	        font-size: 36px;
-	        margin: 10px;
-	        padding: 0 14px 10px 0px;
-	        width: 100%;
-	        height: 100%;
-	        color: #0D2E5B !important
-        }
+		h1 {
+			text-align: center;
+			font-size: 36px;
+			margin: 10px;
+			padding: 0 14px 10px 0px;
+			width: 100%;
+			height: 100%;
+			color: #0D2E5B !important
+		}
 
-        h2 {
-	        font-size: 18px;
-	        margin: 30px 0 10px 0;
-	        padding: 0;
-	        width: 100%;
-	        height: 100%;
-	        color: #0D2E5B !important
-        }
+		h2 {
+			font-size: 18px;
+			margin: 30px 0 10px 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+			color: #0D2E5B !important
+		}
 
-        pre {
-	        font-size: 16px
-        }
+		pre {
+			font-size: 16px
+		}
 
-        .main {
-	        margin-top: 25px;
-	        margin-bottom: 10px;
-	        margin-left: auto;
-	        margin-right: auto;
-	        padding: 0px;
-	        background-color: white;
-	        max-width: 100%
-        }
+		.main {
+			margin-top: 25px;
+			margin-bottom: 10px;
+			margin-left: auto;
+			margin-right: auto;
+			padding: 0px;
+			background-color: white;
+			max-width: 100%
+		}
 
-        .text {
-	        padding-top: 12px;
-	        padding-bottom: 12px;
-	        padding-left: 40px;
-	        padding-right: 40px
-        }
+		.text {
+			padding-top: 12px;
+			padding-bottom: 12px;
+			padding-left: 40px;
+			padding-right: 40px
+		}
 
-        .center {
-	        text-align: center
-        }
+		.center {
+			text-align: center
+		}
 	</style>
-        <div style="width: 80%; margin-left: auto; margin-right: auto; display: block" >
+		<div style="width: 80%; margin-left: auto; margin-right: auto; display: block" >
 			<div class="main">
 				<div class="text">
 					<p align="center">
@@ -151,13 +151,13 @@ func GenReadMe() {
 	htmlFile.WriteString("<h2><b>" + mc.Config.OS + "</b></h2>")
 
 	htmlFile.WriteString(`<p>
-    It is company policy to use only ` + mc.Config.OS + ` on this
-    computer. It is also company policy to use only the
-    latest, official, stable ` + mc.Config.OS + ` packages available
-    for required software and services on this computer.
-    Management has decided that the default web browser for
-    all users on this computer should be the latest stable
-    version of Firefox.`)
+	It is company policy to use only ` + mc.Config.OS + ` on this
+	computer. It is also company policy to use only the
+	latest, official, stable ` + mc.Config.OS + ` packages available
+	for required software and services on this computer.
+	Management has decided that the default web browser for
+	all users on this computer should be the latest stable
+	version of Firefox.`)
 
 	if runtime.GOOS == "linux" {
 		htmlFile.WriteString(` Company policy is to never let users log in as root. If administrators need to run commands as root, they are required to use the "sudo" command.`)

@@ -24,11 +24,11 @@ import (
 // These hashes are used for XORing the plaintext. Again-- not
 // cryptographically genius.
 const (
-	randomHashOne = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-	randomHashTwo = "NowThatsWhatICallARandomString"
+	randomHashOne = "ROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROTROT"
+	randomHashTwo = "GOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOPGOP"
 )
 
-var byteKey = []byte{0x53, 0xf7, 0xb1, 0xcd, 0x26, 0x7a, 0x6f, 0x9a, 0xa5, 0x61, 0xb0, 0x97, 0x21}
+var byteKey = []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 
 // encryptConfig takes the plainText config and returns an encrypted string
 // that should be written to the encrypted scoring data file.
@@ -75,7 +75,7 @@ func decryptConfig(cipherText string) (string, error) {
 	}
 
 	// Check that decryptedConfig is not empty.
-	decryptedConfig := string(dataBuffer.Bytes())
+	decryptedConfig := dataBuffer.String()
 	if decryptedConfig == "" {
 		return "", errors.New("decrypted config is empty")
 	}

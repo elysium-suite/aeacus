@@ -12,22 +12,22 @@
 
 > https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpsb/0b40db09-d95d-40a6-8467-32aedec8140c
 
-- `MinimumPasswordAge`
-- `MaximumPasswordAge`
-- `MinimumPasswordLength`
-- `PasswordComplexity`
-- `ClearTextPassword`
-  > Also known as "Store passwords using reversible encryption".
-- `PasswordHistorySize`
+-   `MinimumPasswordAge`
+-   `MaximumPasswordAge`
+-   `MinimumPasswordLength`
+-   `PasswordComplexity`
+-   `ClearTextPassword`
+	> Also known as "Store passwords using reversible encryption".
+-   `PasswordHistorySize`
 
 ### Account Lockout Policies
 
 > https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpsb/2cd39c97-97cd-4859-a7b4-1229dad5f53d
 
-- `ForceLogoffWhenHourExpire`
-- `LockoutDuration`
-- `LockoutBadCount`
-- `ResetLockoutCount`
+-   `ForceLogoffWhenHourExpire`
+-   `LockoutDuration`
+-   `LockoutBadCount`
+-   `ResetLockoutCount`
 
 ## Local Policies
 
@@ -35,15 +35,15 @@
 
 > https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpsb/01f8e057-f6a8-4d6e-8a00-99bcd241b403
 
-- `AuditSystemEvents`
-- `AuditLogonEvents`
-- `AuditObjectAccess`
-- `AuditPrivilegeUse`
-- `AuditPolicyChange`
-- `AuditAccountManage`
-- `AuditProcessTracking`
-- `AuditDSAccess`
-- `AuditAccountLogon`
+-   `AuditSystemEvents`
+-   `AuditLogonEvents`
+-   `AuditObjectAccess`
+-   `AuditPrivilegeUse`
+-   `AuditPolicyChange`
+-   `AuditAccountManage`
+-   `AuditProcessTracking`
+-   `AuditDSAccess`
+-   `AuditAccountLogon`
 
 > These should be set to `3` for "Success and Failure Audits".
 
@@ -55,11 +55,11 @@ Everything from this point and below should be in the `Security Options` pane of
 
 > https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpsb/d6eaa54a-f609-48e9-8461-b32738d77a47
 
-- `LSAAnonymousNameLookup`
-- `EnableAdminAccount`
-- `EnableGuestAccount`
-- `NewAdministratorName`
-- `NewGuestName`
+-   `LSAAnonymousNameLookup`
+-   `EnableAdminAccount`
+-   `EnableGuestAccount`
+-   `NewAdministratorName`
+-   `NewGuestName`
 
 ## Security Options
 

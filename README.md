@@ -10,16 +10,16 @@ To get started quickly, check out [`cerberus`](https://github.com/elysium-suite/
 
 0. **Extract the release** into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
 
-    > You should try compiling it yourself! If not, you can [download the releases here](https://github.com/elysium-suite/aeacus/releases).
+	> You should try compiling it yourself! If not, you can [download the releases here](https://github.com/elysium-suite/aeacus/releases).
 
 1. **Set up the environment.**
 
-    - Put your **config** in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
+	- Put your **config** in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
 
-        - _Don't have a config? See the example at the bottom of this README._
+		- _Don't have a config? See the example at the bottom of this README._
 
-    - Put your **README data** in `ReadMe.conf`.
-    - Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
+	- Put your **README data** in `ReadMe.conf`.
+	- Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
 
 2. **Check that your config is valid.**
 
@@ -113,22 +113,22 @@ disableshell = true
 message = "Removed insecure sudoers rule"
 points = 10
 
-    [[check.pass]]
-    type="FileContainsNot"
-    arg1="/etc/sudoers"
-    arg2="NOPASSWD"
+	[[check.pass]]
+	type="FileContainsNot"
+	arg1="/etc/sudoers"
+	arg2="NOPASSWD"
 
 [[check]]
 # If no message is specified, one is auto-generated
 points = 20
 
-    [[check.pass]]
-    type="FileExistsNot"
-    arg1="/etc/secrets.zip"
+	[[check.pass]]
+	type="FileExistsNot"
+	arg1="/etc/secrets.zip"
 
-    [[check.pass]] # You can code multiple pass conditions
-    type="Command" # they must ALL succeed for the check to pass
-    arg1="ufw status"
+	[[check.pass]] # You can code multiple pass conditions
+	type="Command" # they must ALL succeed for the check to pass
+	arg1="ufw status"
 
 [[check]]
 message = "Malicious user 'user' can't read /etc/shadow"
@@ -138,30 +138,30 @@ message = "Malicious user 'user' can't read /etc/shadow"
 # If total points already specified is above 100, each check
 # without points is worth 2 points.
 
-    [[check.pass]]
-    type="CommandNot"
-    arg1="sudo -u user cat /etc/shadow"
+	[[check.pass]]
+	type="CommandNot"
+	arg1="sudo -u user cat /etc/shadow"
 
-    [[check.pass]]
-    type="FileExists"
-    arg1="/etc/shadow"
+	[[check.pass]]
+	type="FileExists"
+	arg1="/etc/shadow"
 
-    [[check.passoverride]]  # If you a check to succeed if just one condition
-    type="UserExistsNot"    # passes, regardless of other pass checks, use
-    arg1="user"             # an override pass (passoverride). This is still
-                            # overridden by fail conditions.
+	[[check.passoverride]]  # If you a check to succeed if just one condition
+	type="UserExistsNot"    # passes, regardless of other pass checks, use
+	arg1="user"             # an override pass (passoverride). This is still
+							# overridden by fail conditions.
 
-    [[check.fail]]       # If any fail conditions pass, the whole check
-    type="FileExistsNot" # will fail
-    arg1="/etc/shadow"
+	[[check.fail]]       # If any fail conditions pass, the whole check
+	type="FileExistsNot" # will fail
+	arg1="/etc/shadow"
 
 [[check]]
 message = "Administrator has been removed"
 points = -5 # This check is now a penalty, because it has negative points
 
-    [[check.pass]]
-    type="UserExistsNot"
-    arg1="coolAdmin"
+	[[check.pass]]
+	type="UserExistsNot"
+	arg1="coolAdmin"
 
 ```
 
@@ -172,14 +172,15 @@ Put your README in `ReadMe.conf`. It's pretty self-explanatory. Here's a templat
 ```html
 <!-- Put your comments/additions to the normal ReadMe here! -->
 <p>
-	Uncomplicated Firewall (UFW) is the only company approved Firewall for use on Linux
-	machines at this time.
+	Uncomplicated Firewall (UFW) is the only company approved Firewall for use
+	on Linux machines at this time.
 </p>
 
 <!-- You can add as many <p></p> notes as you want! This HTML is simply imported into the existing ReadMe template. -->
 <p>
-	Congratulations! You just recruited a promising new team member. Create a new
-	Standard user account named "bobbington" with a temporary password of your choosing.
+	Congratulations! You just recruited a promising new team member. Create a
+	new Standard user account named "bobbington" with a temporary password of
+	your choosing.
 </p>
 
 <!-- Put your critical services here! -->
@@ -195,9 +196,9 @@ Put your README in `ReadMe.conf`. It's pretty self-explanatory. Here's a templat
 <pre>
 <b>Authorized Administrators:</b>
 coolUser (you)
-    password: coolPassword
+	password: coolPassword
 bob
-    password: bob
+	password: bob
 
 <b>Authorized Users:</b>
 coolFriend
