@@ -49,16 +49,16 @@ type scoreItem struct {
 // scoringChecks is a representation of the TOML configuration typically
 // specific in scoring.conf.
 type scoringChecks struct {
+	Local        bool
+	NoDestroy    bool
+	DisableShell bool
 	Name         string
 	Title        string
 	User         string
 	OS           string
 	Remote       string
 	Password     string
-	Local        bool
 	EndDate      string
-	NoDestroy    bool
-	DisableShell bool
 	Check        []check
 }
 

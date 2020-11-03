@@ -19,7 +19,10 @@ func scoreImage() {
 		if mc.Config.Remote != "" {
 			checkServer()
 			if mc.Connection {
-				reportScore()
+				err := reportScore()
+				if err != nil {
+					Wat(err)
+				}
 			}
 		}
 		genReport(mc.Image)
@@ -86,13 +89,13 @@ func checkConfigData() {
 	readTeamID()
 }
 
-// scoreChecks runs through every check configured and runs them concurrently.
+// scoreChecks runs through every check configured.
 func scoreChecks() {
 	mc.Image = imageData{}
 	assignPoints()
 
-	for index, check := range mc.Config.Check {
-		scoreCheck(index, check)
+	for _, check := range mc.Config.Check {
+		scoreCheck(check)
 	}
 
 	infoPrint("Finished running all checks.")
@@ -101,7 +104,7 @@ func scoreChecks() {
 
 // scoreCheck will go through each condition inside a check, and determine
 // whether or not the check passes. It does this concurrently.
-func scoreCheck(index int, check check) {
+func scoreCheck(check check) {
 	status := true
 	emptyMessage := true
 	if check.Message == "" {

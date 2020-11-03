@@ -72,7 +72,7 @@ func WriteConfig(sourceFile, destFile string) {
 
 // readData is a wrapper around decryptData, taking the scoring data fileName,
 // and reading its content. It returns the decrypt config.
-func readData(fileName string) (string, error) {
+func readData() (string, error) {
 	// Read in the encrypted configuration filei
 	dataFile, err := readFile(mc.DirPath + ScoringData)
 	if err != nil {
@@ -127,34 +127,68 @@ func printConfig() {
 
 func obfuscateConfig() {
 	infoPrint("Obfuscating configuration...")
-	obfuscateData(&mc.Config.Password)
+	if err := obfuscateData(&mc.Config.Password); err != nil {
+		Wat(err)
+	}
 	for i, check := range mc.Config.Check {
-		obfuscateData(&mc.Config.Check[i].Message)
+		if err := obfuscateData(&mc.Config.Check[i].Message); err != nil {
+			Wat(err)
+		}
 		if check.Pass != nil {
 			for x := range check.Pass {
-				obfuscateData(&mc.Config.Check[i].Pass[x].Type)
-				obfuscateData(&mc.Config.Check[i].Pass[x].Arg1)
-				obfuscateData(&mc.Config.Check[i].Pass[x].Arg2)
-				obfuscateData(&mc.Config.Check[i].Pass[x].Arg3)
-				obfuscateData(&mc.Config.Check[i].Pass[x].Arg4)
+				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Type); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Arg1); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Arg2); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Arg3); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].Pass[x].Arg4); err != nil {
+					Wat(err)
+				}
 			}
 		}
 		if check.PassOverride != nil {
 			for x := range check.PassOverride {
-				obfuscateData(&mc.Config.Check[i].PassOverride[x].Type)
-				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg1)
-				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg2)
-				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg3)
-				obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg4)
+				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Type); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg1); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg2); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg3); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].PassOverride[x].Arg4); err != nil {
+					Wat(err)
+				}
 			}
 		}
 		if check.Fail != nil {
 			for x := range check.Fail {
-				obfuscateData(&mc.Config.Check[i].Fail[x].Type)
-				obfuscateData(&mc.Config.Check[i].Fail[x].Arg1)
-				obfuscateData(&mc.Config.Check[i].Fail[x].Arg2)
-				obfuscateData(&mc.Config.Check[i].Fail[x].Arg3)
-				obfuscateData(&mc.Config.Check[i].Fail[x].Arg4)
+				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Type); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Arg1); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Arg2); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Arg3); err != nil {
+					Wat(err)
+				}
+				if err := obfuscateData(&mc.Config.Check[i].Fail[x].Arg4); err != nil {
+					Wat(err)
+				}
 			}
 		}
 	}
@@ -203,11 +237,11 @@ func infoPrint(toPrint string) {
 
 func printer(colorChosen color.Attribute, messageType, toPrint string) string {
 	printer := color.New(colorChosen, color.Bold)
-	printStr := fmt.Sprintf("[")
+	printStr := "["
 	printStr += printer.Sprintf(messageType)
 	printStr += fmt.Sprintf("] %s", toPrint)
 	if toPrint != "" {
-		printStr += fmt.Sprintf("\n")
+		printStr += "\n"
 	}
 	return printStr
 }

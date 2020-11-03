@@ -16,12 +16,20 @@ import (
 )
 
 // processCheckWrapper takes the data from a check in the config
-// and runs the correct function with the correct parameters
+// and runs the correct function with the correct parameters.
 func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool {
-	deobfuscateData(&checkType)
-	deobfuscateData(&arg1)
-	deobfuscateData(&arg2)
-	deobfuscateData(&arg3)
+	if err := deobfuscateData(&checkType); err != nil {
+		Wat(err)
+	}
+	if err := deobfuscateData(&arg1); err != nil {
+		Wat(err)
+	}
+	if err := deobfuscateData(&arg2); err != nil {
+		Wat(err)
+	}
+	if err := deobfuscateData(&arg3); err != nil {
+		Wat(err)
+	}
 	switch checkType {
 	case "Command":
 		if check.Message == "" {
@@ -287,14 +295,17 @@ func dirContainsRegex(dirName, expressionString string) (bool, error) {
 }
 
 // fileEquals calculates the SHA1 sum of a file and compares it
-// with the hash provided in the check
+// with the hash provided in the check.
 func fileEquals(fileName, fileHash string) (bool, error) {
 	fileContent, err := readFile(fileName)
 	if err != nil {
 		return false, err
 	}
 	hasher := sha1.New()
-	hasher.Write([]byte(fileContent))
+	_, err = hasher.Write([]byte(fileContent))
+	if err != nil {
+		return false, err
+	}
 	hash := hex.EncodeToString(hasher.Sum(nil))
 	return hash == fileHash, nil
 }
