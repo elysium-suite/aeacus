@@ -96,7 +96,8 @@ func tossKey() []byte {
 func obfuscateData(datum *string) error {
 	var err error
 	if *datum == "" {
-		return errors.New("empty datum given to obfuscateData")
+		debugPrint("empty datum given to obfuscateData")
+		return nil
 	}
 	if *datum, err = encryptConfig(*datum); err == nil {
 		*datum = hexEncode(xor(string(tossKey()), *datum))
@@ -111,7 +112,10 @@ func obfuscateData(datum *string) error {
 func deobfuscateData(datum *string) error {
 	var err error
 	if *datum == "" {
-		return errors.New("empty datum given to deobfuscateData")
+		// empty data given to deobfuscateData-- not really a concern
+		// often this is just empty/optional struct fields
+		debugPrint("empty datum given to deobfuscateData")
+		return nil
 	}
 	*datum, err = hexDecode(*datum)
 	if err != nil {

@@ -6,6 +6,7 @@ aeacus
 phocus
 previous.txt
 TeamID.txt
+tags
 *.swp
 *.zip
 *.exe
