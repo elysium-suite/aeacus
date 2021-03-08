@@ -134,6 +134,8 @@ func adminCheck() bool {
 // destroyImage removes the aeacus directory (to stop scoring) and optionally
 // can destroy the entire machine.
 func destroyImage() {
+	failPrint("Destroying the image is temporarily cancelled.")
+	os.Exit(1)
 	failPrint("Destroying the image!")
 	if verboseEnabled {
 		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")

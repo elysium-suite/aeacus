@@ -83,11 +83,11 @@ func genUpdate() (string, error) {
 	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
 	infoPrint("Encrypting score update...")
 	if err := deobfuscateData(&mc.Config.Password); err != nil {
-		Wat(err)
+		errorPrint(err)
 	}
 	finishedUpdate := hexEncode(encryptString(mc.Config.Password, update.String()))
 	if err := obfuscateData(&mc.Config.Password); err != nil {
-		Wat(err)
+		errorPrint(err)
 	}
 	return finishedUpdate, nil
 }
@@ -103,22 +103,22 @@ func genVulns() string {
 	// Build vuln string
 	for _, penalty := range mc.Image.Penalties {
 		if err := deobfuscateData(&penalty.Message); err != nil {
-			Wat(err)
+			errorPrint(err)
 		}
 		vulnString.WriteString(fmt.Sprintf("%s - N%.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
 		if err := obfuscateData(&penalty.Message); err != nil {
-			Wat(err)
+			errorPrint(err)
 		}
 		vulnString.WriteString(delimiter)
 	}
 
 	for _, point := range mc.Image.Points {
 		if err := deobfuscateData(&point.Message); err != nil {
-			Wat(err)
+			errorPrint(err)
 		}
 		vulnString.WriteString(fmt.Sprintf("%s - %d pts", point.Message, point.Points))
 		if err := obfuscateData(&point.Message); err != nil {
-			Wat(err)
+			errorPrint(err)
 		}
 		vulnString.WriteString(delimiter)
 	}
@@ -262,7 +262,7 @@ func encryptString(password, plainText string) string {
 	hasher := sha256.New()
 	_, err := hasher.Write([]byte(password))
 	if err != nil {
-		Wat(err)
+		errorPrint(err)
 	}
 	key := hasher.Sum(nil)
 
@@ -307,7 +307,7 @@ func decryptString(password, ciphertext string) string {
 	// Create a sha256sum hash of the password provided.
 	hasher := sha256.New()
 	if _, err := hasher.Write([]byte(password)); err != nil {
-		Wat(err)
+		errorPrint(err)
 	}
 	key := hasher.Sum(nil)
 

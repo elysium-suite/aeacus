@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"io/ioutil"
-	"log"
 	"net/url"
 	"regexp"
 	"strings"
@@ -28,10 +27,6 @@ var (
 	timeWithoutID, _      = time.ParseDuration("0s")
 	withoutIDThreshold, _ = time.ParseDuration("30m")
 )
-
-func Wat(err error) {
-	log.Println("rot: " + err.Error())
-}
 
 // timeCheck calls destroyImage if the configured EndDate for the image has
 // passed. Its purpose is to dissuade or prevent people using an image after
