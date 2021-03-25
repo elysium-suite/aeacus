@@ -123,14 +123,6 @@ type='FirewallUp'
 
 > **Note**: On Linux, unfortunately uses `ufw` at the moment. On Window, this passes if all three Windows Firewall profiles are active.
 
-**FirefoxPrefIs**: pass if the specified preference is set in Firefox
-
-```
-type='FirefoxPrefIs'
-arg1='app.normandy.first_run'
-arg2='false'
-```
-
 <hr>
 
 ### Linux-Specific Checks

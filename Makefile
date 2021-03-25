@@ -36,7 +36,6 @@ win-dev:
 	echo "Windows development build successful!"
 
 release:
-	clear && \
 	echo "Building obfuscated binaries..." && \
 	CGO_ENABLED=0 GOOS=windows garble build -ldflags '-s -w' -tags phocus -o ./phocus.exe . && \
 	CGO_ENABLED=0 GOOS=windows garble build -ldflags '-s -w' -o ./aeacus.exe . && \

@@ -82,18 +82,6 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		}
 		result, err := permissionIs(arg1, arg2)
 		return err == nil && !result
-	case "FirefoxPrefIs":
-		if check.Message == "" {
-			check.Message = "Firefox preference " + arg1 + " is set to " + arg2
-		}
-		result, err := firefoxSetting(arg1, arg2)
-		return err == nil && result
-	case "FirefoxPrefIsNot":
-		if check.Message == "" {
-			check.Message = "Firefox preference " + arg1 + " is not set to " + arg2
-		}
-		result, err := firefoxSetting(arg1, arg2)
-		return err == nil && !result
 	}
 	return false
 }
@@ -168,32 +156,4 @@ func autoCheckUpdatesEnabled() (bool, error) {
 
 func permissionIs(filePath, permissionToCheck string) (bool, error) {
 	return commandOutput(`stat -c '%a' `+filePath, permissionToCheck)
-}
-
-func firefoxSetting(param, value string) (bool, error) {
-	dirs := []string{
-		"/usr/lib/firefox/defaults/pref/",
-		"/usr/lib/firefox/",
-		"/etc/firefox/",
-		"/home/" + mc.Config.User + "/.mozilla",
-	}
-	prefStyle := []string{
-		"lockPref",
-		"pref",
-		"user_pref",
-	}
-
-	res := false
-	var finalErr error
-	for _, el1 := range dirs {
-		for _, el2 := range prefStyle {
-			res2, err := dirContainsRegex(el1, el2+`("`+param+`", `+value+`);`)
-			res = res || res2
-			if err != nil {
-				finalErr = err // err handling janky, returns last err, plsfix ~safin
-			}
-		}
-	}
-
-	return res, finalErr
 }
