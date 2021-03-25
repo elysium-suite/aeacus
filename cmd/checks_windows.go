@@ -151,18 +151,6 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		}
 		result, err := fileOwner(arg1, arg2)
 		return err == nil && !result
-	case "FirefoxPrefIs":
-		if check.Message == "" {
-			check.Message = "Firefox preference " + arg1 + " is set to " + arg2
-		}
-		result, err := firefoxSetting(arg1, arg2)
-		return err == nil && result
-	case "FirefoxPrefIsNot":
-		if check.Message == "" {
-			check.Message = "Firefox preference " + arg1 + " is not set to " + arg2
-		}
-		result, err := firefoxSetting(arg1, arg2)
-		return err == nil && !result
 	case "ServiceStatus":
 		if check.Message == "" {
 			check.Message = "The service " + arg1 + " is " + arg2 + " with the startup type set as " + arg3
@@ -520,41 +508,4 @@ func registryKey(keyName, keyValue string, existCheck bool) (bool, error) {
 		return true, err
 	}
 	return false, err
-}
-
-func firefoxSetting(param, value string) (bool, error) {
-	res := false
-	var err error
-	// Check firefox install dir cus that may change where settings are located
-	bit64, _ := pathExists(`C:\Program Files\Mozilla Firefox`)
-	bit32, _ := pathExists(`C:\Program Files (x86)\Mozilla Firefox`)
-	if bit64 {
-		check, err := dirContainsRegex(`C:\Program Files\Mozilla Firefox\defaults\pref`, `"general.config.filename"`)
-		if err != nil {
-			return res, err
-		}
-
-		if check {
-			res, _ = dirContainsRegex(`C:\Program Files\Mozilla Firefox`, `"`+param+`",`+value)
-		} else {
-			res, _ = dirContainsRegex(`C:\Users\`+mc.Config.User+`\AppData\Roaming\Mozilla\Firefox\Profiles`, `"`+param+`",`+value)
-		}
-
-	} else if bit32 {
-		check, err := dirContainsRegex(`C:\Program Files (x86)\Mozilla Firefox\defaults\pref`, `"general.config.filename"`)
-		if err != nil {
-			return res, err
-		}
-
-		if check {
-			res, err = dirContainsRegex(`C:\Program Files (x86)\Mozilla Firefox`, `"`+param+`",`+value)
-		} else {
-			res, err = dirContainsRegex(`C:\Users\`+mc.Config.User+`\AppData\Roaming\Mozilla\Firefox\Profiles`, `"`+param+`",`+value)
-		}
-
-	} else {
-		err = errors.New("Firefox was not detected on the system")
-	}
-
-	return res, err
 }

@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/elysium-suite/aeacus/cmd"
-	"github.com/judwhite/go-svc/svc"
+	"github.com/judwhite/go-svc"
 )
 
 func phocusStart(quit chan struct{}) {

@@ -99,7 +99,7 @@ func CleanUp() {
 	shellCommand("rm " + mc.DirPath + "aeacus")
 
 	infoPrint("Overwriting timestamps to obfuscate changes...")
-	shellCommand(`find /etc /home /var -exec  touch --date='2012-12-12 12:12' {} \; 2>/dev/null`)
+	shellCommand(`find /etc /home /var -exec touch --date='2012-12-12 12:12' {} \; 2>/dev/null`)
 
 	infoPrint("Clearing firefox cache and browsing history...")
 	shellCommand("bleachbit --clean firefox.url_history; bleachbit --clean firefox.cache")

@@ -155,18 +155,6 @@ func main() {
 					return nil
 				},
 			},
-			{
-				Name:    "mitigate",
-				Aliases: []string{"m"},
-				Usage:   "Automatically mitigate the configured vulnerabilities",
-				Action: func(c *cli.Context) error {
-					if !cmd.YesEnabled {
-						cmd.ConfirmPrint("Are you sure you want to try to automatically mitigate the configured vulns?")
-					}
-					cmd.MitigateVulns()
-					return nil
-				},
-			},
 		},
 	}
 

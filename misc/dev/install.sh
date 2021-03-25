@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 cat <<EOF
 
@@ -8,30 +8,32 @@ cat <<EOF
 d8(  888  888    .o d8(  888  888   .o8  888   888  o.  )88b
 \`Y888""8o \`Y8bod8P' \`Y888""8o \`Y8bod8P'  \`V88V"V8P' 8""888P'
 
+This script sets up the development environment on a Linux (Debian-based) box.
+
 EOF
 
-# This script sets up the development environment on a Linux (Debian-based) box.
-
-# Force script to be run as root
-if [ "$EUID" -ne 0 ]; then
-	echo "Please run this script as root! It's very short-- please feel free to audit its source code."
+[ "$(id -u)" = 0 ] || {
+	echo "Please run this script as root!"
 	exit 1
-fi
+}
 
-# Update package list
+echo "[+] Updating package lists"
 apt-get update
 
-# Install golang
-echo "[+] Installing golang..."
-wget -O ~/go1.15.2.linux-amd64.tar.gz https://golang.org/dl/go1.15.2.linux-amd64.tar.gz
-tar -C /usr/local -xzf ~/go1.15.2.linux-amd64.tar.gz
-echo "export PATH=$PATH:/usr/local/go/bin" >>/etc/profile
+echo "[+] Installing Go"
+wget -O ~/go.tar.gz https://golang.org/dl/go1.16.2.linux-amd64.tar.gz
+tar -C /usr/local -xzf ~/go.tar.gz
 
-# Install git (for go get)
-echo "[+] Installing git..."
-apt-get install -y git
+echo "Adding \`go\` binary to PATH"
+echo "export PATH=$PATH:/usr/local/go/bin/$HOME/go" >>/etc/profile
 
-# Finalize
-echo "[+] Dependencies installed successfully!"
-echo "Run \`source /etc/profile\` to add \`go\` to your PATH"
-echo "Check out the \`Makefile\` to see what targets you can build Aeacus for!"
+echo "[+] Installing Git & Make"
+apt-get install -y git make
+
+echo "[+] Installing Garble"
+go get -u mvdan.cc/garble
+
+echo "[+] Build dependencies installed successfully"
+echo "Run \`source /etc/profile\` to add \`go\` and \`garble\` to your PATH"
+echo "Run go get -v -t -d ./... to install aeacus' dependencies"
+echo "Check out the \`Makefile\` to see what targets you can build Aeacus for"

@@ -10,3 +10,4 @@ tags
 *.swp
 *.zip
 *.exe
+node_modules
