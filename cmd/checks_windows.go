@@ -163,6 +163,32 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		}
 		result, err := serviceStatus(arg1, arg2, arg3)
 		return err == nil && !result
+	case "ProgramVersion":
+		if check.Message == "" {
+			switch arg3 {
+			case "0":
+				check.Message = arg1 + " has a version equal to " + arg2
+			case "1":
+				check.Message = arg1 + " has a version greater than " + arg2
+			case "2":
+				check.Message = arg1 + " has a version greater than or equal to " + arg2
+			}
+		}
+		result, err := packageVersion(arg1, arg2, arg3)
+		return err == nil && result
+	case "ProgramVersionNot":
+		if check.Message == "" {
+			switch arg3 {
+			case "0":
+				check.Message = arg1 + " has a version that is not equal to " + arg2
+			case "1":
+				check.Message = arg1 + " has a version that is not greater than " + arg2
+			case "2":
+				check.Message = arg1 + " has a version that is not greater than or equal to " + arg2
+			}
+		}
+		result, err := packageVersion(arg1, arg2, arg3)
+		return err == nil && !result
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -186,6 +212,32 @@ func packageInstalled(packageName string) (bool, error) {
 	}
 	for _, p := range packageList {
 		if p == packageName {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func packageVersion(packageName, versionNum, compareMode string) (bool, error) {
+	//compareMode 0 - ==, 1 - >, 2 - >=
+	pkg, err := getPackage(packageName)
+	if err != nil {
+		return false, err
+	}
+	if pkg.Name() != packageName {
+		return false, nil
+	}
+	switch compareMode {
+	case "0":
+		if pkg.DisplayVersion == versionNum {
+			return true, nil
+		}
+	case "1":
+		if pkg.DisplayVersion > versionNum {
+			return true, nil
+		}
+	case "2":
+		if pkg.DisplayVersion >= versionNum {
 			return true, nil
 		}
 	}

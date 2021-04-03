@@ -208,6 +208,20 @@ func getPackages() ([]string, error) {
 	return softwareList, nil
 }
 
+func getPackage(packageName string) (shared.Software, error) {
+	prog := shared.Software{}
+	sw, err := wapi.InstalledSoftwareList()
+	if err != nil {
+		failPrint("Couldn't get packages: " + err.Error())
+	}
+	for _, s := range sw {
+		if s.Name() == packageName {
+			return s, nil
+		}
+	}
+	return prog, nil
+}
+
 func getLocalUsers() ([]shared.LocalUser, error) {
 	ul, err := wapi.ListLocalUsers()
 	if err != nil {

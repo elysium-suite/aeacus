@@ -301,3 +301,27 @@ arg2='BUILTIN\Administrators'
 ```
 
 > Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
+
+**ProgramVersion**: pass if a program meets the version requirements
+
+```
+type='ProgramVersion'
+arg1='Firefox'
+arg2='87'
+arg3='1'
+```
+
+> Variable `arg3` is the version comparing method. 0 is equal to, 1 is greater than, 2 is equal to or greater than.
+> `arg2` is the version that you are comparing the program to.
+
+**ProgramVersionNot**: pass if a program does not meet the version requirements
+
+```
+type='ProgramVersion'
+arg1='Firefox'
+arg2='87'
+arg3='1'
+```
+
+> Variable `arg3` is the version comparing method. 0 is equal to, 1 is greater than, 2 is equal to or greater than.
+> `arg2` is the version that you are comparing the program to.
