@@ -200,7 +200,7 @@ type='PasswordChanged'
 arg1='username'
 arg2='01/17/2019 20:57:41 PM'
 ```
-> You should take the value from `(Get-LocalUser awsm3 | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "` and use it as `arg2`.
+> You should take the value from `(Get-LocalUser <USERNAME> | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "` and use it as `arg2`.
 
 **WindowsFeature**: pass if Feature Enabled
 
