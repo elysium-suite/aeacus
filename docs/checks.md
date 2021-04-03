@@ -193,15 +193,14 @@ arg3="Automatic"
 
 > todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
 
-**PasswordChanged**: pass if user password has changed after the given date
+**PasswordChanged**: pass if user password has changed after the specified date
 
 ```
 type='PasswordChanged'
-arg1='user'
-arg2='01/17/2019 20:57:41'
+arg1='username'
+arg2='01/17/2019 20:57:41 PM'
 ```
-
-> You should take the value from `Get-LocalUser user | select PasswordLastSet` and use it as `arg2`.
+> You should take the value from `(Get-LocalUser <USERNAME> | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "` and use it as `arg2`.
 
 **WindowsFeature**: pass if Feature Enabled
 
