@@ -120,13 +120,13 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 			check.Message = "Password for " + arg1 + " has been changed"
 		}
 		result, err := passwordChanged(arg1, arg2)
-		return err == nil && result
+		return err == nil && !result
 	case "PasswordChangedNot":
 		if check.Message == "" {
 			check.Message = "Password for " + arg1 + " has not been changed"
 		}
 		result, err := passwordChanged(arg1, arg2)
-		return err == nil && !result
+		return err == nil && result
 	case "WindowsFeature":
 		if check.Message == "" {
 			check.Message = arg1 + " feature has been enabled"
@@ -239,7 +239,7 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 }
 
 func passwordChanged(user, date string) (bool, error) {
-	return command(`Get-LocalUser " + user + " | select PasswordLastSet | Select-String "` + date + `"`)
+	return commandOutput(`(Get-LocalUser `+user+` | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "`, date)
 }
 
 func windowsFeature(feature string) (bool, error) {
