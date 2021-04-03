@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cat <<EOF
+cat <<-EOF
 
  .oooo.    .ooooo.   .oooo.    .ooooo.  oooo  oooo   .oooo.o
 \`P  )88b  d88' \`88b \`P  )88b  d88' \`"Y8 \`888  \`888  d88(  "8
@@ -12,28 +12,20 @@ This script sets up the development environment on a Linux (Debian-based) box.
 
 EOF
 
-[ "$(id -u)" = 0 ] || {
-	echo "Please run this script as root!"
-	exit 1
-}
+printf "\033[32;1m[+] Updating package lists\033[0m\n"
+sudo apt-get update
 
-echo "[+] Updating package lists"
-apt-get update
-
-echo "[+] Installing Go"
+printf "\n\033[32;1m[+] Installing Go\033[0m\n"
 wget -O ~/go.tar.gz https://golang.org/dl/go1.16.2.linux-amd64.tar.gz
-tar -C /usr/local -xzf ~/go.tar.gz
+sudo tar -C /usr/local -xzf ~/go.tar.gz
 
-echo "Adding \`go\` binary to PATH"
-echo "export PATH=$PATH:/usr/local/go/bin/$HOME/go" >>/etc/profile
+printf "\n\033[32;1m[+] Adding \`go\` binary to PATH\033[0m\n"
+echo "export PATH=$PATH:/usr/local/go/bin:/$HOME/go" | sudo tee -a /etc/profile
 
-echo "[+] Installing Git & Make"
-apt-get install -y git make
+printf "\n\033[32;1m[+] Installing Git & Make\033[0m\n"
+sudo apt-get install -y git make
 
-echo "[+] Installing Garble"
-go get -u mvdan.cc/garble
-
-echo "[+] Build dependencies installed successfully"
-echo "Run \`source /etc/profile\` to add \`go\` and \`garble\` to your PATH"
+printf "\n\033[32;1m[+] Build dependencies installed successfully\033[0m\n"
+echo "Run \`source /etc/profile\` to add \`go\` and to your PATH"
 echo "Run go get -v -t -d ./... to install aeacus' dependencies"
 echo "Check out the \`Makefile\` to see what targets you can build Aeacus for"
