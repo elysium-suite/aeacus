@@ -2,7 +2,7 @@ package cmd
 
 // WriteDesktopFiles writes default scoring engine files to the desktop
 func WriteDesktopFiles() {
-	firefoxBinary := `C:\Program Files (x86)\Mozilla Firefox\firefox.exe`
+	firefoxBinary := `C:\Program Files\Mozilla Firefox\firefox.exe`
 	infoPrint("Writing ScoringReport.html shortcut to Desktop...")
 	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\assets\ScoringReport.html"; $Shortcut.Save()`
 	shellCommand(cmdString)
