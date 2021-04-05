@@ -129,6 +129,7 @@ func main() {
 				Aliases: []string{"i"},
 				Usage:   "Get info about the system",
 				Action: func(c *cli.Context) error {
+					cmd.SetVerbose(true)
 					cmd.GetInfo(c.Args().Get(0))
 					return nil
 				},
