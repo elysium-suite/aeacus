@@ -214,28 +214,6 @@ func programVersion(programName, versionNum, compareMode string) (bool, error) {
 	return false, nil
 }
 
-func programVersion(packageName, versionNum, compareMode string) (bool, error) {
-	pkg, err := getPackage(packageName)
-	if err != nil {
-		return false, err
-	}
-	switch compareMode {
-	case "eq":
-		if pkg.DisplayVersion == versionNum {
-			return true, nil
-		}
-	case "gt":
-		if pkg.DisplayVersion > versionNum {
-			return true, nil
-		}
-	case "ge":
-		if pkg.DisplayVersion >= versionNum {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
 func serviceUp(serviceName string) (bool, error) {
 	serviceStatus, err := getLocalServiceStatus(serviceName)
 	return serviceStatus.IsRunning, err
