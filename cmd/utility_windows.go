@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -195,6 +196,8 @@ func getNetUserInfo(userName string) (string, error) {
 	return shellCommandOutput("net user " + userName)
 }
 
+// getPackages returns a list of currently installed packages and
+// their versions.
 func getPackages() ([]string, error) {
 	softwareList := []string{}
 	sw, err := wapi.InstalledSoftwareList()
@@ -203,11 +206,14 @@ func getPackages() ([]string, error) {
 		return softwareList, err
 	}
 	for _, s := range sw {
-		softwareList = append(softwareList, s.Name())
+		softwareList = append(softwareList, s.Name()+" - version "+s.DisplayVersion)
 	}
 	return softwareList, nil
 }
 
+// getPackage returns the Software struct of program data from a name.
+// The first package that contains the substring passed as the packageName
+// is returned.
 func getPackage(packageName string) (shared.Software, error) {
 	prog := shared.Software{}
 	sw, err := wapi.InstalledSoftwareList()
@@ -215,11 +221,11 @@ func getPackage(packageName string) (shared.Software, error) {
 		failPrint("Couldn't get packages: " + err.Error())
 	}
 	for _, s := range sw {
-		if s.Name() == packageName {
+		if strings.Contains(s.Name(), packageName) {
 			return s, nil
 		}
 	}
-	return prog, nil
+	return prog, errors.New("package not found")
 }
 
 func getLocalUsers() ([]shared.LocalUser, error) {

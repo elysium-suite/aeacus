@@ -123,6 +123,20 @@ type='FirewallUp'
 
 > **Note**: On Linux, unfortunately uses `ufw` at the moment. On Window, this passes if all three Windows Firewall profiles are active.
 
+
+**ProgramVersion**: pass if a program meets the version requirements
+
+```
+type='ProgramVersion'
+arg1='Firefox'
+arg2='87'
+arg3='ge'
+```
+
+> **Warning!**: This check is a simple _string comparison_ between version names. Sometimes, this may not be what you want, so be careful! Imagine if you had version `1:9.11.5.P4+dfsg-5.1+deb10u3` and version `1:9.11.5.P4+dsc-6.1+deb11u3`. String compare would see the former as more recent even though that's wrong.
+> **Note!**: This check uses `dpkg` in the Linux version and will thus fail on other package-manager based distros. You're encouraged to use `dpkg -l` to check versions on Linux and `.\aeacus.exe info packages` on Windows.
+> Variable `arg3` is the version comparing method. 'eq' is equal to, 'gt' is greater than, 'ge' is equal to or greater than. `arg2` is the version that you are comparing the program to.
+
 <hr>
 
 ### Linux-Specific Checks
@@ -140,16 +154,6 @@ type='PasswordChanged'
 arg1='user'
 arg2='password-hash-here'
 ```
-
-**PackageVersion**: pass if package version is equal to specified
-
-```
-type='PackageVersion'
-arg1='git'
-arg2='1:2.17.1-1ubuntu0.4'
-```
-
-> `PackageVersion` checks `dpkg -l | awk '$2=="<PACKAGENAME>" { print $3 }'`.
 
 **KernelVersion**: pass if kernel version is equal to specified
 
@@ -300,27 +304,3 @@ arg2='BUILTIN\Administrators'
 ```
 
 > Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
-
-**ProgramVersion**: pass if a program meets the version requirements
-
-```
-type='ProgramVersion'
-arg1='Firefox'
-arg2='87'
-arg3='1'
-```
-
-> Variable `arg3` is the version comparing method. 0 is equal to, 1 is greater than, 2 is equal to or greater than.
-> `arg2` is the version that you are comparing the program to.
-
-**ProgramVersionNot**: pass if a program does not meet the version requirements
-
-```
-type='ProgramVersion'
-arg1='Firefox'
-arg2='87'
-arg3='1'
-```
-
-> Variable `arg3` is the version comparing method. 0 is equal to, 1 is greater than, 2 is equal to or greater than.
-> `arg2` is the version that you are comparing the program to.
