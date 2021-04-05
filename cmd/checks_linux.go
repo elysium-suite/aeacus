@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strings"
 	"os/exec"
 )
 
@@ -31,20 +32,6 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 			check.Message = "Password for " + arg1 + " has not been changed"
 		}
 		result, err := passwordChanged(arg1, arg2)
-		return err == nil && !result
-	default:
-		failPrint("No check type " + checkType)
-	case "PackageVersion":
-		if check.Message == "" {
-			check.Message = "Package " + arg1 + " is version " + arg2
-		}
-		result, err := packageVersion(arg1, arg2)
-		return err == nil && result
-	case "PackageVersionNot":
-		if check.Message == "" {
-			check.Message = "Package " + arg1 + " is version " + arg2
-		}
-		result, err := packageVersion(arg1, arg2)
 		return err == nil && !result
 	case "KernelVersion":
 		if check.Message == "" {
@@ -82,6 +69,8 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		}
 		result, err := permissionIs(arg1, arg2)
 		return err == nil && !result
+	default:
+		failPrint("No check type " + checkType)
 	}
 	return false
 }
@@ -142,8 +131,28 @@ func guestDisabledLDM() (bool, error) {
 	return result, err
 }
 
-func packageVersion(packageName, versionNumber string) (bool, error) {
-	return command(`dpkg -l | awk '$2=="` + packageName + `" { print $3 }' | grep -q "` + versionNumber + `"`)
+func programVersion(packageName, versionNum, compareMode string) (bool, error) {
+	commandGiven := `dpkg -l | awk '$2=="` + packageName + `" { print $3 }'`
+	out, err := rawCmd(commandGiven).Output()
+	if err != nil {
+		return false, err
+	}
+	outString := strings.TrimSpace(string(out))
+	switch compareMode {
+	case "eq":
+		if outString == versionNum {
+			return true, nil
+		}
+	case "gt":
+		if outString > versionNum {
+			return true, nil
+		}
+	case "ge":
+		if outString >= versionNum {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func kernelVersion(version string) (bool, error) {
