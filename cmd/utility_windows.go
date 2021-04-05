@@ -198,11 +198,11 @@ func getNetUserInfo(userName string) (string, error) {
 
 // getPackages returns a list of currently installed packages and
 // their versions.
-func getPrograms() ([]string, error) {
+func getPackages() ([]string, error) {
 	softwareList := []string{}
 	sw, err := wapi.InstalledSoftwareList()
 	if err != nil {
-		failPrint("Couldn't get programs: " + err.Error())
+		failPrint("Couldn't get packages: " + err.Error())
 		return softwareList, err
 	}
 	for _, s := range sw {
@@ -214,18 +214,18 @@ func getPrograms() ([]string, error) {
 // getPackage returns the Software struct of program data from a name.
 // The first package that contains the substring passed as the packageName
 // is returned.
-func getProgram(programName string) (shared.Software, error) {
+func getPackage(packageName string) (shared.Software, error) {
 	prog := shared.Software{}
 	sw, err := wapi.InstalledSoftwareList()
 	if err != nil {
-		failPrint("Couldn't get programs: " + err.Error())
+		failPrint("Couldn't get packages: " + err.Error())
 	}
 	for _, s := range sw {
-		if strings.Contains(s.Name(), programName) {
+		if strings.Contains(s.Name(), packageName) {
 			return s, nil
 		}
 	}
-	return prog, errors.New("program not found")
+	return prog, errors.New("package not found")
 }
 
 func getLocalUsers() ([]shared.LocalUser, error) {

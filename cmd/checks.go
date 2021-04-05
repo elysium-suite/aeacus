@@ -127,17 +127,17 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 		}
 		result, err := fileEquals(arg1, arg2)
 		return err == nil && !result
-	case "ProgramInstalled":
+	case "PackageInstalled":
 		if check.Message == "" {
-			check.Message = "Program " + arg1 + " is installed"
+			check.Message = "Package " + arg1 + " is installed"
 		}
-		result, err := programInstalled(arg1)
+		result, err := packageInstalled(arg1)
 		return err == nil && result
-	case "ProgramInstalledNot":
+	case "PackageInstalledNot":
 		if check.Message == "" {
-			check.Message = "Program " + arg1 + " has been removed"
+			check.Message = "Package " + arg1 + " has been removed"
 		}
-		result, err := programInstalled(arg1)
+		result, err := packageInstalled(arg1)
 		return err == nil && !result
 	case "ServiceUp":
 		if check.Message == "" {

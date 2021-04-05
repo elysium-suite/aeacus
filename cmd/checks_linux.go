@@ -97,8 +97,8 @@ func commandInterface(progName string, c ...string) (bool, error) {
 	return true, nil
 }
 
-func programInstalled(programName string) (bool, error) {
-	return commandInterface("/usr/bin/dpkg", "-s", programName)
+func packageInstalled(packageName string) (bool, error) {
+	return commandInterface("/usr/bin/dpkg", "-s", packageName)
 }
 
 func serviceUp(serviceName string) (bool, error) {
@@ -131,8 +131,8 @@ func guestDisabledLDM() (bool, error) {
 	return result, err
 }
 
-func programVersion(programName, versionNum, compareMode string) (bool, error) {
-	commandGiven := `dpkg -l | awk '$2=="` + programName + `" { print $3 }'`
+func programVersion(packageName, versionNum, compareMode string) (bool, error) {
+	commandGiven := `dpkg -l | awk '$2=="` + packageName + `" { print $3 }'`
 	out, err := rawCmd(commandGiven).Output()
 	if err != nil {
 		return false, err
