@@ -81,3 +81,7 @@ func ParseFlags(c *cli.Context) {
 		YesEnabled = true
 	}
 }
+
+func SetVerbose(val bool) {
+	verboseEnabled = val
+}
