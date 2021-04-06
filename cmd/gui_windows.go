@@ -47,6 +47,7 @@ func LaunchIDPrompt() {
 
 	function setID {
 		$global:id=$TextBox1.Text
+		$id = $id -replace '\s',''
 		echo $id > C:\aeacus\TeamID.txt
 		$form.Close()
 	}
