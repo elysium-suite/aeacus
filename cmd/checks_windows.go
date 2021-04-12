@@ -83,13 +83,13 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		if check.Message == "" {
 			check.Message = "Security policy option " + arg1 + " is \"" + arg2 + "\""
 		}
-		result, err := securityPolicy(arg1, arg2, arg3)
+		result, err := securityPolicy(arg1, arg2)
 		return err == nil && result
 	case "SecurityPolicyNot":
 		if check.Message == "" {
 			check.Message = "Security policy option " + arg1 + " is not \"" + arg2 + "\""
 		}
-		result, err := securityPolicy(arg1, arg2, arg3)
+		result, err := securityPolicy(arg1, arg2)
 		return err == nil && !result
 	case "RegistryKey":
 		if check.Message == "" {
@@ -395,7 +395,7 @@ func startupProgramExists(progName string) (bool, error) {
 	return true, nil
 }
 
-func securityPolicy(keyName, keyValue, optValue string) (bool, error) {
+func securityPolicy(keyName, keyValue string) (bool, error) {
 	var desiredString string
 	if regKey, ok := secpolToKey[keyName]; ok {
 		return registryKey(regKey, keyValue, false)
@@ -407,7 +407,7 @@ func securityPolicy(keyName, keyValue, optValue string) (bool, error) {
 	re := regexp.MustCompile("(?m)[\r\n]+^.*" + keyName + ".*$")
 	output := strings.TrimSpace(string(re.Find([]byte(seceditOutput))))
 	if output == "" {
-		return false, errors.New("SecurityPolicy item not found")
+		return false, errors.New("securitypolicy item not found")
 	}
 	if keyName == "NewAdministratorName" || keyName == "NewGuestName" {
 		// These two are strings, not numbers, so they have ""
@@ -415,23 +415,31 @@ func securityPolicy(keyName, keyValue, optValue string) (bool, error) {
 	} else if keyName == "MinimumPasswordAge" ||
 		keyName == "MinimumPasswordLength" ||
 		keyName == "LockoutDuration" ||
-		keyName == "ResetLockoutCount" ||
-		keyName == "MaximumPasswordAge" ||
-		keyName == "LockoutBadCount" {
+		keyName == "ResetLockoutCount" {
 		// Fields where the arg should be X or higher (up to 999)
-		intLow, err := strconv.Atoi(keyValue)
+		intKeyValue, err := strconv.Atoi(keyValue)
 		if err != nil {
 			failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
 			return false, errors.New("Invalid keyValue")
 		}
-		intHigh, err := strconv.Atoi(optValue)
-		if err != nil {
-			failPrint(optValue + " is not a valid integer for SecurityPolicy check")
-			return false, errors.New("Invalid optValue")
+		for c := intKeyValue; c <= 999; c++ {
+			desiredString = keyName + " = " + strconv.Itoa(c)
+			if output == desiredString {
+				return true, err
+			}
 		}
-		var result1, _ = strconv.Atoi(strings.Split(output, " = ")[1])
-		if intLow < result1 && result1 < intHigh {
-			return true, nil
+	} else if keyName == "MaximumPasswordAge" || keyName == "LockoutBadCount" {
+		// Fields where arg should be X or lower but NOT 0
+		intKeyValue, err := strconv.Atoi(keyValue)
+		if err != nil {
+			failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
+			return false, errors.New("Invalid keyValue")
+		}
+		for c := intKeyValue; c > 0; c-- {
+			desiredString = keyName + " = " + strconv.Itoa(c)
+			if output == desiredString {
+				return true, nil
+			}
 		}
 	} else {
 		desiredString = keyName + " = " + keyValue
