@@ -1,3 +1,5 @@
+.idea/
+.vscode/
 scoring.dat
 scoring.conf
 ScoringReport.html
