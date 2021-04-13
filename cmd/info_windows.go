@@ -9,9 +9,9 @@ import (
 // generic information about the system
 func GetInfo(infoType string) {
 	switch infoType {
-	case "packages":
-		packageList, _ := getPackages()
-		for _, p := range packageList {
+	case "programs":
+		programList, _ := getPrograms()
+		for _, p := range programList {
 			infoPrint(p)
 		}
 	case "users":
