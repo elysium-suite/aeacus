@@ -179,35 +179,35 @@ func command(commandGiven string) (bool, error) {
 	return true, nil
 }
 
-func packageInstalled(packageName string) (bool, error) {
-	packageList, err := getPackages()
+func programInstalled(programName string) (bool, error) {
+	programList, err := getPrograms()
 	if err != nil {
 		return false, err
 	}
-	for _, p := range packageList {
-		if p == packageName {
+	for _, p := range programList {
+		if p == programName {
 			return true, nil
 		}
 	}
 	return false, nil
 }
 
-func programVersion(packageName, versionNum, compareMode string) (bool, error) {
-	pkg, err := getPackage(packageName)
+func programVersion(programName, versionNum, compareMode string) (bool, error) {
+	prog, err := getProgram(programName)
 	if err != nil {
 		return false, err
 	}
 	switch compareMode {
 	case "eq":
-		if pkg.DisplayVersion == versionNum {
+		if prog.DisplayVersion == versionNum {
 			return true, nil
 		}
 	case "gt":
-		if pkg.DisplayVersion > versionNum {
+		if prog.DisplayVersion > versionNum {
 			return true, nil
 		}
 	case "ge":
-		if pkg.DisplayVersion >= versionNum {
+		if prog.DisplayVersion >= versionNum {
 			return true, nil
 		}
 	}
