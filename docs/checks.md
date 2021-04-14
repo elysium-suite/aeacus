@@ -38,11 +38,14 @@ type='FileExists'
 arg1='C:\importantprogram.exe'
 ```
 
-> **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `''' like this! that's neat! '''`).
+> **Note!** You don't have to escape any characters because we're using single quotes,
+> which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal
+> `''' like this! that's neat! '''`.
 
 **FileContains**: pass if file contains string
 
-> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for FileExistsNot, for example, if you want to score that a file does not contain a line OR it doesn't exist.
+> Note: `FileContains` will never pass if file does not exist!
+> Add a pass check for FileExistsNot, for example, if you want to score a file does not contain a line OR doesn't exist.
 
 ```
 type='FileContains'
@@ -68,7 +71,8 @@ arg1='/etc/sudoers.d/'
 arg2='NOPASSWD'
 ```
 
-> `DirContainsRegex` is recursive! This means it checks every folder and subfolder. It currently is capped at 10,000 files so it doesn't segfault if you try to search `/`...
+> `DirContainsRegex` is recursive! This means it checks every folder and subfolder.
+> It currently is capped at 10,000 files, so it doesn't segfault if you try to search `/`...
 
 **FileEquals**: pass if file equals sha1 hash
 
@@ -133,9 +137,16 @@ arg2='87'
 arg3='ge'
 ```
 
-> **Warning!**: This check is a simple _string comparison_ between version names. Sometimes, this may not be what you want, so be careful! Imagine if you had version `1:9.11.5.P4+dfsg-5.1+deb10u3` and version `1:9.11.5.P4+dsc-6.1+deb11u3`. String compare would see the former as more recent even though that's wrong.
-> **Note!**: This check uses `dpkg` in the Linux version and will thus fail on other package-manager based distros. You're encouraged to use `dpkg -l` to check versions on Linux and `.\aeacus.exe info packages` on Windows.
-> Variable `arg3` is the version comparing method. 'eq' is equal to, 'gt' is greater than, 'ge' is equal to or greater than. `arg2` is the version that you are comparing the program to.
+> **Warning!**: This check is a simple _string comparison_ between version names.
+> Sometimes, this may not be what you want, so be careful!
+> Imagine if you had version `1:9.11.5.P4+dfsg-5.1+deb10u3` and wanted version `1:9.11.5.P4+dsc-6.1+deb11u3`.
+> String compare would see the former as more recent even though that's wrong.
+
+> **Note!**: This check uses `dpkg` in the Linux version and will thus fail on other package-manager based distros.
+> You're encouraged to use `dpkg -l` to check versions on Linux and `.\aeacus.exe info packages` on Windows.
+> Variable `arg3` is the version comparing method.
+> 'eq' is equal to, 'gt' is greater than, 'ge' is equal to or greater than.
+> `arg2` is the version that you are comparing the program to.
 
 <hr>
 
@@ -193,7 +204,7 @@ arg2="Running"
 arg3="Automatic"
 ```
 
-> This check uses the windows API to check the service current status and the windows registry for the startuptype
+> This check uses the Windows API to check the service current status, and the Windows registry for the StartupType
 
 > todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
 
@@ -250,7 +261,7 @@ type='ScheduledTaskExists'
 arg1='Disk Cleanup'
 ```
 
-(WORK IN PROGRESS, dont use)
+(WORK IN PROGRESS, don't use)
 **StartupProgramExists**: pass if startup program exists
 
 ```
@@ -258,9 +269,9 @@ type='StartupProgramExists'
 arg1='backdoor.exe'
 ```
 
-> (WIP) **StartupProgramExists** checks the startup folder, Run and RunOnce registry keys, and (other startup methods on windows)
+> (WIP) **StartupProgramExists** checks the startup folder, Run and RunOnce registry keys, and (other startup methods on Windows)
 
-**SecurityPolicy**: pass if key is equal to value
+**SecurityPolicy**: Pass if the key is a correct value
 
 ```
 type='SecurityPolicy'
@@ -268,7 +279,16 @@ arg1='DisableCAD'
 arg2='0'
 ```
 
-> **Note**: If your value should be X or higher (for example, MinimumPasswordAge should be 1 or higher), or if your value should be X or lower (but not 0) (ex. MaximumPasswordAge should be between 1 and 999), the `SecurityPolicy` check will intelligently score it for you.
+> **Note**: The checks "MinimumPasswordAge", "MinimumPasswordLength", "LockoutDuration",
+> "ResetLockoutCount", "MaximumPasswordAge", and "LockoutBadCount" have higher and lower bounds.\
+> This means that these checks will look like this:
+
+```
+type='SecurityPolicy'
+arg1'MinimumPasswordAge'
+arg2='7' # The lower bound
+arg3='30' # The higher bound
+```
 
 > Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](securitypolicy.md).
 
