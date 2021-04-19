@@ -260,7 +260,7 @@ arg1='backdoor.exe'
 
 > (WIP) **StartupProgramExists** checks the startup folder, Run and RunOnce registry keys, and (other startup methods on windows)
 
-**SecurityPolicy**: pass if key is equal to value
+**SecurityPolicy**: pass if key is within the bounds for value
 
 ```
 type='SecurityPolicy'
@@ -268,8 +268,15 @@ arg1='DisableCAD'
 arg2='0'
 ```
 
-> **Note**: If your value should be X or higher (for example, MinimumPasswordAge should be 1 or higher), or if your value should be X or lower (but not 0) (ex. MaximumPasswordAge should be between 1 and 999), the `SecurityPolicy` check will intelligently score it for you.
+> **Note**: For all integer-based values (such as `MinimumPasswordAge`), the `optValue` (`arg3`) can be used.
+> `arg2` can be the lower bound, with `arg3` as the higher bound, such as `arg2` < `result` < `arg3`.
 
+```
+type='SecurityPolicy'
+arg1='MaximumPasswordAge'
+arg2='80'
+arg3='100'
+```
 > Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](securitypolicy.md).
 
 **RegistryKey**: pass if key is equal to value
