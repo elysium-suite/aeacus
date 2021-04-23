@@ -427,15 +427,22 @@ func securityPolicy(keyName, keyValue, optValue string) (bool, error) {
 			failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
 			return false, errors.New("Invalid keyValue")
 		}
-		intHigh, err := strconv.Atoi(optValue)
-		if err != nil {
-			failPrint(optValue + " is not a valid integer for SecurityPolicy check")
-			return false, errors.New("Invalid optValue")
-		}
 		var result1, _ = strconv.Atoi(strings.Split(output, " = ")[1])
-		if intLow < result1 && result1 < intHigh {
-			return true, nil
+		if optValue != "" {
+			intHigh, err := strconv.Atoi(optValue)
+			if err != nil {
+				failPrint(optValue + " is not a valid integer for SecurityPolicy check")
+				return false, errors.New("Invalid optValue")
+			}
+			if intLow <= result1 && result1 <= intHigh {
+				return true, nil
+			}
+		} else {
+			if result1 == intLow {
+				return true, nil
+			}
 		}
+
 	} else {
 		desiredString = keyName + " = " + keyValue
 	}
