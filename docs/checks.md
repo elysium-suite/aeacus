@@ -269,7 +269,8 @@ arg2='0'
 ```
 
 > **Note**: For all integer-based values (such as `MinimumPasswordAge`), the `optValue` (`arg3`) can be used.
-> `arg2` can be the lower bound, with `arg3` as the higher bound, such as `arg2` < `result` < `arg3`.
+> `arg2` can be the lower bound, with `arg3` as the higher bound, such as `arg2` =< `result` =< `arg3`.\
+> If no `arg3` is provided, then the system will default back to if `result` = `arg2`.
 
 ```
 type='SecurityPolicy'
