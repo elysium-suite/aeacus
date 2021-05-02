@@ -80,10 +80,10 @@ arg2='403926033d001b5279df37cbbe5287b7c7c267fa'
 
 > **Note!** If a check has negative points assigned to it, it automatically becomes a penalty.
 
-**PackageInstalled**: pass if package is installed
+**ProgramInstalled**: pass if program is installed
 
 ```
-type='PackageInstalled'
+type='ProgramInstalled'
 arg1='Mozilla Firefox 75 (x64 en-US)'
 ```
 
