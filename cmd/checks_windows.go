@@ -185,7 +185,7 @@ func programInstalled(programName string) (bool, error) {
 		return false, err
 	}
 	for _, p := range programList {
-		if p == programName {
+		if strings.Contains(p, programName) {
 			return true, nil
 		}
 	}
