@@ -115,7 +115,8 @@ func userInGroup(userName, groupName string) (bool, error) {
 }
 
 func firewallUp() (bool, error) {
-	return commandOutput("ufw status", "Status: active")
+	status, err := commandOutput("ufw status")
+	return status == "Status: active", err
 }
 
 func passwordChanged(user, hash string) (bool, error) {
@@ -164,5 +165,6 @@ func autoCheckUpdatesEnabled() (bool, error) {
 }
 
 func permissionIs(filePath, permissionToCheck string) (bool, error) {
-	return commandOutput(`stat -c '%a' `+filePath, permissionToCheck)
+	perm, err := commandOutput(`stat -c '%a' ` + filePath)
+	return perm == permissionToCheck, err
 }

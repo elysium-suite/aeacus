@@ -47,14 +47,14 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 		if check.Message == "" {
 			check.Message = "Command \"" + arg1 + "\" had the output \"" + arg2 + "\""
 		}
-		result, err := commandOutput(arg1, arg2)
-		return err == nil && result
+		result, err := commandOutput(arg1)
+		return err == nil && result == arg2
 	case "CommandOutputNot":
 		if check.Message == "" {
 			check.Message = "Command \"" + arg1 + "\" did not have the output \"" + arg2 + "\""
 		}
-		result, err := commandOutput(arg1, arg2)
-		return err == nil && !result
+		result, err := commandOutput(arg1)
+		return err == nil && !(result == arg2)
 	case "CommandContains":
 		if check.Message == "" {
 			check.Message = "Command \"" + arg1 + "\" contained output \"" + arg2 + "\""
@@ -222,16 +222,12 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 	}
 }
 
-func commandOutput(commandGiven, desiredOutput string) (bool, error) {
+func commandOutput(commandGiven string) (string, error) {
 	out, err := rawCmd(commandGiven).Output()
 	if err != nil {
-		return false, err
+		return "", err
 	}
-	outString := strings.TrimSpace(string(out))
-	if outString == desiredOutput {
-		return true, nil
-	}
-	return false, nil
+	return strings.TrimSpace(string(out)), nil
 }
 
 func commandContains(commandGiven, desiredContains string) (bool, error) {
