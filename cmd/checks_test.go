@@ -6,8 +6,8 @@ import (
 )
 
 func TestCommandOutput(t *testing.T) {
-	out, err := commandOutput(`echo 1`, "1")
-	if err != nil || out != true {
+	out, err := commandOutput(`echo 1`)
+	if err != nil || out != "1" {
 		t.Error("commandOutput(`echo 1`, \"1\") got " + fmt.Sprint(out) + ", want `true`. Error " + err.Error())
 	}
 }
