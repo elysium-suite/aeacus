@@ -261,15 +261,18 @@ func serviceStatus(serviceName, wantedStatus, startupType string) (bool, error) 
 }
 
 func passwordChanged(user, date string) (bool, error) {
-	return commandOutput(`(Get-LocalUser `+user+` | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "`, date)
+	changed, _ := commandOutput(`(Get-LocalUser ` + user + ` | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "`)
+	return changed >= date, nil
 }
 
 func windowsFeature(feature string) (bool, error) {
-	return commandOutput("(Get-WindowsOptionalFeature -FeatureName "+feature+" -Online).State", "Enabled")
+	state, _ := commandOutput("(Get-WindowsOptionalFeature -FeatureName " + feature + " -Online).State")
+	return state == "Enabled", nil
 }
 
 func fileOwner(filePath, owner string) (bool, error) {
-	return commandOutput("(Get-Acl "+filePath+").Owner", owner)
+	theowner, _ := commandOutput("(Get-Acl " + filePath + ").Owner")
+	return theowner == owner, nil
 }
 
 func userExists(userName string) (bool, error) {
@@ -303,9 +306,9 @@ func firewallUp() (bool, error) {
 	for _, profile := range fwProfiles {
 		// This is kind of jank and kind of slow
 		cmdText := "(Get-NetFirewallProfile -Name '" + profile + "').Enabled"
-		result, err := commandOutput(cmdText, "True")
-		if !result || err != nil {
-			return result, err
+		result, err := commandOutput(cmdText)
+		if result != "True" || err != nil {
+			return false, err
 		}
 	}
 	return true, nil
