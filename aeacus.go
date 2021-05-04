@@ -75,6 +75,26 @@ func main() {
 				},
 			},
 			{
+				Name:    "readme",
+				Aliases: []string{"c"},
+				Usage:   "Compile the readme",
+				Action: func(c *cli.Context) error {
+					cmd.GenReadMe()
+					return nil
+				},
+			},
+			{
+				Name:    "test",
+				Aliases: []string{"c"},
+				Usage:   "Score the image and render a readme",
+				Action: func(c *cli.Context) error {
+					cmd.GenReadMe()
+					cmd.CheckConfig(cmd.ScoringConf)
+					cmd.ScoreImage()
+					return nil
+				},
+			},
+			{
 				Name:    "encrypt",
 				Aliases: []string{"e"},
 				Usage:   "Encrypt scoring configuration",
