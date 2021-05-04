@@ -120,13 +120,13 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 			check.Message = "Password for " + arg1 + " has been changed"
 		}
 		result, err := passwordChanged(arg1, arg2)
-		return err == nil && !result
+		return err == nil && result
 	case "PasswordChangedNot":
 		if check.Message == "" {
 			check.Message = "Password for " + arg1 + " has not been changed"
 		}
 		result, err := passwordChanged(arg1, arg2)
-		return err == nil && result
+		return err == nil && !result
 	case "WindowsFeature":
 		if check.Message == "" {
 			check.Message = arg1 + " feature has been enabled"
