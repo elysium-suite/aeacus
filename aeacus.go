@@ -76,7 +76,7 @@ func main() {
 			},
 			{
 				Name:    "readme",
-				Aliases: []string{"c"},
+				Aliases: []string{"rd"},
 				Usage:   "Compile the readme",
 				Action: func(c *cli.Context) error {
 					cmd.GenReadMe()
@@ -85,7 +85,7 @@ func main() {
 			},
 			{
 				Name:    "test",
-				Aliases: []string{"c"},
+				Aliases: []string{"t"},
 				Usage:   "Score the image and render a readme",
 				Action: func(c *cli.Context) error {
 					cmd.GenReadMe()
