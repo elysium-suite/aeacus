@@ -79,6 +79,7 @@ func main() {
 				Aliases: []string{"rd"},
 				Usage:   "Compile the readme",
 				Action: func(c *cli.Context) error {
+					cmd.CheckConfig(cmd.ScoringConf)
 					cmd.GenReadMe()
 					return nil
 				},
@@ -88,8 +89,8 @@ func main() {
 				Aliases: []string{"t"},
 				Usage:   "Score the image and render a readme",
 				Action: func(c *cli.Context) error {
-					cmd.GenReadMe()
 					cmd.CheckConfig(cmd.ScoringConf)
+					cmd.GenReadMe()
 					cmd.ScoreImage()
 					return nil
 				},
