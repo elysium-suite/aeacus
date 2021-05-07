@@ -54,7 +54,7 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 			check.Message = "Command \"" + arg1 + "\" did not have the output \"" + arg2 + "\""
 		}
 		result, err := commandOutput(arg1)
-		return err == nil && !(result == arg2)
+		return err == nil && result != arg2
 	case "CommandContains":
 		if check.Message == "" {
 			check.Message = "Command \"" + arg1 + "\" contained output \"" + arg2 + "\""
