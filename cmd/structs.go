@@ -6,8 +6,8 @@ import (
 
 // metaConfig is the overarching context used by most functions in aeacus.
 type metaConfig struct {
-	TeamID      string
 	DirPath     string
+	TeamID      string
 	Config      scoringChecks
 	Image       imageData
 	Conn        connData
@@ -19,24 +19,24 @@ type metaConfig struct {
 // wiped, removed, etc, on each run without affecting anything else.
 type imageData struct {
 	RunningTime time.Time
+	Contribs    int
+	Detracts    int
 	Score       int
 	ScoredVulns int
-	Points      []scoreItem
-	Contribs    int
-	Penalties   []scoreItem
-	Detracts    int
 	TotalPoints int
+	Penalties   []scoreItem
+	Points      []scoreItem
 }
 
 // connData represents the current connectivity state of the image to the
 // internet and the scoring server.
 type connData struct {
-	ServerColor   string
-	ServerStatus  string
-	NetColor      string
-	NetStatus     string
 	OverallColor  string
 	OverallStatus string
+	NetColor      string
+	NetStatus     string
+	ServerColor   string
+	ServerStatus  string
 }
 
 // scoreItem is the scoring report representation of a check, containing only
@@ -49,16 +49,16 @@ type scoreItem struct {
 // scoringChecks is a representation of the TOML configuration typically
 // specific in scoring.conf.
 type scoringChecks struct {
+	DisableShell bool
 	Local        bool
 	NoDestroy    bool
-	DisableShell bool
+	EndDate      string
 	Name         string
+	OS           string
+	Password     string
+	Remote       string
 	Title        string
 	User         string
-	OS           string
-	Remote       string
-	Password     string
-	EndDate      string
 	Check        []check
 }
 
@@ -68,9 +68,9 @@ type scoringChecks struct {
 type check struct {
 	Message      string
 	Points       int
+	Fail         []condition
 	Pass         []condition
 	PassOverride []condition
-	Fail         []condition
 }
 
 // condition is a single pass/fail condition inside of a check. It supports up
