@@ -49,7 +49,7 @@ release:
 	mv aeacus aeacus-linux/aeacus && \
 	mv phocus aeacus-linux/phocus && \
 	cp -Rf assets/ aeacus-win32/ && \
-	cp -Rf misc/ aecus-win32/ && \
+	cp -Rf misc/ aeacus-win32/ && \
 	cp -Rf LICENSE aeacus-win32/ && \
 	cp -Rf assets/ aeacus-linux/ && \
 	cp -Rf misc/ aeacus-linux/ && \
