@@ -36,6 +36,11 @@ func parseConfig(configContent string) {
 			os.Exit(1)
 		}
 	}
+	
+	// This is probably going to be constantly throwing warnings because we never actually update the version :upside_down:
+	if mc.Config.Version != cmd.AeacusVersion {
+		warnPrint("Scoring version does not match Aeacus version! Compatability issues may occur.")
+	}
 }
 
 // WriteConfig reads the plaintext configuration from sourceFile, and writes
@@ -100,6 +105,7 @@ func printConfig() {
 	fmt.Println("EndDate:", mc.Config.EndDate)
 	fmt.Println("NoDestroy:", mc.Config.NoDestroy)
 	fmt.Println("DisableShell:", mc.Config.DisableShell)
+	fmt.Println("DisableShell:", mc.Config.Version)
 	fmt.Println("Checks:")
 	for i, check := range mc.Config.Check {
 		fmt.Printf("\tCheck %d (%d points):\n", i+1, check.Points)

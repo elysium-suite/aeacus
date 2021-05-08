@@ -59,6 +59,7 @@ type scoringChecks struct {
 	Remote       string
 	Title        string
 	User         string
+	Version      string
 	Check        []check
 }
 
