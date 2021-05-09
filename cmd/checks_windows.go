@@ -81,12 +81,18 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 	*/
 	case "SecurityPolicy":
 		if check.Message == "" {
+			if arg3 != "" {
+				check.Message = "Security policy option " + arg1 + " is between \"" + arg2 + "\" and \"" + arg3 + "\""
+			}
 			check.Message = "Security policy option " + arg1 + " is \"" + arg2 + "\""
 		}
 		result, err := securityPolicy(arg1, arg2, arg3)
 		return err == nil && result
 	case "SecurityPolicyNot":
 		if check.Message == "" {
+			if arg3 != "" {
+				check.Message = "Security policy option " + arg1 + " is not between \"" + arg2 + "\" and \"" + arg3 + "\""
+			}
 			check.Message = "Security policy option " + arg1 + " is not \"" + arg2 + "\""
 		}
 		result, err := securityPolicy(arg1, arg2, arg3)
@@ -424,7 +430,10 @@ func securityPolicy(keyName, keyValue, optValue string) (bool, error) {
 			failPrint(keyValue + " is not a valid integer for SecurityPolicy check")
 			return false, errors.New("Invalid keyValue")
 		}
-		var result1, _ = strconv.Atoi(strings.Split(output, " = ")[1])
+		var result1, e = strconv.Atoi(strings.Split(output, " = ")[1])
+		if e != nil {
+			return false, e
+		}
 		if optValue != "" {
 			intHigh, err := strconv.Atoi(optValue)
 			if err != nil {
