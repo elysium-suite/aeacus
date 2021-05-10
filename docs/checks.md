@@ -206,9 +206,7 @@ type='PasswordChanged'
 arg1='username'
 arg2='01/17/2019 20:57:41 PM'
 ```
-> You should take the value from\
-> `(Get-LocalUser <USERNAME> | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "`\
-> and use it as `arg2`.
+> You should take the value from `(Get-LocalUser <USERNAME> | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "` and use it as `arg2`.
 
 **WindowsFeature**: pass if Feature Enabled
 
@@ -291,8 +289,7 @@ arg1='HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
 arg2='0'
 ```
 
-> Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to
-> check that a key was deleted, use `RegistryKeyExistsNot`.
+> Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to check that a key was deleted, use `RegistryKeyExistsNot`.
 
 > **Administrative Templates**: There are 4000+ admin template fields. See [this list of registry keys and descriptions](https://docs.google.com/spreadsheets/d/1N7uuke4Jg1R9FBhj8o5dxJQtEntQlea0McYz5upaiTk/edit?usp=sharing), then use the `RegistryKey` or `RegistryKeyExists` check.
 
