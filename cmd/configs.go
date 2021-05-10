@@ -96,6 +96,7 @@ func readData() (string, error) {
 // by readData and parseConfig.
 func printConfig() {
 	passPrint("Configuration " + mc.DirPath + ScoringConf + " check passed!")
+	fmt.Println("Aeacus Version:", mc.Config.Version)
 	fmt.Println("Title:", mc.Config.Title)
 	fmt.Println("Name:", mc.Config.Name)
 	fmt.Println("OS:", mc.Config.OS)
@@ -105,7 +106,6 @@ func printConfig() {
 	fmt.Println("EndDate:", mc.Config.EndDate)
 	fmt.Println("NoDestroy:", mc.Config.NoDestroy)
 	fmt.Println("DisableShell:", mc.Config.DisableShell)
-	fmt.Println("DisableShell:", mc.Config.Version)
 	fmt.Println("Checks:")
 	for i, check := range mc.Config.Check {
 		fmt.Printf("\tCheck %d (%d points):\n", i+1, check.Points)
