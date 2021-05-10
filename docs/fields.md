@@ -42,7 +42,7 @@ remote = "8.8.8.8"
 password = "H4!b5at+kWls-8yh4Guq"
 ```
 
-**local**: Enables (technically, disables) remote scoring. If no remote address is specified, this will automatically be set to true.
+**local**: Disables remote scoring. If no remote address is specified, this will automatically be set to true.
 
 ```
 local = true
