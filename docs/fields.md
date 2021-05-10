@@ -60,7 +60,7 @@ enddate = "2004/06/05 13:09:00 PDT"
 nodestroy = true
 ```
 
-**disableshell**: Enables remote shell functionality. If set to true, aeacus will not attempt to connect to the remote shell.
+**disableshell**: **WARNING: this does not currently work.** Enables remote shell functionality. If set to true, aeacus will not attempt to connect to the remote shell.
 
 ```
 disableshell = false
