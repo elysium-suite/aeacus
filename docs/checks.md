@@ -31,18 +31,22 @@ arg1='firewall status'
 arg2='Active'
 ```
 
-**FileExists**: pass if specified file exists
+**PathExists**: pass if specified path exists. This works for both files AND folders (directories).
 
 ```
-type='FileExists'
+type='PathExists'
 arg1='C:\importantprogram.exe'
 ```
 
-> **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `''' like this! that's neat! '''`).
+```
+type='PathExists'
+arg1='C:\importantfolder\'
+```
+> **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `" like this! that's neat! "`).
 
 **FileContains**: pass if file contains string
 
-> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for FileExistsNot, for example, if you want to score that a file does not contain a line OR it doesn't exist.
+> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for FileExistsNot, for example, if you want to score that a file does not contain a line, OR it doesn't exist.
 
 ```
 type='FileContains'
@@ -134,8 +138,7 @@ arg3='ge'
 ```
 
 > **Warning!**: This check is a simple _string comparison_ between version names. Sometimes, this may not be what you want, so be careful! Imagine if you had version `1:9.11.5.P4+dfsg-5.1+deb10u3` and version `1:9.11.5.P4+dsc-6.1+deb11u3`. String compare would see the former as more recent even though that's wrong.
-> **Note!**: This check uses `dpkg` in the Linux version and will thus fail on other package-manager based distros. You're encouraged to use `dpkg -l` to check versions on Linux and `.\aeacus.exe info packages` on Windows.
-> Variable `arg3` is the version comparing method. 'eq' is equal to, 'gt' is greater than, 'ge' is equal to or greater than. `arg2` is the version that you are comparing the program to.
+> **Note!**: This check uses `dpkg` in the Linux version and will thus fail on other package-manager based distros. You're encouraged to use `dpkg -l` to check versions on Linux and `.\aeacus.exe info packages` on Windows. Variable `arg3` is the version comparing method. 'eq' is equal to, 'gt' is greater than, 'ge' is equal to or greater than. `arg2` is the version that you are comparing the program to.
 
 <hr>
 
@@ -194,8 +197,7 @@ arg3="Automatic"
 ```
 
 > This check uses the windows API to check the service current status and the windows registry for the startuptype
-
-> todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
+> Todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
 
 **PasswordChanged**: pass if user password has changed after the specified date
 
@@ -212,6 +214,7 @@ arg2='01/17/2019 20:57:41 PM'
 type='WindowsFeature'
 arg1='SMB1Protocol'
 ```
+> **Note:** Use the PowerShell tool `Get-OptionalFeature -Online` to find the feature you want!
 
 **UserDetail**: pass if user detail key is equal to value
 
@@ -268,9 +271,7 @@ arg1='DisableCAD'
 arg2='0'
 ```
 
-> **Note**: For all integer-based values (such as `MinimumPasswordAge`), the `optValue` (`arg3`) can be used.
-> `arg2` can be the lower bound, with `arg3` as the higher bound, such as `arg2` =< `result` =< `arg3`.\
-> If no `arg3` is provided, then the system will default back to if `result` = `arg2`.
+> **Note**: For all integer-based values (such as `MinimumPasswordAge`), the `optValue` (`arg3`) can be used. `arg2` can be the lower bound, with `arg3` as the higher bound, such as `arg2` =< `result` =< `arg3`. If no `arg3` is provided, then the system will default back to if `result` = `arg2`.
 
 ```
 type='SecurityPolicy'

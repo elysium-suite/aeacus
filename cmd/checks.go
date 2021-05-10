@@ -67,13 +67,13 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 		}
 		result, err := commandContains(arg1, arg2)
 		return err == nil && !result
-	case "FileExists":
+	case "PathExists":
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" exists"
 		}
 		result, err := pathExists(arg1)
 		return err == nil && result
-	case "FileExistsNot":
+	case "PathExistsNot":
 		if check.Message == "" {
 			check.Message = "File \"" + arg1 + "\" does not exist"
 		}

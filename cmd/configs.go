@@ -36,9 +36,9 @@ func parseConfig(configContent string) {
 			os.Exit(1)
 		}
 	}
-	
+
 	// This is probably going to be constantly throwing warnings because we never actually update the version :upside_down:
-	if mc.Config.Version != cmd.AeacusVersion {
+	if mc.Config.Version != AeacusVersion {
 		warnPrint("Scoring version does not match Aeacus version! Compatability issues may occur.")
 	}
 }
