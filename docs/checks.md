@@ -42,13 +42,11 @@ arg1='C:\importantprogram.exe'
 type='PathExists'
 arg1='C:\importantfolder\'
 ```
-> **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML
-> . If you need use single quotes, use a TOML multi-line string literal `" like this! that's neat! "`).
+> **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `" like this! that's neat! "`).
 
 **FileContains**: pass if file contains string
 
-> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for FileExistsNot,
-> for example, if you want to score that a file does not contain a line, OR it doesn't exist.
+> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for FileExistsNot, for example, if you want to score that a file does not contain a line, OR it doesn't exist.
 
 ```
 type='FileContains'
@@ -74,8 +72,7 @@ arg1='/etc/sudoers.d/'
 arg2='NOPASSWD'
 ```
 
-> `DirContainsRegex` is recursive! This means it checks every folder and subfolder.
-> It currently is capped at 10,000 files so it doesn't segfault if you try to search `/`...
+> `DirContainsRegex` is recursive! This means it checks every folder and subfolder. It currently is capped at 10,000 files so it doesn't segfault if you try to search `/`...
 
 **FileEquals**: pass if file equals sha1 hash
 
@@ -128,8 +125,7 @@ arg2='Administrators'
 type='FirewallUp'
 ```
 
-> **Note**: On Linux, unfortunately uses `ufw` at the moment. On Window, this passes if all three Windows Firewall
-> profiles are active.
+> **Note**: On Linux, unfortunately uses `ufw` at the moment. On Window, this passes if all three Windows Firewall profiles are active.
 
 
 **ProgramVersion**: pass if a program meets the version requirements
@@ -141,13 +137,8 @@ arg2='87'
 arg3='ge'
 ```
 
-> **Warning!**: This check is a simple _string comparison_ between version names. Sometimes, this may not be what you
-> want, so be careful! Imagine if you had version `1:9.11.5.P4+dfsg-5.1+deb10u3` and version
-> `1:9.11.5.P4+dsc-6.1+deb11u3`. String compare would see the former as more recent even though that's wrong.\
-> **Note!**: This check uses `dpkg` in the Linux version and will thus fail on other package-manager based distros.
-> You're encouraged to use `dpkg -l` to check versions on Linux and `.\aeacus.exe info packages` on Windows.
-> Variable `arg3` is the version comparing method. 'eq' is equal to, 'gt' is greater than, 'ge' is equal to or greater
-> than. `arg2` is the version that you are comparing the program to.
+> **Warning!**: This check is a simple _string comparison_ between version names. Sometimes, this may not be what you want, so be careful! Imagine if you had version `1:9.11.5.P4+dfsg-5.1+deb10u3` and version `1:9.11.5.P4+dsc-6.1+deb11u3`. String compare would see the former as more recent even though that's wrong.
+> **Note!**: This check uses `dpkg` in the Linux version and will thus fail on other package-manager based distros. You're encouraged to use `dpkg -l` to check versions on Linux and `.\aeacus.exe info packages` on Windows. Variable `arg3` is the version comparing method. 'eq' is equal to, 'gt' is greater than, 'ge' is equal to or greater than. `arg2` is the version that you are comparing the program to.
 
 <hr>
 
@@ -206,8 +197,7 @@ arg3="Automatic"
 ```
 
 > This check uses the windows API to check the service current status and the windows registry for the startuptype
-
-> todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
+> Todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
 
 **PasswordChanged**: pass if user password has changed after the specified date
 
@@ -247,8 +237,7 @@ arg1='Administrators'
 arg2='SeTimeZonePrivilege'
 ```
 
-> A list of URA and Constant Names (which are used in the config)
-> [can be found here](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment).
+> A list of URA and Constant Names (which are used in the config) [can be found here](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment).
 
 **ShareExists**: pass if SMB share exists
 
@@ -257,8 +246,7 @@ type='ShareExists'
 arg1='ADMIN$'
 ```
 
-> **Note!** Don't use any single quotes (`'`) in your parameters for Windows options like this.
-> If you need to, use a double-quoted string instead (ex. `"Admin's files"`)
+> **Note!** Don't use any single quotes (`'`) in your parameters for Windows options like this. If you need to, use a double-quoted string instead (ex. `"Admin's files"`)
 
 **ScheduledTaskExists**: pass if scheduled task exists
 
@@ -275,8 +263,7 @@ type='StartupProgramExists'
 arg1='backdoor.exe'
 ```
 
-> (WIP) **StartupProgramExists** checks the startup folder, Run and RunOnce registry keys, and (other startup methods on
-> windows)
+> (WIP) **StartupProgramExists** checks the startup folder, Run and RunOnce registry keys, and (other startup methods on windows)
 
 **SecurityPolicy**: pass if key is within the bounds for value
 
@@ -286,9 +273,7 @@ arg1='DisableCAD'
 arg2='0'
 ```
 
-> **Note**: For all integer-based values (such as `MinimumPasswordAge`), the `optValue` (`arg3`) can be used.
-> `arg2` can be the lower bound, with `arg3` as the higher bound, such as `arg2` =< `result` =< `arg3`.\
-> If no `arg3` is provided, then the system will default back to if `result` = `arg2`.
+> **Note**: For all integer-based values (such as `MinimumPasswordAge`), the `optValue` (`arg3`) can be used. `arg2` can be the lower bound, with `arg3` as the higher bound, such as `arg2` =< `result` =< `arg3`. If no `arg3` is provided, then the system will default back to if `result` = `arg2`.
 
 ```
 type='SecurityPolicy'
@@ -296,8 +281,7 @@ arg1='MaximumPasswordAge'
 arg2='80'
 arg3='100'
 ```
-> Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is
-> `Enabled`. [See here for reference](securitypolicy.md).
+> Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](securitypolicy.md).
 
 **RegistryKey**: pass if key is equal to value
 
@@ -310,8 +294,7 @@ arg2='0'
 > Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to
 > check that a key was deleted, use `RegistryKeyExistsNot`.
 
-> **Administrative Templates**: There are 4000+ admin template fields. See
-> [this list of registry keys and descriptions](https://docs.google.com/spreadsheets/d/1N7uuke4Jg1R9FBhj8o5dxJQtEntQlea0McYz5upaiTk/edit?usp=sharing), then use the `RegistryKey` or `RegistryKeyExists` check.
+> **Administrative Templates**: There are 4000+ admin template fields. See [this list of registry keys and descriptions](https://docs.google.com/spreadsheets/d/1N7uuke4Jg1R9FBhj8o5dxJQtEntQlea0McYz5upaiTk/edit?usp=sharing), then use the `RegistryKey` or `RegistryKeyExists` check.
 
 **RegistryKeyExists**: pass if key exists
 
@@ -320,8 +303,7 @@ type='RegistryKeyExists'
 arg1='SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
 ```
 
-> **Note!**: Notice the single quotes `'` on the above argument! This means it's a _string literal_ in TOML. If you
-> don't do this, you have to make sure to escape your slashes (`\` --> `\\`)
+> **Note!**: Notice the single quotes `'` on the above argument! This means it's a _string literal_ in TOML. If you don't do this, you have to make sure to escape your slashes (`\` --> `\\`)
 
 > Note: You can use `SOFTWARE` as a shortcut for `HKEY_LOCAL_MACHINE\SOFTWARE`.
 
