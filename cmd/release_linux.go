@@ -8,6 +8,7 @@ func WriteDesktopFiles() {
 	shellCommand("chmod 666 " + mc.DirPath + "TeamID.txt")
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " " + mc.DirPath + "TeamID.txt")
 	infoPrint("Writing shortcuts to Desktop...")
+	shellCommand("touch " + mc.Config.User + "/Desktop/")
 	shellCommand("cp " + mc.DirPath + "misc/desktop/*.desktop /home/" + mc.Config.User + "/Desktop/")
 	shellCommand("chmod +x /home/" + mc.Config.User + "/Desktop/*.desktop")
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
@@ -40,6 +41,7 @@ func InstallService() {
 	infoPrint("Installing service...")
 	shellCommand("cp " + mc.DirPath + "misc/dev/CSSClient /etc/init.d/")
 	shellCommand("chmod +x /etc/init.d/CSSClient")
+	shellCommand("systemctl daemon-reload")
 	shellCommand("systemctl enable CSSClient")
 	shellCommand("systemctl start CSSClient")
 }
