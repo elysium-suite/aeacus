@@ -37,6 +37,7 @@ win-dev:
 
 release:
 	echo "Building obfuscated binaries..." && \
+	sh misc/dev/gen-crypto.sh && \
 	CGO_ENABLED=0 GOOS=windows go build -ldflags '-s -w' -tags phocus -o ./phocus.exe . && \
 	CGO_ENABLED=0 GOOS=windows go build -ldflags '-s -w' -o ./aeacus.exe . && \
 	echo "Windows production build successful!" && \
