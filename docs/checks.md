@@ -133,12 +133,10 @@ type='FirewallUp'
 ```
 type='ProgramVersion'
 arg1='Firefox'
-arg2='87'
-arg3='ge'
+arg2='88.0.1+build1-0ubuntu0.20.04.2'
 ```
 
-> **Warning!**: This check is a simple _string comparison_ between version names. Sometimes, this may not be what you want, so be careful! Imagine if you had version `1:9.11.5.P4+dfsg-5.1+deb10u3` and version `1:9.11.5.P4+dsc-6.1+deb11u3`. String compare would see the former as more recent even though that's wrong.
-> **Note!**: This check uses `dpkg` in the Linux version and will thus fail on other package-manager based distros. You're encouraged to use `dpkg -l` to check versions on Linux and `.\aeacus.exe info packages` on Windows. Variable `arg3` is the version comparing method. 'eq' is equal to, 'gt' is greater than, 'ge' is equal to or greater than. `arg2` is the version that you are comparing the program to.
+> **Note**: We reccommend you use the `Not` flavor of this check to score a program's version being different from its version at the beginning of the image. You can't guarantee that the latest version of the program you're scoring will be the same once your round is released, and it's unlikely that a competitor will intentionally downgrade a package.
 
 <hr>
 

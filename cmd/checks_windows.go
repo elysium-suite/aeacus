@@ -198,26 +198,12 @@ func programInstalled(programName string) (bool, error) {
 	return false, nil
 }
 
-func programVersion(programName, versionNum, compareMode string) (bool, error) {
+func programVersion(programName, versionNum) (bool, error) {
 	prog, err := getProgram(programName)
 	if err != nil {
 		return false, err
 	}
-	switch compareMode {
-	case "eq":
-		if prog.DisplayVersion == versionNum {
-			return true, nil
-		}
-	case "gt":
-		if prog.DisplayVersion > versionNum {
-			return true, nil
-		}
-	case "ge":
-		if prog.DisplayVersion >= versionNum {
-			return true, nil
-		}
-	}
-	return false, nil
+	return prog.DisplayVersion == versionNum, nil
 }
 
 func serviceUp(serviceName string) (bool, error) {
