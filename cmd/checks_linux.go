@@ -132,28 +132,13 @@ func guestDisabledLDM() (bool, error) {
 	return result, err
 }
 
-func programVersion(programName, versionNum, compareMode string) (bool, error) {
+func programVersion(programName, versionNum string) (bool, error) {
 	commandGiven := `dpkg -l | awk '$2=="` + programName + `" { print $3 }'`
 	out, err := rawCmd(commandGiven).Output()
 	if err != nil {
 		return false, err
 	}
-	outString := strings.TrimSpace(string(out))
-	switch compareMode {
-	case "eq":
-		if outString == versionNum {
-			return true, nil
-		}
-	case "gt":
-		if outString > versionNum {
-			return true, nil
-		}
-	case "ge":
-		if outString >= versionNum {
-			return true, nil
-		}
-	}
-	return false, nil
+	return strings.TrimSpace(string(out)) == versionNum, nil
 }
 
 func kernelVersion(version string) (bool, error) {
