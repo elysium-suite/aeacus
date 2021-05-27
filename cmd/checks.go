@@ -189,33 +189,15 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 		return err == nil && !result
 	case "ProgramVersion":
 		if check.Message == "" {
-			switch arg3 {
-			case "eq":
-				check.Message = arg1 + " has a version equal to " + arg2
-			case "gt":
-				check.Message = arg1 + " has a version greater than " + arg2
-			case "ge":
-				check.Message = arg1 + " has a version greater than or equal to " + arg2
-			default:
-				failPrint("Invalid compareMode '" + arg3 + "' passed to ProgramVersion")
-			}
+			check.Message = arg1 + " has a version equal to " + arg2
 		}
-		result, err := programVersion(arg1, arg2, arg3)
+		result, err := programVersion(arg1, arg2)
 		return err == nil && result
 	case "ProgramVersionNot":
 		if check.Message == "" {
-			switch arg3 {
-			case "eq":
-				check.Message = arg1 + " has a version that is not equal to " + arg2
-			case "gt":
-				check.Message = arg1 + " has a version that is less than or equal to " + arg2
-			case "ge":
-				check.Message = arg1 + " has a version that is less than " + arg2
-			default:
-				failPrint("Invalid compareMode '" + arg3 + "' passed to ProgramVersion")
-			}
+			check.Message = arg1 + " has a version that is not equal to " + arg2
 		}
-		result, err := programVersion(arg1, arg2, arg3)
+		result, err := programVersion(arg1, arg2)
 		return err == nil && !result
 	default:
 		return processCheck(check, checkType, arg1, arg2, arg3)
