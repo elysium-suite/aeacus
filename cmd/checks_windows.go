@@ -198,7 +198,7 @@ func programInstalled(programName string) (bool, error) {
 	return false, nil
 }
 
-func programVersion(programName, versionNum) (bool, error) {
+func programVersion(programName, versionNum string) (bool, error) {
 	prog, err := getProgram(programName)
 	if err != nil {
 		return false, err
