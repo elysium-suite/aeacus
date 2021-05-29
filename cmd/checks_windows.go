@@ -294,13 +294,11 @@ func userInGroup(userName, groupName string) (bool, error) {
 }
 
 func firewallUp() (bool, error) {
-	fwProfiles := []string{"Domain", "Public", "Private"}
-	for _, profile := range fwProfiles {
-		// This is kind of jank and kind of slow
-		cmdText := "(Get-NetFirewallProfile -Name '" + profile + "').Enabled"
-		result, err := commandOutput(cmdText)
-		if result != "True" || err != nil {
-			return false, err
+	fwProfilesInt := []int{wapi.NET_FW_PROFILE2_DOMAIN, wapi.NET_FW_PROFILE2_PRIVATE, wapi.NET_FW_PROFILE2_PUBLIC}
+	for profile := range fwProfilesInt {
+		profileResult, err := wapi.FirewallIsEnabled(int32(profile))
+		if err != nil || profileResult == false {
+			return false, nil
 		}
 	}
 	return true, nil
