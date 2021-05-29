@@ -187,6 +187,18 @@ func processCheckWrapper(check *check, checkType, arg1, arg2, arg3 string) bool 
 		}
 		result, err := firewallUp()
 		return err == nil && !result
+	case "FirewallDown":
+		if check.Message == "" {
+			check.Message = "Firewall has been disabled"
+		}
+		result, err := firewallUp()
+		return err == nil && result
+	case "FirewallDownNot":
+		if check.Message == "" {
+			check.Message = "Firewall has been enabled"
+		}
+		result, err := firewallUp()
+		return err == nil && !result
 	case "ProgramVersion":
 		if check.Message == "" {
 			check.Message = arg1 + " has a version equal to " + arg2
