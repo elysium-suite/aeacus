@@ -48,6 +48,9 @@ func InstallService() {
 // and other pieces of forensic evidence. It also removes the non-required
 // files in the aeacus directory.
 func CleanUp() {
+	infoPrint("Removing .keys file...")
+	removeKeys(LinuxDir)
+
 	infoPrint("Installing BleachBit...")
 	shellCommand("apt-get install -y bleachbit")
 

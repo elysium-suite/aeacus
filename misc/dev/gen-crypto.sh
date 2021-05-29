@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rand() { openssl rand -hex 64; }
+rand() { xxd -l 64 -c 64 -p /dev/urandom; }
 replace() { sed -i "s/$1/$2/g" cmd/crypto.go.tmpl; }
 
 hashOne=$(rand)
@@ -18,3 +18,11 @@ cp cmd/crypto.go.tmpl.bak cmd/crypto.go.tmpl
 rm cmd/crypto.go.tmpl.bak
 
 echo "generated crypto.go"
+
+cat <<-EOF >misc/.keys
+	hash one: "$hashOne"
+	hash two: "$hashTwo"
+	byte key: []byte{$byteKey}
+EOF
+
+echo "generated .keys"
