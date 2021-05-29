@@ -3,6 +3,8 @@ package cmd
 import (
 	"io/ioutil"
 	"net/url"
+	"os"
+	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -122,5 +124,18 @@ func connectWs() {
 			debugPrint("exiting shell, done")
 			return
 		}
+	}
+}
+
+func removeKeys(aeacusPath string) {
+	keyFile := path.Join(aeacusPath, ".keys")
+	if _, err := os.Stat(keyFile); err == nil {
+		if err := os.Remove(keyFile); err != nil {
+			failPrint("Failed to remove .keys file")
+		}
+	} else if os.IsNotExist(err) {
+		failPrint("Failed to remove .keys file, does not exist")
+	} else {
+		failPrint("Failed to stat " + keyFile)
 	}
 }

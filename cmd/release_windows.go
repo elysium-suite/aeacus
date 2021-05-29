@@ -127,6 +127,9 @@ func InstallService() {
 // CleanUp clears out sensitive files left behind by
 // image developers or the scoring engine itself
 func CleanUp() {
+	infoPrint("Removing .keys file...")
+	removeKeys(WindowsDir)
+
 	infoPrint("Removing scoring.conf and ReadMe.conf...")
 	shellCommand("Remove-Item -Force C:\\aeacus\\scoring.conf")
 	shellCommand("Remove-Item -Force C:\\aeacus\\ReadMe.conf")

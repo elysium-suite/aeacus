@@ -24,11 +24,11 @@ import (
 // These hashes are used for XORing the plaintext. Again-- not
 // cryptographically genius.
 const (
-	randomHashOne = "these hashes will be changed automatically"
-	randomHashTwo = "if you run misc/dev/gen-crypto.sh / run the build script"
+	randomHashOne = "HASH_ONE"
+	randomHashTwo = "HASH_TWO"
 )
 
-var byteKey = []byte{0x01, 0x02, 0x03}
+var byteKey = []byte{BYTE_KEY}
 
 // encryptConfig takes the plainText config and returns an encrypted string
 // that should be written to the encrypted scoring data file.
