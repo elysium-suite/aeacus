@@ -186,7 +186,7 @@ Put your README in `ReadMe.conf`. It's pretty self-explanatory. Here's a templat
 <!-- Put your critical services here! -->
 <p><b>Critical Services:</b></p>
 <ul>
-	<li>OpenSSH Server (sshd)</li>
+	<li>Free Internet Chess Server (FICS)</li>
 	<li>Other cool service</li>
 </ul>
 
@@ -206,6 +206,7 @@ awesomeUser
 radUser
 coolGuy
 niceUser
+joemama
 </pre>
 ```
 
