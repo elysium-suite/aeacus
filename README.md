@@ -187,7 +187,7 @@ Put your README in `ReadMe.conf`. It's pretty self-explanatory. Here's a templat
 <p><b>Critical Services:</b></p>
 <ul>
 	<li>Free Internet Chess Server (FICS)</li>
-	<li>Other cool service</li>
+	<li>Real Checkers (RC)</li>
 </ul>
 
 <!-- Put your users here! -->
