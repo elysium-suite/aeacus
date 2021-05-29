@@ -306,6 +306,19 @@ func firewallUp() (bool, error) {
 	return true, nil
 }
 
+func firewallDown() (bool, error) {
+	fwProfiles := []string{"Domain", "Public", "Private"}
+	for _, profile := range fwProfiles {
+		// This is kind of jank and kind of slow
+		cmdText := "(Get-NetFirewallProfile -Name '" + profile + "').Enabled"
+		result, err := commandOutput(cmdText)
+		if result != "False" || err != nil {
+			return false, err
+		}
+	}
+	return true, nil
+}
+
 func userDetail(userName, detailName, detailValue string) (bool, error) {
 	detailValue = strings.TrimSpace(detailValue)
 	lookingFor := false

@@ -185,6 +185,12 @@ arg2='644'
 
 ### Windows-Specific Checks
 
+**FirewallDown**: pass if firewall is inactive
+
+```
+type='FirewallDown'
+```
+
 **ServiceStatus**: pass if service status and service startup type is the same as specified
 
 ```
