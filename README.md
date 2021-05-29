@@ -20,6 +20,7 @@ To get started quickly, check out [`cerberus (WIP)`](https://github.com/elysium-
 
 	- Put your **README data** in `ReadMe.conf`.
 	- Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
+	- Use `./aeacus forensics 4` to create four Forensic Question files on the Desktop of the main user.
 
 2. **Check that your config is valid.**
 
