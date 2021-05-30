@@ -321,7 +321,7 @@ func firewallUp() (bool, error) {
 func bitlockerEnabled() (bool, error) {
 	const FULLY_ENCRYPTED = 1
 	const ENCRYPTION_IN_PROGRESS = 2
-	status, err := wapi.GetBitLockerConversionStatusForDrive("C")
+	status, err := wapi.GetBitLockerConversionStatusForDrive("C:")
 	if err == nil {
 		if status.ConversionStatus == FULLY_ENCRYPTED || status.ConversionStatus == ENCRYPTION_IN_PROGRESS {
 			return true, nil
