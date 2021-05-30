@@ -185,6 +185,13 @@ arg2='644'
 
 ### Windows-Specific Checks
 
+**BitlockerEnabled**: pass if a drive has been fully encrypted with bitlocker drive encription or is in the process of being encrypted
+
+```
+type="BitlockerEnabled"
+```
+> This check uses the win64 api by iamacarpet and pulls the value of the [ConversionStatus variable](https://docs.microsoft.com/en-us/windows/win32/secprov/getconversionstatus-win32-encryptablevolume#parameters). If the valus is equal to 1 (FullyEncrypted) or 2 (EncryptionInProgress) the check passes. We account for a value of 2 because after a user has selected that they want Bitlocker drive encription it takes a fair about of time to actually encrypt the entire drive. Thus for user experience sake the check passes as long as Bitlocker has made any percent progress encrypting the drive.
+
 **ServiceStatus**: pass if service status and service startup type is the same as specified
 
 ```

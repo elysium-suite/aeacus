@@ -169,6 +169,18 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		}
 		result, err := serviceStatus(arg1, arg2, arg3)
 		return err == nil && !result
+	case "BitlockerEnabled":
+		if check.Message == "" {
+			check.Message = "Bitlocker drive encryption has been enabled"
+		}
+		result, err := bitlockerEnabled()
+		return err == nil && result
+	case "BitlockerEnabledNot":
+		if check.Message == "" {
+			check.Message = "Bitlocker drive encryption has been disabled"
+		}
+		result, err := bitlockerEnabled()
+		return err == nil && !result
 	default:
 		failPrint("No check type " + checkType)
 	}
@@ -304,6 +316,18 @@ func firewallUp() (bool, error) {
 		}
 	}
 	return true, nil
+}
+
+func bitlockerEnabled() (bool, error) {
+	const FULLY_ENCRYPTED = 1
+	const ENCRYPTION_IN_PROGRESS = 2
+	status, err := wapi.GetBitLockerConversionStatusForDrive("C")
+	if err == nil {
+		if status.ConversionStatus == FULLY_ENCRYPTED || status.ConversionStatus == ENCRYPTION_IN_PROGRESS {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func userDetail(userName, detailName, detailValue string) (bool, error) {
