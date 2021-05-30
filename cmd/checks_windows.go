@@ -297,7 +297,9 @@ func firewallUp() (bool, error) {
 	fwProfilesInt := []int{wapi.NET_FW_PROFILE2_DOMAIN, wapi.NET_FW_PROFILE2_PRIVATE, wapi.NET_FW_PROFILE2_PUBLIC}
 	for profile := range fwProfilesInt {
 		profileResult, err := wapi.FirewallIsEnabled(int32(profile))
-		if err != nil || profileResult == false {
+		if err != nil {
+			return false, err
+		} else if !profileResult {
 			return false, nil
 		}
 	}
