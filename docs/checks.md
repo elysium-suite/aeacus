@@ -185,6 +185,13 @@ arg2='644'
 
 ### Windows-Specific Checks
 
+**BitlockerEnabled**: pass if a drive has been fully encrypted with bitlocker drive encription or is in the process of being encrypted
+
+```
+type="BitlockerEnabled"
+```
+> This check will succeed if the drive is either encrypted or encryption is in progress.
+
 **ServiceStatus**: pass if service status and service startup type is the same as specified
 
 ```
