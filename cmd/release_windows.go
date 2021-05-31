@@ -115,13 +115,20 @@ func InstallService() {
 	cmdString = `sc.exe description CSSClient "This is Aeacus's Competition Scoring System client. Don't stop or mess with this unless you want to not get points, and maybe have your registry deleted."`
 	shellCommand(cmdString)
 	infoPrint("Setting up TeamID scheduled task...")
-	taskCreate := `
+	idTaskCreate := `
 	$action = New-ScheduledTaskAction -Execute "C:\aeacus\phocus.exe" -Argument "-i yes"
 	$trigger = New-ScheduledTaskTrigger -AtLogon
 	$principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel Highest
 	Register-ScheduledTask -TaskName "TeamID" -Description "Scheduled Task to ensure Aeacus TeamID prompt is displayed when needed" -Action $action -Trigger $trigger -Principal $principal
 	`
-	shellCommand(taskCreate)
+	serviceTaskCreate := `
+	$action = New-ScheduledTaskAction -Execute "net.exe" -Argument "start CSSClient"
+	$trigger = New-ScheduledTaskTrigger -AtLogon
+	$principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel Highest
+	Register-ScheduledTask -TaskName "CSSClient" -Description "Scheduled Task to ensure the CSSClient service remains up" -Action $action -Trigger $trigger -Principal $principal
+	`
+	shellCommand(idTaskCreate)
+	shellCommand(serviceTaskCreate)
 }
 
 // CleanUp clears out sensitive files left behind by
