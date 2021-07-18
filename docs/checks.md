@@ -4,7 +4,7 @@
 
 This is a list of vulnerability checks that can be used in the configuration for `aeacus`. The notes on this page contain a lot of important information, please be sure to read them.
 
-> **Note!** Each of the commands here can check for the opposite by appending 'Not' to the check type. For example, `FileExistsNot` to pass if a file does not exist.
+> **Note!** Each of the commands here can check for the opposite by appending 'Not' to the check type. For example, `PathExistsNot` to pass if a file does not exist.
 
 **Command**: pass if command succeeds (exit code `0`, checks `$?`)
 
@@ -46,7 +46,7 @@ arg1='C:\importantfolder\'
 
 **FileContains**: pass if file contains string
 
-> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for FileExistsNot, for example, if you want to score that a file does not contain a line, OR it doesn't exist.
+> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for PathExistsNot, for example, if you want to score that a file does not contain a line, OR it doesn't exist.
 
 ```
 type='FileContains'
