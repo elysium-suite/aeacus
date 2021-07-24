@@ -4,8 +4,6 @@
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 
-To get started quickly, check out [`cerberus (WIP)`](https://github.com/elysium-suite/cerberus), a(n unstable) GUI wrapper for aeacus to assist with image development and vulnerability configuration.
-
 ## Installation
 
 0. **Extract the release** into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
@@ -112,6 +110,7 @@ disableshell = true
 # Set the version of this scoring file. This is not a number
 # that is changed for YOUR versions, it is changed in tandem
 # with the current version of aeacus.
+# If you're ever unsure of the version, just run "aeacus version"
 version = "1.8.2"
 
 [[check]]
@@ -234,7 +233,7 @@ The authors of this project recommend using [sarpedon](https://github.com/elysiu
 -   On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities.
 
 ## Compiling
-
+If you need a tool to quickly install `go` and a few other tools, use [this](https://github.com/elysium-suite/aeacus/blob/master/misc/dev/install.sh) to help you out!
 Once you install `go` (make sure you use a recent version) and install dependencies using `go get -v -d -t ./...`, you can build with these commands:
 
 -   Building for `Linux`: `make lin`
