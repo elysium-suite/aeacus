@@ -59,15 +59,35 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		return err == nil && !result
 	case "PermissionIs":
 		if check.Message == "" {
-			check.Message = "The permissions of " + arg1 + " are " + arg2
+
+			if arg2 == "octal" {
+				check.Message = "The octal permissions of " + arg1 + " are " + arg3
+			} else if arg2 == "WorldWritable" {
+				check.Message = arg1 + " is world writable"
+			} else if arg2 == "WorldReadable" {
+				check.Message = arg1 + " is world readable"
+			} else {
+				check.Message = "Permissions of " + arg1 + " are " + arg3
+			}
+
 		}
-		result, err := permissionIs(arg1, arg2)
+		result, err := permissionIs(arg1, arg2, arg3)
 		return err == nil && result
 	case "PermissionIsNot":
 		if check.Message == "" {
-			check.Message = "The permissions of " + arg1 + " are not " + arg2
+
+			if arg2 == "octal" {
+				check.Message = "The octal permissions of " + arg1 + " are not " + arg3
+			} else if arg2 == "WorldWritable" {
+				check.Message = arg1 + " is not world writable"
+			} else if arg2 == "WorldReadable" {
+				check.Message = arg1 + " is not world readable"
+			} else {
+				check.Message = "Permissions of " + arg1 + " are not " + arg3
+			}
+
 		}
-		result, err := permissionIs(arg1, arg2)
+		result, err := permissionIs(arg1, arg2, arg3)
 		return err == nil && !result
 	default:
 		failPrint("No check type " + checkType)
@@ -149,7 +169,20 @@ func autoCheckUpdatesEnabled() (bool, error) {
 	return fileContainsRegex("/etc/apt/apt.conf.d/20auto-upgrades", `APT::Periodic::Update-Package-Lists( |)"1";`)
 }
 
-func permissionIs(filePath, permissionToCheck string) (bool, error) {
-	perm, err := commandOutput(`stat -c '%a' ` + filePath)
-	return perm == permissionToCheck, err
+// func permissionIs(filePath, permissionToCheck string) (bool, error) {
+// 	perm, err := commandOutput(`stat -c '%a' ` + filePath)
+// 	return perm == permissionToCheck, err
+// }
+
+func permissionIs(filePath, checkType, permissionToCheck string) (bool, error) {
+	if checkType == "octal" {
+		perm, err := commandOutput(`stat -c '%a' ` + filePath)
+		return perm == permissionToCheck, err
+	} else if checkType == "WorldWritable" {
+		return commandContains(`find `+filePath+` -perm -g+w -or -perm -o+w`, filePath)
+	} else if checkType == "WorldReadable" {
+		return commandContains(`find `+filePath+` -perm -o=r`, filePath)
+	}
+	// If arguments are messed up or whatever:
+	return false, nil
 }

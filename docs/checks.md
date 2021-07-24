@@ -173,12 +173,27 @@ type='AutoCheckUpdatesEnabled'
 
 > Only works for standard `apt` installs.
 
-**PermissionIs**: pass if the specified file has the octal permissions specified
+**PermissionIs**: pass if the specified file has permissions specified
 
 ```
 type='PermissionIs'
 arg1='/etc/passwd'
-arg2='644'
+arg2='octal'
+arg3='644'
+```
+
+```
+type='PermissionIs'
+arg1='/etc/passwd'
+arg2='WorldWritable'
+arg3='none'
+```
+
+```
+type='PermissionIs'
+arg1='/etc/passwd'
+arg2='WorldReadable'
+arg3='none'
 ```
 
 <hr>
