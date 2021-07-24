@@ -10,7 +10,7 @@ To get started quickly, check out [`cerberus (WIP)`](https://github.com/elysium-
 
 0. **Extract the release** into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
 
-	> You should try compiling it yourself! If not, you can [download the releases here](https://github.com/elysium-suite/aeacus/releases).
+	> Try compiling it yourself! Or, you can [download the releases here](https://github.com/elysium-suite/aeacus/releases).
 
 1. **Set up the environment.**
 
@@ -230,7 +230,7 @@ The authors of this project recommend using [sarpedon](https://github.com/elysiu
 
 ## Compiling
 
-Once you install `go` (make sure you use a recent version) and `garble` (`GO111MODULE=on go get mvdan.cc/garble`), you can build with these commands:
+Once you install `go` (make sure you use a recent version) and install dependencies using `go get -v -d -t ./...`, you can build with these commands:
 
 -   Building for `Linux`: `make lin`
 -   Building for `Windows`: `make win`
