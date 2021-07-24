@@ -112,7 +112,7 @@ disableshell = true
 # Set the version of this scoring file. This is not a number
 # that is changed for YOUR versions, it is changed in tandem
 # with the current version of aeacus.
-version = 1.8.2
+version = "1.8.2"
 
 [[check]]
 message = "Removed insecure sudoers rule"
