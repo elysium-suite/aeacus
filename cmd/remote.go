@@ -226,6 +226,12 @@ func checkServer() {
 		failPrint("Remote server returned an error for its status! Your ID is probably wrong.")
 		sendNotification("Status check failed, TeamID incorrect!")
 		mc.Connection = false
+	} else if mc.Conn.ServerStatus == "DISABLED" {
+		mc.Conn.OverallColor = RED
+		mc.Conn.OverallStatus = "Remote scoring server is no longer accepting scores."
+		failPrint("Remote scoring server is no longer accepting scores.")
+		sendNotification("Remote scoring server is no longer accepting scores.")
+		mc.Connection = false
 	} else {
 		timeStart = time.Now()
 		mc.Conn.OverallColor = GREEN
