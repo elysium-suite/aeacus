@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	AeacusVersion = "1.8.2"
+	AeacusVersion = "1.8.3"
 	ScoringConf   = "scoring.conf"
 	ScoringData   = "scoring.dat"
 	LinuxDir      = "/opt/aeacus/"
