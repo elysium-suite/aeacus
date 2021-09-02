@@ -11,6 +11,7 @@ func WriteDesktopFiles() {
 	shellCommand("cp " + mc.DirPath + "misc/desktop/*.desktop /home/" + mc.Config.User + "/Desktop/")
 	shellCommand("chmod +x /home/" + mc.Config.User + "/Desktop/*.desktop")
 	shellCommand("chown " + mc.Config.User + ":" + mc.Config.User + " /home/" + mc.Config.User + "/Desktop/*")
+	shellCommand("for i in /home/" + mc.Config.User + "/Desktop/*.desktop; do gio set \"$i\" \"metadata::trusted\" yes ;done")
 }
 
 // ConfigureAutologin configures the auto-login capability for LightDM and
