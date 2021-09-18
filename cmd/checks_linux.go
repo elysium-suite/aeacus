@@ -123,7 +123,7 @@ func programInstalled(programName string) (bool, error) {
 
 func serviceUp(serviceName string) (bool, error) {
 	// TODO: detect and use other init systems
-	return commandContains("systemctl is-active "+serviceName, "active")
+	return !commandContains("systemctl is-active "+serviceName, "inactive")
 }
 
 func userExists(userName string) (bool, error) {
