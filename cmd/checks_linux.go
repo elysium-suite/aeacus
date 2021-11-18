@@ -123,7 +123,8 @@ func programInstalled(programName string) (bool, error) {
 
 func serviceUp(serviceName string) (bool, error) {
 	// TODO: detect and use other init systems
-	return commandInterface("/usr/bin/systemctl", "is-active", serviceName)
+	ret, err := commandContains("systemctl is-active "+serviceName, "inactive")
+	return !ret, err
 }
 
 func userExists(userName string) (bool, error) {
