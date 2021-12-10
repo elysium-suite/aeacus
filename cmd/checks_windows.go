@@ -353,7 +353,7 @@ func userDetail(userName, detailName, detailValue string) (bool, error) {
 		return user.IsAdmin == lookingFor, nil
 	case "PasswordNeverExpires":
 		return user.PasswordNeverExpires == lookingFor, nil
-	case "NoChangePassword:
+	case "NoChangePassword":
 		return user.NoChangePassword == lookingFor, nil
 	default:
 		failPrint("detailName (" + detailName + ") passed to userDetail is invalid.")
