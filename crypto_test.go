@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-func TestEncryption(t *testing.T) {
+func TestConfigEncryption(t *testing.T) {
 	// Testing encryptConfig
 	plainText := "Test string."
 	if encrypted, err := encryptConfig(plainText); err != nil {
@@ -14,8 +14,10 @@ func TestEncryption(t *testing.T) {
 			t.Errorf("decryptConfig returned an error: %s", err.Error())
 		}
 	}
+}
 
-	// Testing encryptString
+func TestAESEncryption(t *testing.T) {
+	plainText := "Test string."
 	password := "Password1!"
 	encrypted := encryptString(password, plainText)
 	if decrypted := decryptString(password, encrypted); decrypted != plainText {

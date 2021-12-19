@@ -1,28 +1,21 @@
 #!/bin/sh
+set -e
 
 rand() { xxd -l 64 -c 64 -p /dev/urandom; }
-replace() { sed -i "s/$1/$2/g" cmd/crypto.go.tmpl; }
+replace() { sed -i "s/$1/$2/g" crypto.go; }
 
 hashOne=$(rand)
 hashTwo=$(rand)
 byteKey=$(rand | sed 's/\(..\)/0x\1, /g')
 
-cp cmd/crypto.go.tmpl cmd/crypto.go.tmpl.bak
+if [ -f "crypto.go.bak" ]; then
+	mv crypto.go.bak crypto.go
+fi
+
+cp crypto.go crypto.go.bak
 
 replace "HASH_ONE" "$hashOne"
 replace "HASH_TWO" "$hashTwo"
-replace "BYTE_KEY" "$byteKey"
-
-cp cmd/crypto.go.tmpl cmd/crypto.go
-cp cmd/crypto.go.tmpl.bak cmd/crypto.go.tmpl
-rm cmd/crypto.go.tmpl.bak
+replace "0x01" "`echo $byteKey | head -c 382`"
 
 echo "generated crypto.go"
-
-cat <<-EOF >misc/.keys
-	hash one: "$hashOne"
-	hash two: "$hashTwo"
-	byte key: []byte{$byteKey}
-EOF
-
-echo "generated .keys"
