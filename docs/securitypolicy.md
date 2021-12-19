@@ -1,12 +1,14 @@
 # aeacus
 
-## Windows Security Settings 🤯🔫
+## Windows Security Settings
 
 > A note on using `secedit.exe` and just parsing it... even [more reputable projects](https://github.com/dsccommunity/SecurityPolicyDsc/blob/8c318e43171cd32b14fe914b9c18c307093ba964/Modules/SecurityPolicyResourceHelper/SecurityPolicyResourceHelper.psm1) found it to be usable solution.
 
 > List is sourced from `secedit.exe` and [this god-awful spreadsheet from Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=25250).
 
-### Account Policies
+These are all aliases. You can (and probably should) use the RegistryKey check for more control and to score obscure policies.
+
+## Account Policies
 
 ### Password Policies
 
@@ -61,6 +63,6 @@ Everything from this point and below should be in the `Security Options` pane of
 -   `NewAdministratorName`
 -   `NewGuestName`
 
-## Security Options
+## Other Options
 
-I'm seriously going to suffer brain damage if I have to format all of these again... [See the spreadsheet](https://docs.google.com/spreadsheets/d/1N7uuke4Jg1R9FBhj8o5dxJQtEntQlea0McYz5upaiTk/edit#gid=1772229936).
+It's probably best if you just look at the source code. See `policies_windows.go`.
