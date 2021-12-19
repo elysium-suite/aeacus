@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"fmt"
@@ -9,38 +9,43 @@ import (
 	"time"
 )
 
-func genReport(img imageData) {
-	teamID := mc.TeamID
+func genReport(img *imageData) {
+
+	// displayTeamID is used for the tiling background.
+	var displayTeamID string
 	if len(teamID) < 7 {
-		teamID = "1010 1101"
+		displayTeamID = "1010 1101"
+	} else {
+		displayTeamID = teamID
 	}
-	header := `<!DOCTYPE html> <html> <head> <meta http-equiv="refresh" content="60"> <title>Aeacus Scoring Report</title> <style type="text/css"> h1 { text-align: center; } h2 { text-align: center; } body { font-family: Arial, Verdana, sans-serif; font-size: 14px; margin: 0; padding: 0; width: 100%; height: 100%; background: url('./img/background.png'); background-size: cover; background-attachment: fixed; background-position: top center; background-color: #336699; } .red {color: red;} .green {color: green;} .blue {color: blue;} .main { margin-top: 10px; margin-bottom: 10px; margin-left: auto; margin-right: auto; padding: 0px; border-radius: 12px; background-color: white; width: 900px; max-width: 100%; min-width: 600px; box-shadow: 0px 0px 12px #003366; } .text { padding: 12px; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } .center { text-align: center; } .binary { position: relative; overflow: hidden; } .binary::before { position: absolute; top: -1000px; left: -1000px; display: block; width: 500%; height: 300%; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -ms-transform: rotate(-45deg); transform: rotate(-45deg); content: attr(data-binary); opacity: 0.15; line-height: 2em; letter-spacing: 2px; color: #369; font-size: 10px; pointer-events: none; } </style> <meta http-equiv="refresh"> </head> <body><div class="main"><div class="text"><div class="binary" data-binary="` + teamID + `"><p align=center style="width:100%;text-align:center"><img align=middle style="width:180px; float:middle" src="./img/logo.png"></p>`
+
+	header := `<!DOCTYPE html> <html> <head> <meta http-equiv="refresh" content="60"> <title>Aeacus Scoring Report</title> <style type="text/css"> h1 { text-align: center; } h2 { text-align: center; } body { font-family: Arial, Verdana, sans-serif; font-size: 14px; margin: 0; padding: 0; width: 100%; height: 100%; background: url('./img/background.png'); background-size: cover; background-attachment: fixed; background-position: top center; background-color: #336699; } .red {color: red;} .green {color: green;} .blue {color: blue;} .main { margin-top: 10px; margin-bottom: 10px; margin-left: auto; margin-right: auto; padding: 0px; border-radius: 12px; background-color: white; width: 900px; max-width: 100%; min-width: 600px; box-shadow: 0px 0px 12px #003366; } .text { padding: 12px; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } .center { text-align: center; } .binary { position: relative; overflow: hidden; } .binary::before { position: absolute; top: -1000px; left: -1000px; display: block; width: 500%; height: 300%; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -ms-transform: rotate(-45deg); transform: rotate(-45deg); content: attr(data-binary); opacity: 0.15; line-height: 2em; letter-spacing: 2px; color: #369; font-size: 10px; pointer-events: none; } </style> <meta http-equiv="refresh"> </head> <body><div class="main"><div class="text"><div class="binary" data-binary="` + displayTeamID + `"><p align=center style="width:100%;text-align:center"><img align=middle style="width:180px; float:middle" src="./img/logo.png"></p>`
 
 	footer := `</p> <br> <p align=center style="text-align:center"> The Aeacus project is free and open source software. This project is in no way endorsed or affiliated with the Air Force Association or the University of Texas at San Antonio. </p> </div> </div> </div> </body> </html>`
 
 	var htmlFile strings.Builder
 	htmlFile.WriteString(header)
 	genTime := time.Now()
-	htmlFile.WriteString("<h1>" + mc.Config.Title + "</h1>")
+	htmlFile.WriteString("<h1>" + conf.Title + "</h1>")
 	htmlFile.WriteString("<h2>Report Generated At: " + genTime.Format("2006/01/02 15:04:05 MST") + " </h2>")
 	htmlFile.WriteString(`<script>var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(10000).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CCS Scoring service may not be running</h2></span>'); } </script>`)
 
-	if mc.Config.Remote != "" {
-		htmlFile.WriteString(`<h3 class="center">Current Team ID: ` + mc.TeamID + `</h3>`)
+	if conf.Remote != "" {
+		htmlFile.WriteString(`<h3 class="center">Current Team ID: ` + teamID + `</h3>`)
 	}
 
 	htmlFile.WriteString(fmt.Sprintf(`<h2> %d out of %d points received</h2>`, img.Score, img.TotalPoints))
 
-	if mc.Config.Remote != "" {
-		htmlFile.WriteString(`<a href="` + mc.Config.Remote + `">Click here to view the public scoreboard</a><br>`)
-		htmlFile.WriteString(`<a href="` + mc.Config.Remote + `/announcements` + `">Click here to view the announcements</a><br>`)
+	if conf.Remote != "" {
+		htmlFile.WriteString(`<a href="` + conf.Remote + `">Click here to view the public scoreboard</a><br>`)
+		htmlFile.WriteString(`<a href="` + conf.Remote + `/announcements` + `">Click here to view the announcements</a><br>`)
 
-		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + mc.Conn.OverallColor + `">` + mc.Conn.OverallStatus + `<span></h3>`)
+		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + conn.OverallColor + `">` + conn.OverallStatus + `<span></h3>`)
 
-		htmlFile.WriteString(`Internet Connectivity Check: <span style="color:` + mc.Conn.NetColor + `">` + mc.Conn.NetStatus + `</span><br>`)
-		htmlFile.WriteString(`Aeacus Server Connection Status: <span style="color:` + mc.Conn.ServerColor + `">` + mc.Conn.ServerStatus + `</span></p>`)
+		htmlFile.WriteString(`Internet Connectivity Check: <span style="color:` + conn.NetColor + `">` + conn.NetStatus + `</span><br>`)
+		htmlFile.WriteString(`Aeacus Server Connection Status: <span style="color:` + conn.ServerColor + `">` + conn.ServerStatus + `</span></p>`)
 	} else {
-		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + mc.Conn.OverallColor + `">` + mc.Conn.OverallStatus + `<span></h3>`)
+		htmlFile.WriteString(`<p><h3>Connection Status: <span style="color:` + conn.OverallColor + `">` + conn.OverallStatus + `<span></h3>`)
 		htmlFile.WriteString(`Internet Connectivity Check: <span style="color:grey">N/A</span><br>`)
 		htmlFile.WriteString(`Aeacus Server Connection Status: <span style="color:grey">N/A</span><br>`)
 	}
@@ -65,13 +70,13 @@ func genReport(img imageData) {
 
 	htmlFile.WriteString(footer)
 
-	infoPrint("Writing HTML to ScoringReport.html...")
-	writeFile(mc.DirPath+"assets/ScoringReport.html", htmlFile.String())
+	info("Writing HTML to ScoringReport.html...")
+	writeFile(dirPath+"assets/ScoringReport.html", htmlFile.String())
 }
 
-// GenReadMe generates a competition ReadMe with some built-in defaults from your
-// ReadMe.conf
-func GenReadMe() {
+// genReadMe generates a competition ReadMe with some built-in defaults from
+// your ReadMe.conf.
+func genReadMe() {
 	header := `
 <!DOCTYPE html>
 <html>
@@ -181,14 +186,14 @@ func GenReadMe() {
 
 	var htmlFile strings.Builder
 	htmlFile.WriteString(header)
-	htmlFile.WriteString("<h1><b>" + mc.Config.OS + " " + mc.Config.Title + " README</b></h1>")
+	htmlFile.WriteString("<h1><b>" + conf.OS + " " + conf.Title + " README</b></h1>")
 	htmlFile.WriteString(headerTheSequel)
 
-	htmlFile.WriteString("<h2><b>" + mc.Config.OS + "</b></h2>")
+	htmlFile.WriteString("<h2><b>" + conf.OS + "</b></h2>")
 
 	htmlFile.WriteString(`<p>
-	It is company policy to use only ` + mc.Config.OS + ` on this computer. It is also company policy to use only the
-	latest, official, stable ` + mc.Config.OS + ` packages available for required software and services on this computer.
+	It is company policy to use only ` + conf.OS + ` on this computer. It is also company policy to use only the
+	latest, official, stable ` + conf.OS + ` packages available for required software and services on this computer.
 	Management has decided that the default web browser for all users on this computer should be the latest stable
 	version of Firefox.`)
 
@@ -198,13 +203,24 @@ func GenReadMe() {
 	}
 
 	htmlFile.WriteString("</p>")
-	userReadMe, err := readFile("ReadMe.conf")
+
+	// Check for common variations of ReadMe.conf.
+	var userReadMe string
+	var err error
+	readMeFiles := []string{"ReadMe.conf", "README.conf", "readme.conf"}
+	for _, readme := range readMeFiles {
+		userReadMe, err = readFile(readme)
+		if err == nil {
+			break
+		}
+	}
 	if err != nil {
-		failPrint("No ReadMe.conf file found!")
+		fail("No ReadMe.conf file found!")
 		os.Exit(1)
 	}
+
 	htmlFile.WriteString(userReadMe)
 	htmlFile.WriteString(footer)
-	infoPrint("Writing HTML to ReadMe.html...")
-	writeFile(mc.DirPath+"assets/ReadMe.html", htmlFile.String())
+	info("Writing HTML to ReadMe.html...")
+	writeFile(dirPath+"assets/ReadMe.html", htmlFile.String())
 }

@@ -1,4 +1,4 @@
-package cmd
+package main
 
 // secpolToKey contains a large mapping onf securityPolicy
 // names or keys to registry locations.

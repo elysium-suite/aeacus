@@ -1,0 +1,410 @@
+package main
+
+import (
+	"encoding/binary"
+	"errors"
+	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
+	wapi "github.com/iamacarpet/go-win64api"
+	"golang.org/x/sys/windows/registry"
+)
+
+func (c cond) BitlockerEnabled() (bool, error) {
+	const FULLY_ENCRYPTED = 1
+	const ENCRYPTION_IN_PROGRESS = 2
+	status, err := wapi.GetBitLockerConversionStatusForDrive("C:")
+	if err == nil {
+		if status.ConversionStatus == FULLY_ENCRYPTED || status.ConversionStatus == ENCRYPTION_IN_PROGRESS {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (c cond) FileOwner() (bool, error) {
+	owner, err := shellCommandOutput("(Get-Acl " + c.Path + ").Owner")
+	owner = strings.TrimSpace(owner)
+	return owner == c.User || owner == c.Group, err
+}
+
+func (c cond) FirewallUp() (bool, error) {
+	fwProfilesInt := []int{wapi.NET_FW_PROFILE2_DOMAIN, wapi.NET_FW_PROFILE2_PRIVATE, wapi.NET_FW_PROFILE2_PUBLIC}
+	for profile := range fwProfilesInt {
+		profileResult, err := wapi.FirewallIsEnabled(int32(profile))
+		if err != nil {
+			return false, err
+		} else if !profileResult {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+// PasswordChanged checks if the password for a given user was changed more
+// recently than specified. The date format output by this command is:
+//     Monday, January 02, 2006 3:04:05 PM
+// Which somehow manages to defy every common date format. Thanks, Windows.
+func (c cond) PasswordChanged() (bool, error) {
+	configDate, err := time.Parse("Monday, January 02, 2006 3:04:05 PM", strings.TrimSpace(c.After))
+	if err != nil {
+		return false, err
+	}
+	changed, err := shellCommandOutput(`(Get-LocalUser ` + c.User + `).PasswordLastSet`)
+	if err != nil {
+		return false, err
+	}
+	changeDate, err := time.Parse("Monday, January 02, 2006 3:04:05 PM", strings.TrimSpace(changed))
+	if err != nil {
+		return false, err
+	}
+	return changeDate.After(configDate), nil
+}
+
+func (c cond) ProgramInstalled() (bool, error) {
+	programList, err := getPrograms()
+	if err != nil {
+		return false, err
+	}
+	for _, p := range programList {
+		if strings.Contains(p, c.Program) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (c cond) ProgramVersion() (bool, error) {
+	prog, err := getProgram(c.Program)
+	if err != nil {
+		return false, err
+	}
+	return prog.DisplayVersion == c.Version, nil
+}
+
+func (c cond) RegistryKey() (bool, error) {
+	registryArgs := regexp.MustCompile(`[\\]+`).Split(c.Key, -1)
+	if len(registryArgs) < 2 {
+		fail("Invalid key for RegistryKey. Did you supply 'key'?")
+		return false, errors.New("invalid registry key path: " + c.Key)
+	}
+	registryHiveText := registryArgs[0]
+	keyPath := fmt.Sprintf(strings.Join(registryArgs[1:len(registryArgs)-1], `\`))
+	keyLoc := registryArgs[len(registryArgs)-1]
+
+	var registryHive registry.Key
+	switch registryHiveText {
+	case "HKEY_CLASSES_ROOT", "HKCR":
+		registryHive = registry.CLASSES_ROOT
+	case "HKEY_CURRENT_USER", "HKCU":
+		registryHive = registry.CURRENT_USER
+	case "HKEY_LOCAL_MACHINE", "HKLM", "MACHINE":
+		registryHive = registry.LOCAL_MACHINE
+	case "HKEY_USERS", "HKU":
+		registryHive = registry.USERS
+	case "HKEY_CURRENT_CONFIG", "HKCC":
+		registryHive = registry.CURRENT_CONFIG
+	case "SOFTWARE":
+		registryHive = registry.LOCAL_MACHINE
+		keyPath = `SOFTWARE\` + keyPath
+	default:
+		fail("Unknown registry hive: " + registryHiveText)
+		return false, errors.New("Unknown registry hive " + registryHiveText)
+	}
+
+	debug("Getting key", keyPath, "from hive ", registryHiveText)
+	// Actually get the key
+	k, err := registry.OpenKey(registryHive, keyPath, registry.QUERY_VALUE)
+	if err != nil {
+		if verboseEnabled {
+			warn("Registry opening key failed:", err)
+		}
+		return false, err
+	}
+	defer k.Close()
+
+	// Fetch registry value
+	registrySlice := make([]byte, 256)
+	regLength, valType, err := k.GetValue(keyLoc, registrySlice)
+	if err != nil {
+		// Error is probably about the key not existing. This is fine, some keys
+		// are not defined until the setting is explicitly set. However, the
+		// check should not pass for RegistryKey or RegistryKeyNot, so we return
+		// an error.
+		warn("Failed to open registry key:", err)
+		return false, err
+	}
+
+	registrySlice = registrySlice[:regLength]
+	debug("Retrieved registry value was", registrySlice, "length", regLength, "value", valType)
+
+	// Determine value type to convert to string
+	var registryValue string
+	switch valType {
+	case 1: // SZ
+		registryValue, _, err = k.GetStringValue(keyLoc)
+	case 2: // EXPAND_SZ
+		registryValue, _, err = k.GetStringValue(keyLoc)
+	case 3: // BINARY
+		fail("Binary registry format not yet supported.")
+	case 4: // DWORD
+		registryValue = strconv.FormatUint(uint64(binary.LittleEndian.Uint32(registrySlice)), 10)
+	default:
+		fail("Unknown registry type: " + fmt.Sprint(valType))
+	}
+
+	// fmt.Printf("Registry value: %s, keyvalue %s\n", registryValue, keyValue)
+	if registryValue == c.Value {
+		return true, err
+	}
+	return false, err
+}
+
+func (c cond) RegistryKeyExists() (bool, error) {
+	_, err := c.RegistryKey()
+	if err != nil {
+		if err == registry.ErrNotExist {
+			return false, nil
+		} else {
+			return false, err
+		}
+	} else {
+		return true, nil
+	}
+}
+
+func (c cond) ScheduledTaskExists() (bool, error) {
+	return cond{
+		Cmd:   "(Get-ScheduledTask -TaskName '" + c.Name + "').TaskName",
+		Value: c.Name,
+	}.CommandOutput()
+}
+
+func (c cond) SecurityPolicy() (bool, error) {
+	var desiredString string
+
+	// If the passed key is one we know is in the registry, just wrap
+	// RegistryKey.
+	if regKey, ok := secpolToKey[c.Key]; ok {
+		return cond{
+			Key:   regKey,
+			Value: c.Value,
+		}.RegistryKey()
+	}
+
+	// Otherwise, we're going to grab and parse secedit output :/
+	seceditOutput, err := getSecedit()
+	if err != nil {
+		return false, err
+	}
+
+	re := regexp.MustCompile("(?m)[\r\n]+^.*" + c.Key + ".*$")
+	output := strings.TrimSpace(string(re.Find([]byte(seceditOutput))))
+	if output == "" {
+		return false, errors.New("SecurityPolicy item not found")
+	}
+
+	if c.Key == "NewAdministratorName" || c.Key == "NewGuestName" {
+		// These two are strings, not numbers, so they have ""
+		desiredString = c.Key + " = " + c.Value
+	} else if c.Key == "MinimumPasswordAge" ||
+		c.Key == "MinimumPasswordLength" ||
+		c.Key == "LockoutDuration" ||
+		c.Key == "ResetLockoutCount" ||
+		c.Key == "MaximumPasswordAge" ||
+		c.Key == "LockoutBadCount" {
+
+		// These keys are integers, and support ranges.
+		var outputResult, err = strconv.Atoi(strings.Split(output, " = ")[1])
+		if err != nil {
+			return false, err
+		}
+
+		if strings.Contains(c.Value, "-") {
+			splitVal := strings.Split(c.Value, "-")
+			if len(splitVal) != 2 {
+				fail("Malformed range value:", c.Value)
+				return false, errors.New("Invalid c.Value range")
+			}
+			intLow, err := strconv.Atoi(splitVal[0])
+			if err != nil {
+				fail(splitVal[0] + " is not a valid integer for SecurityPolicy check")
+				return false, err
+			}
+			intHigh, err := strconv.Atoi(splitVal[1])
+			if err != nil {
+				fail(splitVal[1] + " is not a valid integer for SecurityPolicy check")
+				return false, err
+			}
+			if intLow <= outputResult && outputResult <= intHigh {
+				return true, nil
+			}
+		} else {
+			desiredValue, err := strconv.Atoi(c.Value)
+			if err != nil {
+				fail(c.Value + " is not a valid integer for SecurityPolicy check")
+				return false, errors.New("Invalid c.Value")
+			}
+			if outputResult == desiredValue {
+				return true, nil
+			}
+		}
+	} else {
+		desiredString = c.Key + " = " + c.Value
+	}
+
+	return output == desiredString, nil
+}
+
+func (c cond) ServiceStartup() (bool, error) {
+	var startupNumber string
+	switch c.Value = strings.ToLower(c.Value); c.Value {
+	case "automatic":
+		startupNumber = "2"
+	case "manual":
+		startupNumber = "3"
+	case "disabled":
+		startupNumber = "4"
+	default:
+		fail("Unknown startup type '"+c.Value+"' for", c.Name)
+		return false, errors.New("Unknown status type found for " + c.Name)
+	}
+	serviceKey := `HKLM\SYSTEM\CurrentControlSet\Services\` + c.Name + `\Start`
+	return cond{
+		Key:   serviceKey,
+		Value: startupNumber,
+	}.RegistryKey()
+}
+
+func (c cond) ServiceUp() (bool, error) {
+	serviceStatus, err := getLocalServiceStatus(c.Name)
+	return serviceStatus.IsRunning, err
+}
+
+func (c cond) ShareExists() (bool, error) {
+	return cond{
+		Cmd:   "(Get-SmbShare -Name '" + c.Name + "').Name",
+		Value: c.Name,
+	}.CommandOutput()
+}
+
+func (c cond) UserExists() (bool, error) {
+	user, err := getLocalUser(c.User)
+	if err != nil {
+		return false, err
+	}
+	if user.Username == "" {
+		return false, nil
+	}
+	return true, nil
+}
+
+func (c cond) UserInGroup() (bool, error) {
+	users, err := wapi.LocalGroupGetMembers(c.Group)
+	if err != nil {
+		// Error is returned if group is empty.
+		return false, nil
+	}
+	for _, user := range users {
+		justName := strings.Split(user.Name, `\`)[1]
+		if c.User == user.Name || c.User == justName {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (c cond) UserDetail() (bool, error) {
+	c.Key = strings.TrimSpace(c.Key)
+	lookingFor := false
+	if strings.ToLower(c.Key) == "yes" {
+		lookingFor = true
+	}
+	user, err := getLocalUser(c.User)
+	if err != nil {
+		return false, err
+	}
+	switch c.Key {
+	case "FullName":
+		if user.FullName == c.Key {
+			return true, nil
+		}
+	case "IsEnabled":
+		return user.IsEnabled == lookingFor, nil
+	case "IsLocked":
+		return user.IsLocked == lookingFor, nil
+	case "IsAdmin":
+		return user.IsAdmin == lookingFor, nil
+	case "PasswordNeverExpires":
+		return user.PasswordNeverExpires == lookingFor, nil
+	default:
+		fail("c.Key (" + c.Key + ") passed to userDetail is invalid.")
+		return false, errors.New("Invalid detail")
+	}
+	return false, nil
+}
+
+func (c cond) UserRights() (bool, error) {
+	// TODO consider /mergedpolicy when windows domain is active?
+	// domain support is untested, it should be easy to add a domain
+	// flag in the config though. then just make sure you're not getting
+	// invalid local policies instead of gpo
+
+	if c.User != "" && c.Group != "" {
+		fail("Can't have both User and Group for UserRights condition")
+		return false, errors.New("Bad condition config: conflicting keys User and Group")
+	} else if c.User != "" {
+		c.Group = c.User
+	} else if c.Group != "" {
+		c.User = c.Group
+	}
+
+	// TODO: only get section of users -- this can also falsely score correct for other secedit fields (like LegalNoticeText)
+	seceditOutput, err := getSecedit()
+	if err != nil {
+		return false, err
+	}
+
+	re := regexp.MustCompile("(?m)[\r\n]+^.*" + c.Value + ".*$")
+	privilegeString := strings.TrimSpace(string(re.Find([]byte(seceditOutput))))
+	debug("Privilege string for UserRights is:", privilegeString)
+	if privilegeString == "" {
+		return false, nil
+	}
+
+	if strings.Contains(privilegeString, c.User) {
+		// Sometimes, Windows just puts their user or group name instead of the
+		// SID. Really cool
+		return true, nil
+	}
+
+	privStringSplit := strings.Split(privilegeString, " ")
+	if len(privStringSplit) != 3 {
+		return false, errors.New("Error splitting privilege")
+	}
+
+	privStringSplit = strings.Split(privStringSplit[2], ",")
+	for _, sidValue := range privStringSplit {
+		sidValue = strings.TrimSpace(sidValue)
+		userForSid := strings.Split(sidToLocalUser(sidValue[1:]), "\\")
+		userSid := strings.TrimSpace(userForSid[0])
+		if len(userForSid) == 2 {
+			userSid = strings.TrimSpace(userForSid[1])
+		}
+		if userSid == c.User {
+			return true, nil
+		}
+	}
+
+	return false, err
+}
+
+func (c cond) WindowsFeature() (bool, error) {
+	return cond{
+		Cmd:   "(Get-WindowsOptionalFeature -Online -FeatureName " + c.Name + ").State",
+		Value: "Enabled",
+	}.CommandOutput()
+}
