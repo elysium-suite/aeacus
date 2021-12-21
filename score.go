@@ -165,10 +165,6 @@ func scoreImage() {
 	// Write previous.txt from current round.
 	writeFile(dirPath+"assets/previous.txt", strconv.Itoa(image.Score))
 
-	verboseEnabled = true
-	info("image is", image)
-	info("conf is", conf)
-
 	// Remove imageData for next scoring round.
 	image = &imageData{}
 }
