@@ -70,7 +70,17 @@ type statusRes struct {
 // which parses the encrypted scoring configuration file.
 func readScoringData() error {
 	info("Decrypting data from " + dirPath + scoringData + "...")
-	decryptedData, err := readData()
+	// Read in the encrypted configuration file
+	dataFile, err := readFile(dirPath + scoringData)
+	if err != nil {
+		return err
+	} else if dataFile == "" {
+		return errors.New("Scoring data is empty!")
+	}
+	decryptedData, err := decryptConfig(dataFile)
+	if err != nil {
+		return err
+	}
 	if err != nil {
 		fail("Error reading in scoring data: " + err.Error())
 		return err

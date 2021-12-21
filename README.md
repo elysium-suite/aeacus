@@ -1,4 +1,4 @@
-# aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/elysium-suite/aeacus)](https://goreportcard.com/report/github.com/elysium-suite/aeacus)[![godocs.io](https://godocs.io/github.com/elysium-suite/aeacus?status.svg)](https://godocs.io/github.com/elysium-suite/aeacus)
+# aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/elysium-suite/aeacus)](https://goreportcard.com/report/github.com/elysium-suite/aeacus)
 
 <img align="right" width="200" src="assets/img/logo.png"/>
 
@@ -14,7 +14,7 @@
 
 	- Put your **config** in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
 
-		- _Don't have a config? See the example at the bottom of this README._
+		- _Don't have a config? See the example below._
 
 	- Put your **README data** in `ReadMe.conf`.
 
@@ -79,10 +79,10 @@ If you're developing for `aeacus`, compile with these commands to leave debug sy
 All checks (with examples and notes) [are documented here](docs/checks.md).
 
 Other documentation:
-- [Scoring Conf](docs/config.md).
-- [Crypto](docs/crypto.md).
-- [Security](docs/security.md).
-- [Windows SecPol](docs/securitypolicy.md).
+- [Scoring Configuration](docs/config.md)
+- [Crypto](docs/crypto.md)
+- [Security Model](docs/security.md)
+- [Windows Security Policy](docs/securitypolicy.md)
 
 ## Remote Endpoint
 
@@ -109,7 +109,7 @@ version = "2.0.0"
 message = "Removed insecure sudoers rule"
 points = 10
 
-	[[check.pass]	]
+	[[check.pass]]
 	type = "FileContainsNot"
 	path = "/etc/sudoers"
 	value = "NOPASSWD"

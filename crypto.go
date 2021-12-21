@@ -51,26 +51,26 @@ func encryptConfig(plainText string) (string, error) {
 	}
 	writer.Close()
 
-	// Encrypt with AES-GCM.
-	encryptedContent := encryptString(string(byteKey), encryptedFile.String())
-
 	// XOR the encrypted file with our key.
-	return xor(key, encryptedContent), err
+	encryptedContent := xor(key, encryptedFile.String())
+
+	// Encrypt with AES-GCM.
+	return encryptString(string(byteKey), encryptedContent), nil
 }
 
 // decryptConfig is used to decrypt the scoring data file.
 func decryptConfig(cipherText string) (string, error) {
+	// Decrypt with AES-GCM.
+	cipherText = decryptString(string(byteKey), cipherText)
+
 	// Create our key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
 
-	// Apply the XOR key to decrypt the zlib-compressed data.
+	// Apply the XOR key to get the zlib-compressed data.
 	cipherText = xor(key, cipherText)
 
-	// Decrypt with AES-GCM.
-	decryptedContent := decryptString(string(byteKey), cipherText)
-
 	// Create the zlib reader.
-	reader, err := zlib.NewReader(bytes.NewReader([]byte(decryptedContent)))
+	reader, err := zlib.NewReader(bytes.NewReader([]byte(cipherText)))
 	if err != nil {
 		return "", errors.New("error creating zlib reader")
 	}
@@ -80,8 +80,7 @@ func decryptConfig(cipherText string) (string, error) {
 	dataBuffer := bytes.NewBuffer(nil)
 	_, err = io.Copy(dataBuffer, reader)
 	if err != nil {
-		fail("error decrypting or decompressing scoring data")
-		return "", errors.New("error decrypting or decompressing zlib data")
+		return "", errors.New("error decrypting or decompressing zlib data: " + err.Error())
 	}
 
 	// Check that decryptedConfig is not empty.
@@ -131,7 +130,7 @@ func deobfuscateData(datum *string) error {
 	}
 	*datum = xor(string(tossKey()), *datum)
 	if *datum, err = decryptConfig(*datum); err != nil {
-		fail("crypto: failed to deobufscate datum: " + err.Error())
+		fail("crypto: failed to deobufscate datum:", err.Error())
 		return err
 	}
 	return nil

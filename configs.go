@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -68,23 +67,6 @@ func writeConfig() {
 	}
 
 	writeFile(dataPath, encryptedConfig)
-}
-
-// readData is a wrapper around decryptData, taking the scoring data fileName,
-// and reading its content. It returns the decrypt config.
-func readData() (string, error) {
-	// Read in the encrypted configuration filei
-	dataFile, err := readFile(dirPath + scoringData)
-	if err != nil {
-		return "", err
-	} else if dataFile == "" {
-		return "", errors.New("Scoring data is empty!")
-	}
-	decryptedConfig, err := decryptConfig(dataFile)
-	if err != nil {
-		return "", err
-	}
-	return decryptedConfig, nil
 }
 
 // ReadConfig parses the scoring configuration file.

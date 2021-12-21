@@ -1,7 +1,7 @@
 package main
 
-// secpolToKey contains a large mapping onf securityPolicy
-// names or keys to registry locations.
+// secpolToKey contains a large mapping of securityPolicy names or keys to
+// registry locations.
 var secpolToKey = map[string]string{
 	"LimitBlankPasswordUse":        "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\LimitBlankPasswordUse",
 	"AuditBaseObjects":             "MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\AuditBaseObjects",

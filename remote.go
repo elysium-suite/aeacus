@@ -252,6 +252,7 @@ func encryptString(password, plainText string) string {
 	_, err := hasher.Write([]byte(password))
 	if err != nil {
 		fail(err)
+		return ""
 	}
 	key := hasher.Sum(nil)
 
@@ -262,25 +263,29 @@ func encryptString(password, plainText string) string {
 	}
 	plainText = plainText + string(paddingArray)
 	if len(plainText)%aes.BlockSize != 0 {
-		panic("plainText is not a multiple of block size!")
+		fail("plainText is not a multiple of block size!")
+		return ""
 	}
 
 	// Create cipher block with key.
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		fail(err)
+		return ""
 	}
 
 	// Generate nonce.
 	nonce := make([]byte, 12)
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		panic(err.Error())
+		fail(err)
+		return ""
 	}
 
 	// Create NewGCM cipher.
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(err.Error())
+		fail(err)
+		return ""
 	}
 
 	// Encrypt and seal plainText.
