@@ -239,8 +239,11 @@ func scoreCheck(check check) {
 		image.Score += check.Points
 	}
 
-	image.ScoredVulns++
-	image.TotalPoints += check.Points
+	// If check is not a penalty, add to total
+	if check.Points >= 0 {
+		image.ScoredVulns++
+		image.TotalPoints += check.Points
+	}
 }
 
 func checkFails(check *check) bool {
