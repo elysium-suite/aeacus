@@ -15,7 +15,7 @@ fi
 cp crypto.go crypto.go.bak
 
 replace "HASH_ONE" "$hashOne"
-replace "HASH_TWO" "$hashTwo"
+replace "SECOND_HASH" "$hashTwo"
 replace "0x01" "`echo $byteKey | head -c 382`"
 
-echo "generated crypto.go"
+echo "Generated random keys for crypto.go"

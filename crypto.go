@@ -29,7 +29,7 @@ import (
 // script at `misc/dev/gen-crypto.sh`.
 const (
 	randomHashOne = "HASH_ONE"
-	randomHashTwo = "HASH_TWO"
+	randomHashTwo = "SECOND_HASH"
 )
 
 var byteKey = []byte{0x01}
@@ -51,18 +51,12 @@ func encryptConfig(plainText string) (string, error) {
 	}
 	writer.Close()
 
-	// XOR the encrypted file with our key.
-	encryptedContent := xor(key, encryptedFile.String())
-
-	// Encrypt with AES-GCM.
-	return encryptString(string(byteKey), encryptedContent), nil
+	// XOR the file content with our key
+	return xor(key, encryptedFile.String()), nil
 }
 
 // decryptConfig is used to decrypt the scoring data file.
 func decryptConfig(cipherText string) (string, error) {
-	// Decrypt with AES-GCM.
-	cipherText = decryptString(string(byteKey), cipherText)
-
 	// Create our key by XORing two strings.
 	key := xor(randomHashOne, randomHashTwo)
 
@@ -80,7 +74,7 @@ func decryptConfig(cipherText string) (string, error) {
 	dataBuffer := bytes.NewBuffer(nil)
 	_, err = io.Copy(dataBuffer, reader)
 	if err != nil {
-		return "", errors.New("error decrypting or decompressing zlib data: " + err.Error())
+		return "", errors.New("error decrypting or decompressing zlib data:" + err.Error())
 	}
 
 	// Check that decryptedConfig is not empty.
@@ -130,7 +124,7 @@ func deobfuscateData(datum *string) error {
 	}
 	*datum = xor(string(tossKey()), *datum)
 	if *datum, err = decryptConfig(*datum); err != nil {
-		fail("crypto: failed to deobufscate datum:", err.Error())
+		fail("crypto: failed to deobufscate datum: ", *datum, err.Error())
 		return err
 	}
 	return nil
