@@ -157,6 +157,18 @@ func processCheck(check *check, checkType, arg1, arg2, arg3 string) bool {
 		}
 		result, err := fileOwner(arg1, arg2)
 		return err == nil && !result
+	case "FilePermission":
+		if check.Message == "" {
+			check.Message = arg2 + " has " + arg1 + " to " + arg3
+		}
+		result, err := filePermission(arg1, arg2, arg3)
+		return err == nil && result
+	case "FilePermissionNot":
+		if check.Message == "" {
+			check.Message = arg2 + " does not have " + arg1 + " to " + arg3
+		}
+		result, err := filePermission(arg1, arg2, arg3)
+		return err == nil && !result
 	case "ServiceStatus":
 		if check.Message == "" {
 			check.Message = "The service " + arg1 + " is " + arg2 + " with the startup type set as " + arg3
@@ -277,6 +289,15 @@ func windowsFeature(feature string) (bool, error) {
 func fileOwner(filePath, owner string) (bool, error) {
 	theowner, _ := commandOutput("(Get-Acl " + filePath + ").Owner")
 	return theowner == owner, nil
+}
+
+func filePermission(filePath, user, permission string) (bool, error) {
+	cmd := fmt.Sprintf("Get-Acl \"%s\"| Select-Object -ExpandProperty Access | Where-Object identityreference -eq '%s'", filePath, user)
+	lines, _ := commandOutput(cmd)
+	permissions := lines2map(lines)
+	rights := permissions["filesystemrights"]
+	access := permissions["accesscontroltype"]
+	return strings.Contains(rights, permission) && !strings.EqualFold(access, "Deny"), nil
 }
 
 func userExists(userName string) (bool, error) {
