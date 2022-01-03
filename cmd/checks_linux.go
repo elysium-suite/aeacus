@@ -167,7 +167,7 @@ func kernelVersion(version string) (bool, error) {
 }
 
 func autoCheckUpdatesEnabled() (bool, error) {
-	return fileContainsRegex("/etc/apt/apt.conf.d/20auto-upgrades", `APT::Periodic::Update-Package-Lists( |)"1";`)
+	return dirContainsRegex("/etc/apt/apt.conf.d/", `APT::Periodic::Update-Package-Lists\s+"1";`)
 }
 
 // func permissionIs(filePath, permissionToCheck string) (bool, error) {
