@@ -333,3 +333,15 @@ arg2='BUILTIN\Administrators'
 ```
 
 > Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
+
+
+**FilePermission**: pass if specified user has specified permission on 
+
+```
+type='FilePermission'
+arg1='C:\test.txt'
+arg2='BUILTIN\Administrators'
+arg3='FullControl'
+```
+
+> Get a users permission of the file using `(Get-Acl [FILENAME]).Access`.

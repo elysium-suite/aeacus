@@ -11,10 +11,12 @@ require (
 	github.com/godbus/dbus/v5 v5.0.4 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210519211817-2312de329ae4 // indirect
 	github.com/gorilla/websocket v1.4.2
+	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95 // indirect
 	github.com/iamacarpet/go-win64api v0.0.0-20210311141720-fe38760bed28
 	github.com/judwhite/go-svc v1.2.1
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0
-	golang.org/x/sys v0.0.0-20210525143221-35b2ab0089ea
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
 	golang.org/x/text v0.3.5
 )
