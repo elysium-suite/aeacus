@@ -66,7 +66,7 @@ func (c cond) requireArgs(args ...interface{}) {
 				fail(c.Type + ":", "missing required argument '" + vType.Field(i).Name + "'")
 			}
 		} else if v.Field(i).String() != "" {
-			warn(c.Type + ":", vType.Field(i).Name, "specifying unnecessary argument '" + vType.Field(i).Name + "'")
+			warn(c.Type + ":", "specifying unnecessary argument '" + vType.Field(i).Name + "'")
 		}
 
 	}
