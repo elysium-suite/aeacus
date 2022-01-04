@@ -186,6 +186,12 @@ func (c cond) DirContains() (bool, error) {
 	return false, nil
 }
 
+
+// DirContainsRegex is an alias for DirContains
+func (c cond) DirContainsRegex() (bool, error) {
+	return c.DirContains()
+}
+
 // FileContains determines whether a file contains a given regular expression.
 //
 // Newlines in regex may not work as expected, especially on Windows. It's
@@ -208,6 +214,11 @@ func (c cond) FileContains() (bool, error) {
 		}
 	}
 	return found, err
+}
+
+// FileContainsRegex is an alias for FileContains
+func (c cond) FileContainsRegex() (bool, error) {
+	return c.FileContains()
 }
 
 // FileEquals calculates the SHA256 sum of a file and compares it with the hash

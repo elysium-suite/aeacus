@@ -4,6 +4,10 @@
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 
+## V2
+
+`aeacus` has recently been updated to version 2.0.0! To view the breaking changes, refer to [./docs/v2.md](./docs/v2.md).
+
 ## Installation
 
 0. **Extract the release** into `/opt/aeacus` (Linux) or `C:\aeacus\` (Windows).
