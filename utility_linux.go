@@ -50,7 +50,7 @@ func checkTrace() {
 
 	// If there was an error reading the file, the user may be restricting access to /proc for the phocus binary
 	// through tools such as AppArmor. In this case, the engine should error out.
-	if !result || err {
+	if !result || err != nil {
 		fail("Try harder instead of ptracing the engine, please.")
 		os.Exit(1)
 	}
