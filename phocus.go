@@ -28,6 +28,7 @@ func phocusEnvironment() {
 	checkTrace()
 	// Read in scoring data from the scoring data file.
 	if err := readScoringData(); err != nil {
+		fail(err)
 		os.Exit(1)
 	}
 	// Seed the random function for scoring at "random" intervals.

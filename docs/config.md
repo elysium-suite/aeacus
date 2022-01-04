@@ -70,11 +70,13 @@ version = "X.X.X"
 
 Using multiple conditions for a check can be confusing at first, but can greatly improve the quality of your images by accounting for edge cases and abuse.
 
+Given no conditions, a check does not pass.
+
 **Pass** conditions act as a logical AND with other pass conditions. This means they must ALL be true for a check to pass.
 
 **PassOverride** conditions act as a logical OR. This means that any can succeed for the check to pass.
 
-If any **Fail** conditions suceed, the check does not pass.
+If any **Fail** conditions succeed, the check does not pass.
 
 So, it's like: ``((all pass checks) OR passoverride) AND fails``.
 

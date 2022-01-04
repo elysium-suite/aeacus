@@ -72,7 +72,7 @@ func cleanUp() {
 	shellCommand("rm -rf " + dirPath + "*.exe")
 	shellCommand("rm -rf " + dirPath + "docs")
 
-	if !ask("Do you want to remove cache and log files, overwrite timestamps, and remove other forensic data from this machine?") {
+	if !ask("Do you want to remove cache and log files, overwrite timestamps, and remove other forensic data from this machine? This may impact data used for your forensic questions!") {
 		return
 	}
 
@@ -82,6 +82,9 @@ func cleanUp() {
 	info("Symlinking .bash_history and .zsh_history to /dev/null...")
 	shellCommand(`find ` + findPaths + ` -iname '*.bash_history' -exec ln -sf /dev/null {} \;`)
 	shellCommand(`find ` + findPaths + ` -name '.zsh_history' -exec ln -sf /dev/null {} \;`)
+
+	info("Removing .mysql_history...")
+	shellCommand(`find ` + findPaths + ` -name '.mysql_history' -exec rm {} \;`)
 
 	info("Removing .local files...")
 	shellCommand("rm -rf /root/.local /home/*/.local/")

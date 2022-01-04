@@ -44,7 +44,7 @@ value = 'NOPASSWD'
 
 **FileContains**: pass if file contains regex string. If it returns an error, check will never pass
 
-> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for PathExistsNot, for example, if you want to score that a file does not contain a line, OR it doesn't exist.
+> Note: `FileContains` will never pass if file does not exist! Add an additional PassOverride check for PathExistsNot, if you want to score that a file does not contain a line, OR it doesn't exist.
 
 ```
 type = 'FileContains'

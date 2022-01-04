@@ -196,25 +196,21 @@ func scoreChecks() {
 // scoreCheck will go through each condition inside a check, and determine
 // whether or not the check passes.
 func scoreCheck(check check) {
-	status := true
+	status := false
+	failed := false
 
 	// If a fail condition passes, the check fails, no other checks required.
 	if len(check.Fail) > 0 {
-		status = checkFails(&check)
-		if status {
-			return
-		}
+		failed = checkFails(&check)
 	}
 
 	// If a PassOverride succeeds, that overrides the Pass checks
-	passOverrideStatus := false
-	if len(check.PassOverride) > 0 {
-		passOverrideStatus = checkPassOverrides(&check)
-		status = passOverrideStatus
+	if !failed && len(check.PassOverride) > 0 {
+		status = checkPassOverrides(&check)
 	}
 
-	// Finally, we check the normal pass checks.
-	if !passOverrideStatus && len(check.Pass) > 0 {
+	// Finally, we check the normal pass checks
+	if !failed && !status && len(check.Pass) > 0 {
 		status = checkPass(&check)
 	}
 
@@ -267,19 +263,10 @@ func checkPassOverrides(check *check) bool {
 }
 
 func checkPass(check *check) bool {
-	status := true
-	passStatus := []bool{}
 	for _, cond := range check.Pass {
-		passItemStatus := runCheck(cond)
-		passStatus = append(passStatus, passItemStatus)
-	}
-
-	// For multiple pass conditions, will only be true if ALL of them are
-	for _, result := range passStatus {
-		status = status && result
-		if !status {
-			break
+		if !runCheck(cond) {
+			return false
 		}
 	}
-	return status
+	return true
 }

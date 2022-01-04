@@ -86,9 +86,12 @@ func runCheck(cond cond) bool {
 	vals := reflect.ValueOf(cond).MethodByName(condFunc).Call([]reflect.Value{})
 	result := vals[0].Bool()
 	err := vals[1]
+
 	if negation {
+		debug("Result is", !result, "(negated) and error is", err)
 		return err.IsNil() && !result
 	}
+
 	debug("Result is", result, "and error is", err)
 	return err.IsNil() && result
 }
