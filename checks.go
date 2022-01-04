@@ -29,16 +29,47 @@ type check struct {
 type cond struct {
 	Type    string
 	Path    string
-	Hash    string
 	Cmd     string
 	User    string
 	Group   string
-	Program string
-	Version string
 	Name    string
 	Key     string
 	Value   string
 	After   string
+}
+
+func (c cond) requireArgs(args ...interface{}) {
+	// Don't process internal calls -- assume the developers know what they're
+	// doing. This also prevents extra errors being printed when they don't pass
+	// required arguments.
+	if c.Type == "" {
+		return
+	}
+
+	v := reflect.ValueOf(c)
+	vType := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		if vType.Field(i).Name == "Type" {
+			continue
+		}
+
+		required := false
+		for _, a := range args {
+			if vType.Field(i).Name == a {
+				required = true
+				break
+			}
+		}
+
+		if required {
+			if v.Field(i).String() == "" {
+				fail(c.Type + ":", "missing required argument '" + vType.Field(i).Name + "'")
+			}
+		} else if v.Field(i).String() != "" {
+			warn(c.Type + ":", vType.Field(i).Name, "specifying unnecessary argument '" + vType.Field(i).Name + "'")
+		}
+
+	}
 }
 
 func (c cond) String() string {
@@ -57,7 +88,7 @@ func (c cond) String() string {
 
 func handleReflectPanic(condFunc string) {
 	if r := recover(); r != nil {
-		fail("Check type does not exist: "+condFunc, "("+fmt.Sprint(r)+")")
+		fail("Check type does not exist: "+condFunc, "("+r.(*reflect.ValueError).Error()+")")
 	}
 }
 
@@ -88,7 +119,7 @@ func runCheck(cond cond) bool {
 	err := vals[1]
 
 	if negation {
-		debug("Result is", !result, "(negated) and error is", err)
+		debug("Result is", !result, "(was", result, "before negation) and error is", err)
 		return err.IsNil() && !result
 	}
 
@@ -99,6 +130,7 @@ func runCheck(cond cond) bool {
 // CommandContains checks if a given shell command contains a certain output.
 // This check will always fail if the command returns an error.
 func (c cond) CommandContains() (bool, error) {
+	c.requireArgs("Cmd", "Value")
 	out, err := shellCommandOutput(c.Cmd)
 	return strings.Contains(strings.TrimSpace(out), c.Value), err
 }
@@ -106,6 +138,7 @@ func (c cond) CommandContains() (bool, error) {
 // CommandOutput checks if a given shell command produces an exact output. This
 // check will always fail if the command returns an error.
 func (c cond) CommandOutput() (bool, error) {
+	c.requireArgs("Cmd", "Value")
 	out, err := shellCommandOutput(c.Cmd)
 	return strings.TrimSpace(out) == c.Value, err
 }
@@ -113,18 +146,17 @@ func (c cond) CommandOutput() (bool, error) {
 // DirContains returns true if any file in the directory matches the regular
 // expression provided.
 func (c cond) DirContains() (bool, error) {
-	if c.Value == "" {
-		fail("No Regex value specified for DirContains")
-		return false, errors.New("no regex specified")
-	}
-	result, err := c.PathExists()
+	c.requireArgs("Path", "Value")
+	result, err := cond{
+		Path: c.Path,
+	}.PathExists()
 	if err != nil {
 		return false, err
 	}
 	if !result {
-		return false, errors.New("DirContains: path does not exist")
-
+		return false, errors.New("path does not exist")
 	}
+
 	var files []string
 	err = filepath.Walk(c.Path, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -154,11 +186,12 @@ func (c cond) DirContains() (bool, error) {
 	return false, nil
 }
 
-// FillContains determines whether a file contains a given regular expression.
+// FileContains determines whether a file contains a given regular expression.
 //
 // Newlines in regex may not work as expected, especially on Windows. It's
 // best to not use these (ex. ^ and $).
 func (c cond) FileContains() (bool, error) {
+	c.requireArgs("Path", "Value")
 	fileContent, err := readFile(c.Path)
 	if err != nil {
 		return false, err
@@ -180,6 +213,7 @@ func (c cond) FileContains() (bool, error) {
 // FileEquals calculates the SHA256 sum of a file and compares it with the hash
 // provided in the check.
 func (c cond) FileEquals() (bool, error) {
+	c.requireArgs("Path", "Value")
 	fileContent, err := readFile(c.Path)
 	if err != nil {
 		return false, err
@@ -190,12 +224,13 @@ func (c cond) FileEquals() (bool, error) {
 		return false, err
 	}
 	hash := hex.EncodeToString(hasher.Sum(nil))
-	return hash == c.Hash, nil
+	return hash == c.Value, nil
 }
 
 // PathExists is a wrapper around os.Stat and os.IsNotExist, and determines
 // whether a file or folder exists.
 func (c cond) PathExists() (bool, error) {
+	c.requireArgs("Path")
 	_, err := os.Stat(c.Path)
 	if err != nil && os.IsNotExist(err) {
 		return false, nil

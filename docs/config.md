@@ -66,6 +66,24 @@ destroy = true
 version = "X.X.X"
 ```
 
+## Penalties
+
+Assign a check a negative point value, and it will become a penalty. Example:
+
+```
+[[check]]
+message = "Critical service OpenSSH stopped or removed"
+points = "-5"
+
+    [[check.passoverride]]
+    type = 'ServiceUpNot'
+    name = 'sshd'
+
+    [[check.passoverride]]
+    type = 'PathExistsNot'
+    name = '/lib/systemd/system/sshd.service'
+```
+
 ## Combining check conditions
 
 Using multiple conditions for a check can be confusing at first, but can greatly improve the quality of your images by accounting for edge cases and abuse.

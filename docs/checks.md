@@ -10,8 +10,7 @@ This is a list of vulnerability checks that can be used in the configuration for
 
 > **Note!** Each of these check types can be used for `Pass`, `PassOverride` or `Fail` conditions, and there can be multiple conditions per check. See [configuration](config.md) for more details.
 
-
-> Note: `Command*` checks are prone to interception, modification, and tomfoolery. Your scoring configuration will be much more robust if you rely on checks using native mechanisms rather than shell commands (for example, PathExists instead of ls).
+> Note: `Command*` checks are prone to interception, modification, and tomfoolery. Your scoring configuration will be much more robust if you rely on checks using native mechanisms rather than shell commands (for example, `PathExists` instead of ls).
 
 **CommandContains**: pass if command output contains string. If it returns an error, check never passes. Use of this check is discouraged.
 
@@ -57,7 +56,7 @@ value = 'ANSWER:\sCool[a-zA-Z]+VariedAnswer'
 ```
 type = 'FileEquals'
 path = '/etc/sysctl.conf'
-hash = 'e61ff3fb83b51fe9f2cd03cc0408afa15d4e8e69b8488b4ed1ecb854ae25da9b'
+name = 'e61ff3fb83b51fe9f2cd03cc0408afa15d4e8e69b8488b4ed1ecb854ae25da9b'
 ```
 
 **FirewallUp**: pass if firewall is active
@@ -87,7 +86,7 @@ path = 'C:\importantfolder\'
 
 ```
 type = 'ProgramInstalled'
-program = 'Mozilla Firefox 75 (x64 en-US)'
+name = 'Mozilla Firefox 75 (x64 en-US)'
 
 ```
 
@@ -96,15 +95,15 @@ program = 'Mozilla Firefox 75 (x64 en-US)'
 ```
 # Linux: get version from dpkg -s programhere
 type = 'ProgramVersion'
-program = 'Firefox'
-version = '88.0.1+build1-0ubuntu0.20.04.2'
+name = 'Firefox'
+value = '88.0.1+build1-0ubuntu0.20.04.2'
 ```
 
 ```
 # Windows: get versions from ./aeacus.exe info programs
 type = 'ProgramVersion'
-program = 'Firefox'
-version = '95.0.1'
+name = 'Firefox'
+value = '95.0.1'
 ```
 
 > **Note**: We recommend you use the `Not` version of this check to score a program's version being different from its version at the beginning of the image. You can't guarantee that the latest version of the program you're scoring will be the same once your round is released, and it's unlikely that a competitor will intentionally downgrade a package.
@@ -171,7 +170,7 @@ type = 'GuestDisabledLDM'
 
 ```
 type = 'KernelVersion'
-version = '5.4.0-42-generic'
+value = '5.4.0-42-generic'
 ```
 
 > Tip: Check your `KernelVersion` with `uname -r`. This check performs the `uname` syscall.
@@ -183,7 +182,7 @@ version = '5.4.0-42-generic'
 ```
 type = 'PasswordChanged'
 user = 'bob'
-hash = '$6$BgBsRlajjwVOoQCY$rw5WBSha4nkpynzfCzc3yYkV1OyDhr.ELoJOPpidwZoygUzRFBFSrtE3fyP0ITubCwN9Bb9DUqVV3mzTHL8sw/'
+value = '$6$BgBsRlajjwVOoQCY$rw5WBSha4nkpynzfCzc3yYkV1OyDhr.ELoJOPpidwZoygUzRFBFSrtE3fyP0ITubCwN9Bb9DUqVV3mzTHL8sw/'
 ```
 
 > This check will never pass if the user does not exist, so don't use this with users that should be removed.
@@ -219,7 +218,7 @@ type = "BitlockerEnabled"
 ```
 type = 'FileOwner'
 path = 'C:\test.txt'
-user = 'BUILTIN\Administrators'
+name = 'BUILTIN\Administrators'
 ```
 
 > Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
@@ -266,7 +265,7 @@ name = 'Disk Cleanup'
 **SecurityPolicy**: pass if key is within the bounds for value
 
 ```
-type='SecurityPolicy'
+type = 'SecurityPolicy'
 key = 'DisableCAD'
 value = '0'
 ```
@@ -278,7 +277,7 @@ value = '0'
 ```
 type = 'SecurityPolicy'
 key = 'MaximumPasswordAge'
-value ='80-100'
+value = '80-100'
 ```
 
 **ServiceStartup**: pass if service is set to a given startup type (manual, automatic, or disabled)
@@ -317,7 +316,7 @@ value = 'No'
 
 ```
 type = 'UserRights'
-group = 'Administrators'
+name = 'Administrators'
 value = 'SeTimeZonePrivilege'
 ```
 

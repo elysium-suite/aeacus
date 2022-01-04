@@ -26,9 +26,10 @@ func (c cond) BitlockerEnabled() (bool, error) {
 }
 
 func (c cond) FileOwner() (bool, error) {
+	c.requireArgs("Path", "Name")
 	owner, err := shellCommandOutput("(Get-Acl " + c.Path + ").Owner")
 	owner = strings.TrimSpace(owner)
-	return owner == c.User || owner == c.Group, err
+	return owner == c.Name, err
 }
 
 func (c cond) FirewallUp() (bool, error) {
@@ -49,7 +50,9 @@ func (c cond) FirewallUp() (bool, error) {
 //     Monday, January 02, 2006 3:04:05 PM
 // Which somehow manages to defy every common date format. Thanks, Windows.
 func (c cond) PasswordChanged() (bool, error) {
-	configDate, err := time.Parse("Monday, January 02, 2006 3:04:05 PM", strings.TrimSpace(c.After))
+	c.requireArgs("User", "After")
+	timeStr := "Monday, January 02, 2006 3:04:05 PM"
+	configDate, err := time.Parse(timeStr, strings.TrimSpace(c.After))
 	if err != nil {
 		return false, err
 	}
@@ -57,7 +60,7 @@ func (c cond) PasswordChanged() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	changeDate, err := time.Parse("Monday, January 02, 2006 3:04:05 PM", strings.TrimSpace(changed))
+	changeDate, err := time.Parse(timeStr, strings.TrimSpace(changed))
 	if err != nil {
 		return false, err
 	}
@@ -65,12 +68,13 @@ func (c cond) PasswordChanged() (bool, error) {
 }
 
 func (c cond) ProgramInstalled() (bool, error) {
+	c.requireArgs("Name")
 	programList, err := getPrograms()
 	if err != nil {
 		return false, err
 	}
 	for _, p := range programList {
-		if strings.Contains(p, c.Program) {
+		if strings.Contains(p, c.Name) {
 			return true, nil
 		}
 	}
@@ -78,14 +82,16 @@ func (c cond) ProgramInstalled() (bool, error) {
 }
 
 func (c cond) ProgramVersion() (bool, error) {
-	prog, err := getProgram(c.Program)
+	c.requireArgs("Name", "Value")
+	prog, err := getProgram(c.Name)
 	if err != nil {
 		return false, err
 	}
-	return prog.DisplayVersion == c.Version, nil
+	return prog.DisplayVersion == c.Value, nil
 }
 
 func (c cond) RegistryKey() (bool, error) {
+	c.requireArgs("Key", "Value")
 	registryArgs := regexp.MustCompile(`[\\]+`).Split(c.Key, -1)
 	if len(registryArgs) < 2 {
 		fail("Invalid key for RegistryKey. Did you supply 'key'?")
@@ -164,6 +170,7 @@ func (c cond) RegistryKey() (bool, error) {
 }
 
 func (c cond) RegistryKeyExists() (bool, error) {
+	c.requireArgs("Key")
 	_, err := c.RegistryKey()
 	if err != nil {
 		if err == registry.ErrNotExist {
@@ -177,6 +184,7 @@ func (c cond) RegistryKeyExists() (bool, error) {
 }
 
 func (c cond) ScheduledTaskExists() (bool, error) {
+	c.requireArgs("Name")
 	return cond{
 		Cmd:   "(Get-ScheduledTask -TaskName '" + c.Name + "').TaskName",
 		Value: c.Name,
@@ -184,6 +192,7 @@ func (c cond) ScheduledTaskExists() (bool, error) {
 }
 
 func (c cond) SecurityPolicy() (bool, error) {
+	c.requireArgs("Key", "Value")
 	var desiredString string
 
 	// If the passed key is one we know is in the registry, just wrap
@@ -260,6 +269,7 @@ func (c cond) SecurityPolicy() (bool, error) {
 }
 
 func (c cond) ServiceStartup() (bool, error) {
+	c.requireArgs("Name", "Value")
 	var startupNumber string
 	switch c.Value = strings.ToLower(c.Value); c.Value {
 	case "automatic":
@@ -280,11 +290,13 @@ func (c cond) ServiceStartup() (bool, error) {
 }
 
 func (c cond) ServiceUp() (bool, error) {
+	c.requireArgs("Name")
 	serviceStatus, err := getLocalServiceStatus(c.Name)
 	return serviceStatus.IsRunning, err
 }
 
 func (c cond) ShareExists() (bool, error) {
+	c.requireArgs("Name")
 	return cond{
 		Cmd:   "(Get-SmbShare -Name '" + c.Name + "').Name",
 		Value: c.Name,
@@ -292,6 +304,7 @@ func (c cond) ShareExists() (bool, error) {
 }
 
 func (c cond) UserExists() (bool, error) {
+	c.requireArgs("User")
 	user, err := getLocalUser(c.User)
 	if err != nil {
 		return false, err
@@ -303,6 +316,7 @@ func (c cond) UserExists() (bool, error) {
 }
 
 func (c cond) UserInGroup() (bool, error) {
+	c.requireArgs("User", "Group")
 	users, err := wapi.LocalGroupGetMembers(c.Group)
 	if err != nil {
 		// Error is returned if group is empty.
@@ -318,6 +332,7 @@ func (c cond) UserInGroup() (bool, error) {
 }
 
 func (c cond) UserDetail() (bool, error) {
+	c.requireArgs("User", "Key", "Value")
 	c.Key = strings.TrimSpace(c.Key)
 	lookingFor := false
 	if strings.ToLower(c.Key) == "yes" {
@@ -352,15 +367,7 @@ func (c cond) UserRights() (bool, error) {
 	// domain support is untested, it should be easy to add a domain
 	// flag in the config though. then just make sure you're not getting
 	// invalid local policies instead of gpo
-
-	if c.User != "" && c.Group != "" {
-		fail("Can't have both User and Group for UserRights condition")
-		return false, errors.New("Bad condition config: conflicting keys User and Group")
-	} else if c.User != "" {
-		c.Group = c.User
-	} else if c.Group != "" {
-		c.User = c.Group
-	}
+	c.requireArgs("Name", "Value")
 
 	// TODO: only get section of users -- this can also falsely score correct for other secedit fields (like LegalNoticeText)
 	seceditOutput, err := getSecedit()
@@ -375,7 +382,7 @@ func (c cond) UserRights() (bool, error) {
 		return false, nil
 	}
 
-	if strings.Contains(privilegeString, c.User) {
+	if strings.Contains(privilegeString, c.Name) {
 		// Sometimes, Windows just puts their user or group name instead of the
 		// SID. Really cool
 		return true, nil
@@ -394,7 +401,7 @@ func (c cond) UserRights() (bool, error) {
 		if len(userForSid) == 2 {
 			userSid = strings.TrimSpace(userForSid[1])
 		}
-		if userSid == c.User {
+		if userSid == c.Name {
 			return true, nil
 		}
 	}
@@ -403,6 +410,7 @@ func (c cond) UserRights() (bool, error) {
 }
 
 func (c cond) WindowsFeature() (bool, error) {
+	c.requireArgs("Name")
 	return cond{
 		Cmd:   "(Get-WindowsOptionalFeature -Online -FeatureName " + c.Name + ").State",
 		Value: "Enabled",

@@ -227,9 +227,9 @@ func getDesc(c cond) string {
 	case "FileEqualsNot":
 		return "File \"" + c.Path + "\" doesn't match hash"
 	case "ProgramInstalled":
-		return c.Program + " is installed"
+		return c.Name + " is installed"
 	case "ProgramInstalledNot":
-		return c.Program + " has been removed"
+		return c.Name + " has been removed"
 	case "ServiceUp":
 		return "Service \"" + c.Name + "\" is installed and running"
 	case "ServiceUpNot":
@@ -247,9 +247,9 @@ func getDesc(c cond) string {
 	case "FirewallUpNot":
 		return "Firewall has been disabled"
 	case "ProgramVersion":
-		return c.Program + " is version " + c.Version
+		return c.Name + " is version " + c.Value
 	case "ProgramVersionNot":
-		return c.Program + " is not version " + c.Version
+		return c.Name + " is not version " + c.Value
 
 	// Linux checks
 	case "AutoCheckUpdatesEnabled":
@@ -261,9 +261,9 @@ func getDesc(c cond) string {
 	case "GuestDisabledLDMNot":
 		return "Guest is enabled"
 	case "KernelVersion":
-		return "Kernel is version " + c.Version
+		return "Kernel is version " + c.Value
 	case "KernelVersionNot":
-		return "Kernel is not version " + c.Version
+		return "Kernel is not version " + c.Value
 	case "PermissionIs":
 		return "Permissions of " + c.Path + " are " + c.Value
 	case "PermissionIsNot":
