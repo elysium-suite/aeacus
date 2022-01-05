@@ -62,17 +62,25 @@
 
 ## Compiling
 
+Only Linux development environments are officially supported. Ubuntu virtual machines work great.
+
 Make sure you have a recent version of `go` installed, as well as `git` and `make`. If you want to compile Windows and Linux, install all dependencies using `go get -v -d -t ./...`. Then to compile, use `go build`, OR make:
 
--   Building for `Linux`: `make lin`
--   Building for `Windows`: `make win`
+- Building for `Linux`: `make lin`
+- Building for `Windows`: `make win`
 
-### Development compliation
+### Development
 
 If you're developing for `aeacus`, compile with these commands to leave debug symbols in the binaries:
 
--   Building for `Linux`: `make lin-dev`
--   Building for `Windows`: `make win-dev`
+- Building for `Linux`: `make lin-dev`
+- Building for `Windows`: `make win-dev`
+
+### Release Archives
+
+You can build release archives (e.g., `aeacus-linux.zip`). These will have auto-generated `crypto.go` files.
+
+- Building both platforms: `make release`
 
 ## Documentation
 
