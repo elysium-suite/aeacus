@@ -100,12 +100,13 @@ func runCheck(cond cond) bool {
 	defer obfuscateCond(&cond)
 	debug("Running condition:\n", cond)
 
+	not := "Not"
 	condFunc := ""
 	negation := false
-	condEnding := cond.Type[len(cond.Type)-3 : len(cond.Type)]
-	if condEnding == "Not" {
+	condEnding := cond.Type[len(cond.Type)-len(not) : len(cond.Type)]
+	if condEnding == not {
 		negation = true
-		condFunc = cond.Type[:len(cond.Type)-3]
+		condFunc = cond.Type[:len(cond.Type)-len(not)]
 	} else {
 		condFunc = cond.Type
 	}
