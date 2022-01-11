@@ -219,11 +219,11 @@ niceUser
 
 The `aeacus` binary supports gathering information (on **Windows** only) in cases where it's tough to gather what the scoring system can see.
 
-Print information with `./aeacus info type` where `type` is one the following:
+Print information with `./aeacus info type` where `type` is one the following (NOTE: this is deprecated and will be removed in a future release):
 
 ### Windows
 
--   `packages` (shows installed programs)
+-   `programs` (shows installed programs)
 -   `users` (shows local users)
 -   `admins` (shows local administrator users)
 
