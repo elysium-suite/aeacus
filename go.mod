@@ -3,8 +3,10 @@ module github.com/elysium-suite/aeacus
 go 1.15
 
 require (
+	github.com/ActiveState/termtest/conpty v0.5.0 // indirect
 	github.com/BurntSushi/toml v0.3.1
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
+	github.com/creack/pty v1.1.17 // indirect
 	github.com/fatih/color v1.10.0
 	github.com/gen2brain/beeep v0.0.0-20210529141713-5586760f0cc1
 	github.com/go-ole/go-ole v1.2.5 // indirect

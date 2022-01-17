@@ -2,14 +2,10 @@ package cmd
 
 import (
 	"io/ioutil"
-	"net/url"
 	"os"
 	"path"
 	"regexp"
-	"strings"
 	"time"
-
-	"github.com/gorilla/websocket"
 )
 
 const (
@@ -61,70 +57,6 @@ func writeFile(fileName, fileContent string) {
 func grepString(patternText, fileText string) string {
 	re := regexp.MustCompile("(?m)[\r\n]+^.*" + patternText + ".*$")
 	return string(re.Find([]byte(fileText)))
-}
-
-func connectWs() {
-	mc.ShellActive = true
-	wsPath := strings.Split(mc.Config.Remote, "://")[1]
-
-	clientOut := url.URL{Scheme: "ws", Host: wsPath, Path: "/shell/" + mc.TeamID + "/" + mc.Config.Name + "/clientOutput"}
-	debugPrint("Connecting to " + clientOut.String())
-
-	clientIn := url.URL{Scheme: "ws", Host: wsPath, Path: "/shell/" + mc.TeamID + "/" + mc.Config.Name + "/clientInput"}
-	debugPrint("Connecting to " + clientIn.String())
-
-	stdout, _, err := websocket.DefaultDialer.Dial(clientOut.String(), nil)
-	if err != nil {
-		failPrint("dial: " + err.Error())
-	}
-	defer stdout.Close()
-
-	stdin, _, err := websocket.DefaultDialer.Dial(clientIn.String(), nil)
-	if err != nil {
-		failPrint("dial: " + err.Error())
-	}
-	defer stdin.Close()
-
-	done := make(chan struct{})
-	debugPrint("Sending connected message...")
-	stdout.WriteMessage(1, []byte("Connected"))
-
-	go func() {
-		defer close(done)
-		for {
-			_, message, err := stdin.ReadMessage()
-			if err != nil {
-				failPrint("read: " + err.Error())
-				return
-			}
-
-			cmdInput := strings.TrimSpace(string(message))
-			debugPrint("ws: Read in cmdInput: " + cmdInput)
-			if cmdInput == "exit" {
-				debugPrint("ws: exiting due to receiving exit command")
-				break
-			}
-			output, err := shellCommandOutput(cmdInput)
-			if err != nil {
-				err = stdout.WriteMessage(1, []byte("ERROR: "+err.Error()))
-			} else {
-				err = stdout.WriteMessage(1, []byte(output))
-			}
-			if err != nil {
-				failPrint("write: " + err.Error())
-				break
-			}
-		}
-	}()
-
-	for {
-		select {
-		case <-done:
-			mc.ShellActive = false
-			debugPrint("exiting shell, done")
-			return
-		}
-	}
 }
 
 func removeKeys(aeacusPath string) {

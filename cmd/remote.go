@@ -250,10 +250,6 @@ func handleStatus(status string) {
 	case "DIE":
 		failPrint("Destroying image! Server has told me to die.")
 		// destroyImage()
-	case "GIMMESHELL":
-		if !mc.Config.DisableShell && !mc.ShellActive {
-			go connectWs()
-		}
 	}
 }
 
