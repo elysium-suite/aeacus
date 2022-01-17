@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	go cmd.StartSocketLin()
 	app := cmd.GenPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {

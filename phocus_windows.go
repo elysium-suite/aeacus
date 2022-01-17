@@ -1,3 +1,4 @@
+//go:build phocus
 // +build phocus
 
 package main
@@ -15,6 +16,7 @@ import (
 )
 
 func phocusStart(quit chan struct{}) {
+	go cmd.StartSocketWin()
 	app := cmd.GenPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {
