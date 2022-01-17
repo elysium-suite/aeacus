@@ -14,6 +14,7 @@ import (
 )
 
 func phocusStart(quit chan struct{}) {
+	go StartSocketWin()
 	app := genPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {
