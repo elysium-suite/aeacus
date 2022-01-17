@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	go StartSocketLin()
 	app := genPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {
