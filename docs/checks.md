@@ -6,98 +6,122 @@ This is a list of vulnerability checks that can be used in the configuration for
 
 > **Note!** Each of the commands here can check for the opposite by appending 'Not' to the check type. For example, `PathExistsNot` to pass if a file does not exist.
 
-**Command**: pass if command succeeds (exit code `0`, checks `$?`)
+> **Note!** If a check has negative points assigned to it, it automatically becomes a penalty.
+
+> **Note!** Each of these check types can be used for `Pass`, `PassOverride` or `Fail` conditions, and there can be multiple conditions per check. See [configuration](config.md) for more details.
+
+> Note: `Command*` checks are prone to interception, modification, and tomfoolery. Your scoring configuration will be much more robust if you rely on checks using native mechanisms rather than shell commands (for example, `PathExists` instead of ls).
+
+**CommandContains**: pass if command output contains string. If it returns an error, check never passes. Use of this check is discouraged.
 
 ```
-type='Command'
-arg1='grep "pam_history.so" /etc/pam.d/common-password'
+type = 'CommandContains'
+cmd = 'ufw status'
+value = 'Status: active'
 ```
 
-> **Note!** Each of these check types can be used for either `Pass` or `Fail` conditions, and there can be multiple conditions per check.
-
-**CommandOutput**: pass if command output matches exactly. if error, never passes
+**CommandOutput**: pass if command output matches exactly. If it returns an error, check never passes. Use of this check is discouraged.
 
 ```
-type='CommandOutput'
-arg1='(Get-NetFirewallProfile -Name Domain).Enabled'
-arg2='True'
+type = 'CommandOutput'
+cmd = '(Get-NetFirewallProfile -Name Domain).Enabled'
+value = 'True'
 ```
 
-**CommandContains**: pass if command output contains string. if error, never passes
+**DirContains**: pass if directory contains regex string
 
 ```
-type='CommandContains'
-arg1='firewall status'
-arg2='Active'
+type = 'DirContains'
+path = '/etc/sudoers.d/'
+value = 'NOPASSWD'
 ```
+
+> `DirContains` is recursive! This means it checks every folder and subfolder. It currently is capped at 10,000 files, so you should begin your search at the deepest folder possible.
+
+
+> **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `''' like this! that's neat! C:\path\here '''`), or just normal quotes (but you'll have to escape characters with those).
+
+**FileContains**: pass if file contains regex string. If it returns an error, check will never pass
+
+> Note: `FileContains` will never pass if file does not exist! Add an additional PassOverride check for PathExistsNot, if you want to score that a file does not contain a line, OR it doesn't exist.
+
+```
+type = 'FileContains'
+path = 'C:\Users\coolUser\Desktop\Forensic Question 1.txt'
+value = 'ANSWER:\sCool[a-zA-Z]+VariedAnswer'
+```
+
+**FileEquals**: pass if file equals sha256 hash
+
+```
+type = 'FileEquals'
+path = '/etc/sysctl.conf'
+name = 'e61ff3fb83b51fe9f2cd03cc0408afa15d4e8e69b8488b4ed1ecb854ae25da9b'
+```
+
+**FirewallUp**: pass if firewall is active
+
+```
+type = 'FirewallUp'
+```
+
+> **Note**: On Linux, only `ufw` is supported (checks `/etc/ufw/ufw.conf`). On Window, this passes if all three Windows Firewall profiles are active.
+
 
 **PathExists**: pass if specified path exists. This works for both files AND folders (directories).
 
 ```
-type='PathExists'
-arg1='C:\importantprogram.exe'
+type = 'PathExists'
+path = '/var/www/backup.zip'
 ```
 
 ```
-type='PathExists'
-arg1='C:\importantfolder\'
-```
-> **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `" like this! that's neat! "`).
-
-**FileContains**: pass if file contains string
-
-> Note: `FileContains` will never pass if file does not exist! Add an additional pass check for PathExistsNot, for example, if you want to score that a file does not contain a line, OR it doesn't exist.
-
-```
-type='FileContains'
-arg1='/home/coolUser/Desktop/Forensic Question 1.txt'
-arg2='ANSWER: SomeCoolAnswer'
+type = 'PathExists'
+path = 'C:\importantfolder\'
 ```
 
 > **Note!**: Please use absolute paths (rather than relative) for safety and specificity.
 
-**FileContainsRegex**: pass if file contains regex string
+**ProgramInstalled**: pass if program is installed. On Linux, will use `dpkg`, and on Windows, checks if any installed programs contain your program string.
 
 ```
-type='FileContainsRegex'
-arg1='C:\Users\coolUser\Desktop\Forensic Question 1.txt'
-arg2='ANSWER:\sCool[a-zA-Z]+VariedAnswer'
-```
-
-**DirContainsRegex**: pass if directory contains regex string
+type = 'ProgramInstalled'
+name = 'Mozilla Firefox 75 (x64 en-US)'
 
 ```
-type='DirContainsRegex'
-arg1='/etc/sudoers.d/'
-arg2='NOPASSWD'
-```
 
-> `DirContainsRegex` is recursive! This means it checks every folder and subfolder. It currently is capped at 10,000 files so it doesn't segfault if you try to search `/`...
-
-**FileEquals**: pass if file equals sha1 hash
+**ProgramVersion**: pass if a program meets the version requirements
 
 ```
-type='FileEquals'
-arg1='/etc/sysctl.conf'
-arg2='403926033d001b5279df37cbbe5287b7c7c267fa'
+# Linux: get version from dpkg -s programhere
+type = 'ProgramVersion'
+name = 'Firefox'
+value = '88.0.1+build1-0ubuntu0.20.04.2'
 ```
 
-> **Note!** If a check has negative points assigned to it, it automatically becomes a penalty.
-
-**ProgramInstalled**: pass if program is installed
-
 ```
-type='ProgramInstalled'
-arg1='Mozilla Firefox 75 (x64 en-US)'
+# Windows: get versions from ./aeacus.exe info programs
+type = 'ProgramVersion'
+name = 'Firefox'
+value = '95.0.1'
 ```
+
+> **Note**: We recommend you use the `Not` version of this check to score a program's version being different from its version at the beginning of the image. You can't guarantee that the latest version of the program you're scoring will be the same once your round is released, and it's unlikely that a competitor will intentionally downgrade a package.
 
 > For packages, Linux uses `dpkg`, Windows uses the Windows API
 
 **ServiceUp**: pass if service is running
 
 ```
-type='ServiceUp'
-arg1='sshd'
+type = 'ServiceUp'
+name = 'sshd'
+```
+
+```
+# Windows: check the service 'Properties' to find the real service name
+type = 'ServiceUp'
+name = 'tapisrv' # this is telephony
+
 ```
 
 > For services, Linux uses `systemctl`, Windows uses `Get-Service`
@@ -105,95 +129,77 @@ arg1='sshd'
 **UserExists**: pass if user exists on system
 
 ```
-type='UserExists'
-arg1='ballen'
+type = 'UserExists'
+user = 'ballen'
 ```
 
 **UserInGroup**: pass if specified user is in specified group
 
 ```
-type='UserInGroupNot'
-arg1='HackerUser'
-arg2='Administrators'
+type = 'UserInGroupNot'
+user = 'HackerUser'
+group = 'Administrators'
 ```
 
-> Linux reads `/etc/group` and Windows checks `net user` behind the scenes.
-
-**FirewallUp**: pass if firewall is active
-
-```
-type='FirewallUp'
-```
-
-> **Note**: On Linux, unfortunately uses `ufw` at the moment. On Window, this passes if all three Windows Firewall profiles are active.
-
-
-**ProgramVersion**: pass if a program meets the version requirements
-
-```
-type='ProgramVersion'
-arg1='Firefox'
-arg2='88.0.1+build1-0ubuntu0.20.04.2'
-```
-
-> **Note**: We reccommend you use the `Not` flavor of this check to score a program's version being different from its version at the beginning of the image. You can't guarantee that the latest version of the program you're scoring will be the same once your round is released, and it's unlikely that a competitor will intentionally downgrade a package.
+> Linux reads `/etc/group` and Windows checks `net user`.
 
 <hr>
 
 ### Linux-Specific Checks
 
+**AutoCheckUpdatesEnabled**: pass if the system is configured to automatically check for updates
+
+```
+type = 'AutoCheckUpdatesEnabled'
+```
+
+**Command**: pass if command succeeds. Use of this check is discouraged.
+
+```
+type = 'Command'
+cmd = 'cat coolfile.txt'
+```
+
 **GuestDisabledLDM**: pass if guest is disabled (for LightDM)
 
 ```
-type='GuestDisabledLDM'
-```
-
-**PasswordChanged**: pass if user's hashed password is not in `/etc/shadow`
-
-```
-type='PasswordChanged'
-arg1='user'
-arg2='password-hash-here'
+type = 'GuestDisabledLDM'
 ```
 
 **KernelVersion**: pass if kernel version is equal to specified
 
 ```
-type='KernelVersion'
-arg1='5.4.0-42-generic'
+type = 'KernelVersion'
+value = '5.4.0-42-generic'
 ```
 
-> `KernelVersion` checks `uname -r`.
-
-**AutoCheckUpdatesEnabled**: pass if the system is configured to automatically check for updates
-
-```
-type='AutoCheckUpdatesEnabled'
-```
+> Tip: Check your `KernelVersion` with `uname -r`. This check performs the `uname` syscall.
 
 > Only works for standard `apt` installs.
 
-**PermissionIs**: pass if the specified file has permissions specified
+**PasswordChanged**: pass if user's password hash is not next to their username in `/etc/shadow`. If you don't use the whole hash, make sure you start it from the beginning (typically `$X$...` where X is a number).
 
 ```
-type='PermissionIs'
-arg1='/etc/passwd'
-arg2='octal'
-arg3='644'
+type = 'PasswordChanged'
+user = 'bob'
+value = '$6$BgBsRlajjwVOoQCY$rw5WBSha4nkpynzfCzc3yYkV1OyDhr.ELoJOPpidwZoygUzRFBFSrtE3fyP0ITubCwN9Bb9DUqVV3mzTHL8sw/'
 ```
 
-```
-type='PermissionIs'
-arg1='/etc/passwd'
-arg2='WorldWritable'
-arg3='none'
-```
+> This check will never pass if the user does not exist, so don't use this with users that should be removed.
+
+**PermissionIs**: pass if the specified file has octal permissions specified. Use question marks to omit bits you don't care about.
 
 ```
-type='PermissionIs'
-arg1='/etc/passwd'
-arg2='WorldReadable'
-arg3='none'
+type = 'PermissionIs'
+path = '/etc/shadow
+value = 'rw-rw----'
+```
+
+For example, this one checks that /bin/bash is not SUID and not world writable:
+```
+type = 'PermissionIsNot'
+path = '/bin/bash'
+value = 's???????w?'
 ```
 
 <hr>
@@ -203,133 +209,126 @@ arg3='none'
 **BitlockerEnabled**: pass if a drive has been fully encrypted with bitlocker drive encription or is in the process of being encrypted
 
 ```
-type="BitlockerEnabled"
+type = "BitlockerEnabled"
 ```
 > This check will succeed if the drive is either encrypted or encryption is in progress.
 
-**ServiceStatus**: pass if service status and service startup type is the same as specified
+**FileOwner**: pass if specified owner is the owner of the specified file
 
 ```
-type="ServiceStatus"
-arg1="TermService"
-arg2="Running"
-arg3="Automatic"
+type = 'FileOwner'
+path = 'C:\test.txt'
+name = 'BUILTIN\Administrators'
 ```
 
-> This check uses the windows API to check the service current status and the windows registry for the startuptype
-> Todo: allow SID input or auto-translation for system account names that can change (Guest, Administrator)
+> Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
 
 **PasswordChanged**: pass if user password has changed after the specified date
 
 ```
-type='PasswordChanged'
-arg1='username'
-arg2='01/17/2019 20:57:41 PM'
+type = 'PasswordChanged'
+user = 'username'
+after = 'Monday, January 02, 2006 3:04:05 PM'
 ```
-> You should take the value from `(Get-LocalUser <USERNAME> | select PasswordLastSet).PasswordLastSet -replace "n",", " -replace "r",", "` and use it as `arg2`.
-
-**WindowsFeature**: pass if Feature Enabled
-
-```
-type='WindowsFeature'
-arg1='SMB1Protocol'
-```
-> **Note:** Use the PowerShell tool `Get-OptionalFeature -Online` to find the feature you want!
-
-**UserDetail**: pass if user detail key is equal to value
-
-```
-type='UserDetailNot'
-arg1='Administrator'
-arg2='PasswordNeverExpires'
-arg3='No'
-```
-
-> See [here](userproperties.md) for all `UserDetail` properties.
-
-**UserRights**: pass if specified user or group has specified privilege
-
-```
-type='UserRights'
-arg1='Administrators'
-arg2='SeTimeZonePrivilege'
-```
-
-> A list of URA and Constant Names (which are used in the config) [can be found here](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment).
-
-**ShareExists**: pass if SMB share exists
-
-```
-type='ShareExists'
-arg1='ADMIN$'
-```
-
-> **Note!** Don't use any single quotes (`'`) in your parameters for Windows options like this. If you need to, use a double-quoted string instead (ex. `"Admin's files"`)
-
-**ScheduledTaskExists**: pass if scheduled task exists
-
-```
-type='ScheduledTaskExists'
-arg1='Disk Cleanup'
-```
-
-(WORK IN PROGRESS, dont use)
-**StartupProgramExists**: pass if startup program exists
-
-```
-type='StartupProgramExists'
-arg1='backdoor.exe'
-```
-
-> (WIP) **StartupProgramExists** checks the startup folder, Run and RunOnce registry keys, and (other startup methods on windows)
-
-**SecurityPolicy**: pass if key is within the bounds for value
-
-```
-type='SecurityPolicy'
-arg1='DisableCAD'
-arg2='0'
-```
-
-> **Note**: For all integer-based values (such as `MinimumPasswordAge`), the `optValue` (`arg3`) can be used. `arg2` can be the lower bound, with `arg3` as the higher bound, such as `arg2` =< `result` =< `arg3`. If no `arg3` is provided, then the system will default back to if `result` = `arg2`.
-
-```
-type='SecurityPolicy'
-arg1='MaximumPasswordAge'
-arg2='80'
-arg3='100'
-```
-> Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](securitypolicy.md).
+> You should take the value from `(Get-LocalUser <USERNAME>).PasswordLastSet` and use it as `after`. This check will never pass if the user does not exist, so don't use this with users that should be removed.
 
 **RegistryKey**: pass if key is equal to value
 
 ```
-type='RegistryKey'
-arg1='HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
-arg2='0'
+type = 'RegistryKey'
+key = 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
+value = '0'
 ```
 
-> Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to check that a key was deleted, use `RegistryKeyExistsNot`.
+> Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to check that a key was deleted, use `RegistryKeyExists`.
 
 > **Administrative Templates**: There are 4000+ admin template fields. See [this list of registry keys and descriptions](https://docs.google.com/spreadsheets/d/1N7uuke4Jg1R9FBhj8o5dxJQtEntQlea0McYz5upaiTk/edit?usp=sharing), then use the `RegistryKey` or `RegistryKeyExists` check.
 
 **RegistryKeyExists**: pass if key exists
 
 ```
-type='RegistryKeyExists'
-arg1='SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
+type = 'RegistryKeyExists'
+key = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
 ```
 
 > **Note!**: Notice the single quotes `'` on the above argument! This means it's a _string literal_ in TOML. If you don't do this, you have to make sure to escape your slashes (`\` --> `\\`)
 
 > Note: You can use `SOFTWARE` as a shortcut for `HKEY_LOCAL_MACHINE\SOFTWARE`.
 
-**FileOwner**: pass if specified owner is the owner of the specified file
+**ScheduledTaskExists**: pass if scheduled task exists
 
 ```
-type='FileOwner'
-arg1='C:\test.txt'
-arg2='BUILTIN\Administrators'
+type = 'ScheduledTaskExists'
+name = 'Disk Cleanup'
 ```
 
-> Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
+**SecurityPolicy**: pass if key is within the bounds for value
+
+```
+type = 'SecurityPolicy'
+key = 'DisableCAD'
+value = '0'
+```
+
+> Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](securitypolicy.md).
+
+> **Note**: For all integer-based values (such as `MinimumPasswordAge`), you can provide a range of values, as seen below.
+
+```
+type = 'SecurityPolicy'
+key = 'MaximumPasswordAge'
+value = '80-100'
+```
+
+**ServiceStartup**: pass if service is set to a given startup type (manual, automatic, or disabled)
+
+```
+type = "ServiceStartup"
+name = "TermService"
+value = "manual"
+```
+
+> This check is a wrapper around RegistryKey to fetch the proper key for you. Also, Automatic (Delayed) and Automatic are the same value for the key we're checking.
+
+**ShareExists**: pass if SMB share exists
+
+```
+type = 'ShareExists'
+name = 'ADMIN$'
+```
+
+> **Note!** Don't use any single quotes (`'`) in your parameters for Windows options like this. If you need to, use a double-quoted string instead (ex. `"Admin's files"`)
+
+
+**UserDetail**: pass if user detail key is equal to value
+
+```
+type = 'UserDetailNot'
+user = 'Administrator'
+key = 'PasswordNeverExpires'
+value = 'No'
+```
+
+> See [here](userproperties.md) for all `UserDetail` properties.
+
+
+**UserRights**: pass if specified user or group has specified privilege
+
+```
+type = 'UserRights'
+name = 'Administrators'
+value = 'SeTimeZonePrivilege'
+```
+
+> A list of URA and Constant Names (which are used in the config) [can be found here](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment).
+
+
+**WindowsFeature**: pass if Windows Feature is enabled
+
+```
+type = 'WindowsFeature'
+name = 'SMB1Protocol'
+```
+
+> **Note:** Use the PowerShell tool `Get-WindowsOptionalFeature -Online` to find the feature you want!
+

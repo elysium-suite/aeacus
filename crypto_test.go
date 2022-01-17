@@ -1,8 +1,8 @@
-package cmd
+package main
 
 import "testing"
 
-func TestEncryption(t *testing.T) {
+func TestConfigEncryption(t *testing.T) {
 	// Testing encryptConfig
 	plainText := "Test string."
 	if encrypted, err := encryptConfig(plainText); err != nil {
@@ -14,16 +14,20 @@ func TestEncryption(t *testing.T) {
 			t.Errorf("decryptConfig returned an error: %s", err.Error())
 		}
 	}
+}
 
-	// Testing encryptString
+func TestAESEncryption(t *testing.T) {
+	plainText := "Test string."
 	password := "Password1!"
 	encrypted := encryptString(password, plainText)
 	if decrypted := decryptString(password, encrypted); decrypted != plainText {
 		t.Errorf("decryptConfig(encryptConfig('%s')) == %s, should be '%s'", plainText, decrypted, plainText)
 	}
+}
 
+func TestObfuscation(t *testing.T) {
 	// Testing obfuscateData
-	plainText = "I am data!"
+	plainText := "I am data!"
 	cipherText := "I am data!"
 	if err := obfuscateData(&cipherText); err != nil {
 		t.Errorf("obfuscateData returned an error: %s", err.Error())

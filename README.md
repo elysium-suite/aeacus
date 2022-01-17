@@ -1,8 +1,12 @@
-# aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/elysium-suite/aeacus)](https://goreportcard.com/report/github.com/elysium-suite/aeacus) ![build](https://github.com/elysium-suite/aeacus/workflows/Build/badge.svg) ![test](https://github.com/elysium-suite/aeacus/workflows/Test/badge.svg) ![format](https://github.com/elysium-suite/aeacus/workflows/Format/badge.svg)
+# aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/elysium-suite/aeacus)](https://goreportcard.com/report/github.com/elysium-suite/aeacus)
 
 <img align="right" width="200" src="assets/img/logo.png"/>
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
+
+## V2
+
+`aeacus` has recently been updated to version 2.0.0! To view the breaking changes, refer to [./docs/v2.md](./docs/v2.md).
 
 ## Installation
 
@@ -14,10 +18,9 @@
 
 	- Put your **config** in `/opt/aeacus/scoring.conf` or`C:\aeacus\scoring.conf`.
 
-		- _Don't have a config? See the example at the bottom of this README._
+		- _Don't have a config? See the example below._
 
 	- Put your **README data** in `ReadMe.conf`.
-	- Use `./aeacus forensics 3` to create three Forensic Question files on the Desktop of the main user.
 
 2. **Check that your config is valid.**
 
@@ -37,37 +40,69 @@
 
 4. **Prepare the image for release.**
 
+> **WARNING**: This will remove `scoring.conf`. Back it up somewhere if you want to save it! It will also remove the `aeacus` executable and other sensitive files.
+
 ```
 ./aeacus --verbose release
 ```
 
-> WARNING: This will remove `scoring.conf`. Back it up somewhere if you want to save it! It will also remove the `aeacus` executable and other sensitive files.
-
 ## Screenshots
 
-#### Scoring Report:
+### Scoring Report:
 
 ![Scoring Report](./misc/gh/ScoringReport.png)
 
-#### ReadMe:
+### ReadMe:
 
 ![ReadMe](./misc/gh/ReadMe.png)
 
 ## Features
 
 -   Robust yet simple vulnerability scorer
--   Image deployment (cleanup, README, etc)
+-   Image preparation (cleanup, README, etc)
 -   Remote score reporting
 
-> Note: `aeacus` ships with very weak crypto on purpose. You need to implement your own crypto functions. See the [Adding Crypto](/docs/crypto.md) for more information.
+> Note: `aeacus` ships with weak crypto on purpose. You should implement your own crypto functions if you want to make it harder to crack. See [Adding Crypto](/docs/crypto.md) for more information.
 
-## Checks
+## Compiling
+
+Only Linux development environments are officially supported. Ubuntu virtual machines work great.
+
+Make sure you have a recent version of `go` installed, as well as `git` and `make`. If you want to compile Windows and Linux, install all dependencies using `go get -v -d -t ./...`. Then to compile, use `go build`, OR make:
+
+- Building for `Linux`: `make lin`
+- Building for `Windows`: `make win`
+
+### Development
+
+If you're developing for `aeacus`, compile with these commands to leave debug symbols in the binaries:
+
+- Building for `Linux`: `make lin-dev`
+- Building for `Windows`: `make win-dev`
+
+### Release Archives
+
+You can build release archives (e.g., `aeacus-linux.zip`). These will have auto-generated `crypto.go` files.
+
+- Building both platforms: `make release`
+
+## Documentation
 
 All checks (with examples and notes) [are documented here](docs/checks.md).
 
+Other documentation:
+- [Scoring Configuration](docs/config.md)
+- [Crypto](docs/crypto.md)
+- [Security Model](docs/security.md)
+- [Windows Security Policy](docs/securitypolicy.md)
+
+## Remote Endpoint
+
+Set the `remote` field in the configuration, and your image will use remote scoring. If you want remote scoring, you will need to host a remote scoring endpoint. The authors of this project recommend using [sarpedon](https://github.com/elysium-suite/sarpedon). See [this example remote configuration](docs/examples/remote.conf).
+
 ## Configuration
 
-The configuration is written in TOML. All fields are optional unless otherwise specified. See the below example:
+The configuration is written in TOML. Here is a minimal example:
 
 ```toml
 name = "ubuntu-18-supercool" # Image name
@@ -75,103 +110,70 @@ title = "CoolCyberStuff Practice Round" # Round title
 os = "Ubuntu 18.04" # OS, used for README
 user = "coolUser" # Main user for the image
 
-# If remote is specified, aeacus will report its score
-# and refuse to score if the remote server does not accept
-# its messages and Team ID (unless "local" is set to "yes")
-# Make sure to include the scheme (http, https...)
-# NOTE: _DON'T_ include a slash after the url!
-remote = "https://192.168.1.100"
-
-# If password is specified, it will be used to
-# encrypt remote reporting traffic
-# NOTE: Server must have the same password set
-password = "HackersArentReal"
-
-# If local is set to true, then the image will give
-# feedback and score regardless of whether or not
-# remote scoring is working
-local = true
-
-# If enddate exists, image will self destruct
-# after the time specified. The format is:
-# YEAR/MO/DA HR:MN:SC ZONE
-enddate = "2020/03/21 15:04:05 PDT"
-
-# If nodestroy is set to true, then the image will not
-# self destruct, only the aeacus folder will be deleted.
-# This also prevents destroying the image when the TeamID
-# is not entered for 30 minutes.
-nodestroy = true
-
-# If disableshell is set to true, the aeacus binary will not
-# reach out for the debug remote shell.
-disableshell = true
-
-# Set the version of this scoring file. This is not a number
-# that is changed for YOUR versions, it is changed in tandem
-# with the current version of aeacus.
-# If you're ever unsure of the version, just run "aeacus version"
-version = "1.8.2"
+# Set the aeacus version of this scoring file. Set this to the version
+# of aeacus you are using. This is used to make sure your configuration,
+# if re-used, is compatible with the version of aeacus being used.
+#
+# You can print your version of aeacus with ./aeacus version.
+version = "2.0.0"
 
 [[check]]
 message = "Removed insecure sudoers rule"
 points = 10
 
 	[[check.pass]]
-	type="FileContainsNot"
-	arg1="/etc/sudoers"
-	arg2="NOPASSWD"
+	type = "FileContainsNot"
+	path = "/etc/sudoers"
+	value = "NOPASSWD"
 
 [[check]]
 # If no message is specified, one is auto-generated
 points = 20
 
 	[[check.pass]]
-	type="FileExistsNot"
-	arg1="/etc/secrets.zip"
+	type = "FileExistsNot"
+	path = "/usr/bin/ufw-backdoor"
 
-	[[check.pass]] # You can code multiple pass conditions
-	type="Command" # they must ALL succeed for the check to pass
-	arg1="ufw status"
+	[[check.pass]]     # You can code multiple pass conditions, but
+	type = "Command"   # they must ALL succeed for the check to pass!
+	cmd  = "ufw status"
 
 [[check]]
 message = "Malicious user 'user' can't read /etc/shadow"
-# If no points are specified, they are auto-calculated.
-# If total points specified is less than 100, each check
-# is assigned points (integers) that add up to 100.
-# If total points already specified is above 100, each check
-# without points is worth 2 points.
+# If no points are specified, they are auto-calculated out of 100.
 
 	[[check.pass]]
-	type="CommandNot"
-	arg1="sudo -u user cat /etc/shadow"
+	type = "CommandNot"
+	cmd  = "sudo -u user cat /etc/shadow"
 
-	[[check.pass]]
-	type="FileExists"
-	arg1="/etc/shadow"
+	[[check.pass]]  		# "pass" conditions are logically AND with other pass
+	type = "FileExists"		# conditions. This means they all must pass for a check
+	path = "/etc/shadow"	# to be considered successful.
 
 	[[check.passoverride]]  # If you a check to succeed if just one condition
-	type="UserExistsNot"    # passes, regardless of other pass checks, use
-	arg1="user"             # an override pass (passoverride). This is still
-							# overridden by fail conditions.
+	type = "UserExistsNot"  # passes, regardless of other pass checks, use
+	user = "user"           # an override pass (passoverride). This is a logical OR.
+							# passoverride is overridden by fail conditions.
 
-	[[check.fail]]       # If any fail conditions pass, the whole check
-	type="FileExistsNot" # will fail
-	arg1="/etc/shadow"
+	[[check.fail]]          # If any fail conditions succeed, the entire check will fail.
+	type = "FileExistsNot"
+	path = "/etc/shadow"
 
 [[check]]
 message = "Administrator has been removed"
 points = -5 # This check is now a penalty, because it has negative points
 
 	[[check.pass]]
-	type="UserExistsNot"
-	arg1="coolAdmin"
+	type = "UserExistsNot"
+	user = "coolAdmin"
 
 ```
 
+See more in-depth examples, including remote reporting, [here](https://github.com/elysium-suite/aeacus/tree/master/docs/examples).
+
 ## ReadMe Configuration
 
-Put your README in `ReadMe.conf`. It's pretty self-explanatory. Here's a template:
+Put your README in `ReadMe.conf`. Here's a commented template:
 
 ```html
 <!-- Put your comments/additions to the normal ReadMe here! -->
@@ -215,34 +217,23 @@ niceUser
 
 ## Information Gathering
 
-The `aeacus` binary supports gathering information on Windows in cases where it's tough to gather what the scoring system can see.
+The `aeacus` binary supports gathering information (on **Windows** only) in cases where it's tough to gather what the scoring system can see.
 
-Print information with `./aeacus info type` where `type` is one the following:
+Print information with `./aeacus info type` where `type` is one the following (NOTE: this is deprecated and will be removed in a future release):
 
 ### Windows
 
--   `packages` (shows installed programs)
-
-## Remote Endpoint
-
-The authors of this project recommend using [sarpedon](https://github.com/elysium-suite/sarpedon) as the remote scoring endpoint.
+-   `programs` (shows installed programs)
+-   `users` (shows local users)
+-   `admins` (shows local administrator users)
 
 ## Tips and Tricks
 
 -   Easily change the branding by replacing `assets/img/logo.png`.
--   On Linux, you can run `./aeacus configure` to launch a GUI tool for configuring vulnerabilities.
-
-## Compiling
-If you need a tool to quickly install `go` and a few other tools, use [this](https://github.com/elysium-suite/aeacus/blob/master/misc/dev/install.sh) to help you out!
-Once you install `go` (make sure you use a recent version) and install dependencies using `go get -v -d -t ./...`, you can build with these commands:
-
--   Building for `Linux`: `make lin`
--   Building for `Windows`: `make win`
-
-### Development compliation
-
--   Building for `Linux`: `make lin-dev`
--   Building for `Windows`: `make win-dev`
+-   Test your scoring configuration in a loop:
+``` bash
+while true; do ./aeacus -v; sleep 20; done
+```
 
 ## Contributing and Disclaimer
 

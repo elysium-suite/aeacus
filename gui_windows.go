@@ -1,7 +1,7 @@
-package cmd
+package main
 
-// LaunchIDPrompt launches an ID Prompt on Windows using PowerShell
-func LaunchIDPrompt() {
+// launchIDPrompt launches an ID Prompt on Windows using PowerShell
+func launchIDPrompt() {
 	powerShellPrompt := `
 	Start-Service -Name CSSClient -ErrorAction SilentlyContinue
 	$teamIDContent = Get-Content C:\aeacus\TeamID.txt
@@ -56,9 +56,4 @@ func LaunchIDPrompt() {
 	}
 	`
 	shellCommand(powerShellPrompt)
-}
-
-// LaunchConfigGui (WIP) launches a configuration GUI on Windows
-func LaunchConfigGui() {
-	warnPrint("This feature is not supported yet on Windows.")
 }

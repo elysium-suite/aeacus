@@ -44,6 +44,8 @@ release:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags '-s -w' -tags phocus -o ./phocus . && \
 	CGO_ENABLED=0 GOOS=linux go build -ldflags '-s -w' -o ./aeacus . && \
 	echo "Linux production build successful!" && \
+	mv crypto.go.bak crypto.go && \
+	echo "Restored crypto.go" && \
 	mkdir aeacus-win32/ && mkdir aeacus-linux/ && \
 	mv aeacus.exe aeacus-win32/aeacus.exe && \
 	mv phocus.exe aeacus-win32/phocus.exe && \

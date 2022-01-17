@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"bytes"
@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/gen2brain/beeep"
@@ -34,7 +33,7 @@ func readFile(filename string) (string, error) {
 
 // decodeString (Windows) attempts to determine the file encoding type
 // (typically, UTF-8, UTF-16, or ANSI) and return the appropriately
-// encoded string.
+// encoded string. (HACK)
 func decodeString(fileContent string) (string, error) {
 	// If contains ~>40% null bytes, we're gonna assume its Unicode
 	raw := []byte(fileContent)
@@ -56,6 +55,7 @@ func decodeString(fileContent string) (string, error) {
 
 	// Make an tranformer that converts MS-Win default to UTF8
 	win16be := unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM)
+
 	// Make a transformer that is like win16be, but abides by BOM
 	utf16bom := unicode.BOMOverride(win16be.NewDecoder())
 
@@ -67,20 +67,22 @@ func decodeString(fileContent string) (string, error) {
 	return string(decoded), err
 }
 
+// checkTrace runs WinAPI function "IsDebuggerPresent" to check for an attached
+// debugger.
 func checkTrace() {
 	result, _, _ := debuggerCheck.Call()
 	if int(result) != 0 {
-		failPrint("Reversing is cool, but we would appreciate if you practiced your skills in an environment that was less destructive to other peoples' experiences.")
+		fail("Reversing is cool, but we would appreciate if you practiced your skills in an environment that was less destructive to other peoples' experiences.")
 		os.Exit(1)
 	}
 }
 
-// sendNotification (Windows) employes the beeep library to send notifications
+// sendNotification (Windows) employs the beeep library to send notifications
 // to the end user.
 func sendNotification(messageString string) {
-	err := beeep.Notify("Aeacus SE", messageString, mc.DirPath+"assets/img/logo.png")
+	err := beeep.Notify("Aeacus SE", messageString, dirPath+"assets/img/logo.png")
 	if err != nil {
-		failPrint("Notification error: " + err.Error())
+		fail("Notification error: " + err.Error())
 	}
 }
 
@@ -91,54 +93,15 @@ func sendNotification(messageString string) {
 // system and retrieve the return value.
 func rawCmd(commandGiven string) *exec.Cmd {
 	cmdInput := "powershell.exe -NonInteractive -NoProfile Invoke-Command -ScriptBlock { " + commandGiven + " }"
-	debugPrint("rawCmd input: " + cmdInput)
+	debug("rawCmd input: " + cmdInput)
 	return exec.Command("powershell.exe", "-NonInteractive", "-NoProfile", "Invoke-Command", "-ScriptBlock", "{ "+commandGiven+" }")
 }
 
-// shellCommand (Windows) executes a given command in a PowerShell environment
-// and prints an error if one occurred.
-func shellCommand(commandGiven string) {
-	cmd := rawCmd(commandGiven)
-	if err := cmd.Run(); err != nil {
-		if _, ok := err.(*exec.ExitError); ok {
-			if len(commandGiven) > 12 {
-				failPrint("Command \"" + commandGiven[:12] + "...\" errored out (code " + err.Error() + ").")
-			} else {
-				failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
-			}
-		}
-	}
-}
-
-// shellCommand (Windows) executes a given command in a PowerShell environment
-// and returns the commands output and its error (if one occurred).
-func shellCommandOutput(commandGiven string) (string, error) {
-	out, err := rawCmd(commandGiven).Output()
-	if err != nil {
-		if len(commandGiven) > 9 {
-			failPrint("Command \"" + commandGiven[:9] + "...\" errored out (code " + err.Error() + ").")
-		} else {
-			failPrint("Command \"" + commandGiven + "\" errored out (code " + err.Error() + ").")
-		}
-		return "", err
-	}
-	return strings.TrimSpace(string(out)), err
-}
-
+// playAudio plays a .wav file with the given path with PowerShell.
 func playAudio(wavPath string) {
+	info("Playing audio:", wavPath)
 	commandText := "(New-Object Media.SoundPlayer '" + wavPath + "').PlaySync();"
 	shellCommand(commandText)
-}
-
-// CreateFQs is a quality of life function that creates Forensic Question files
-// on the Desktop, pre-populated with a template.
-func CreateFQs(numFqs int) {
-	for i := 1; i <= numFqs; i++ {
-		fileName := "'Forensic Question " + strconv.Itoa(i) + ".txt'"
-		shellCommand("echo 'QUESTION:' > C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
-		shellCommand("echo 'ANSWER:' >> C:\\Users\\" + mc.Config.User + "\\Desktop\\" + fileName)
-		infoPrint("Wrote " + fileName + " to Desktop")
-	}
 }
 
 // adminCheck (Windows) will attempt to open:
@@ -151,25 +114,31 @@ func adminCheck() bool {
 }
 
 func destroyImage() {
-	failPrint("Destroying the image!")
-	if verboseEnabled {
-		warnPrint("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
-	} else {
-		shellCommand("del /s /q C:\\aeacus")
-		if !mc.Config.NoDestroy {
-			// nuke registry
-			// other destructive commands
-			// rm -rf /
-			// kill all procceses
-			// overwrite system32
-			shellCommand("shutdown /r /t 0")
+	// TODO, make sure you're not nuking people's machines
+	fail("Destroying the image is temporarily cancelled.")
+	os.Exit(1)
+	/*
+		fail("Destroying the image!")
+		if verboseEnabled {
+			warn("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
+		} else {
+			shellCommand("del /s /q C:\\aeacus")
+			if conf.Destroy {
+				// TODO write mean things here
+				// nuke registry
+				// other destructive commands
+				// rm -rf /
+				// kill all procceses
+				// overwrite system32
+				shellCommand("shutdown /r /t 0")
+			}
+			os.Exit(1)
 		}
-		os.Exit(1)
-	}
+	*/
 }
 
-// sidToLocalUser takes an SID as a string and returns a string containing
-// the username of the Local User (NTAccount) that it belongs to.
+// sidToLocalUser takes an SID as a string and returns a string containing the
+// username of the Local User (NTAccount) that it belongs to.
 func sidToLocalUser(sid string) string {
 	cmdText := "$objSID = New-Object System.Security.Principal.SecurityIdentifier('" + sid + "'); $objUser = $objSID.Translate([System.Security.Principal.NTAccount]); Write-Host $objUser.Value"
 	output, _ := shellCommandOutput(cmdText)
@@ -202,7 +171,7 @@ func getPrograms() ([]string, error) {
 	softwareList := []string{}
 	sw, err := wapi.InstalledSoftwareList()
 	if err != nil {
-		failPrint("Couldn't get programs: " + err.Error())
+		fail("Couldn't get programs: " + err.Error())
 		return softwareList, err
 	}
 	for _, s := range sw {
@@ -211,14 +180,13 @@ func getPrograms() ([]string, error) {
 	return softwareList, nil
 }
 
-// getProgram returns the Software struct of program data from a name.
-// The first Program that contains the substring passed as the programName
-// is returned.
+// getProgram returns the Software struct of program data from a name. The first
+// Program that contains the substring passed as the programName is returned.
 func getProgram(programName string) (shared.Software, error) {
 	prog := shared.Software{}
 	sw, err := wapi.InstalledSoftwareList()
 	if err != nil {
-		failPrint("Couldn't get programs: " + err.Error())
+		fail("Couldn't get programs: " + err.Error())
 	}
 	for _, s := range sw {
 		if strings.Contains(s.Name(), programName) {
@@ -231,7 +199,7 @@ func getProgram(programName string) (shared.Software, error) {
 func getLocalUsers() ([]shared.LocalUser, error) {
 	ul, err := wapi.ListLocalUsers()
 	if err != nil {
-		failPrint("Couldn't get local users: " + err.Error())
+		fail("Couldn't get local users: " + err.Error())
 	}
 	return ul, err
 }
@@ -239,7 +207,7 @@ func getLocalUsers() ([]shared.LocalUser, error) {
 func getLocalAdmins() ([]shared.LocalUser, error) {
 	ul, err := wapi.ListLocalUsers()
 	if err != nil {
-		failPrint("Couldn't get local users: " + err.Error())
+		fail("Couldn't get local users: " + err.Error())
 	}
 	var admins []shared.LocalUser
 	for _, user := range ul {
@@ -267,7 +235,7 @@ func getLocalServiceStatus(serviceName string) (shared.Service, error) {
 	serviceDataList, err := wapi.GetServices()
 	var serviceStatusData shared.Service
 	if err != nil {
-		failPrint("Couldn't get local service: " + err.Error())
+		fail("Couldn't get local service: " + err.Error())
 		return serviceStatusData, err
 	}
 	for _, v := range serviceDataList {
@@ -275,6 +243,6 @@ func getLocalServiceStatus(serviceName string) (shared.Service, error) {
 			return v, nil
 		}
 	}
-	failPrint(`Specified service '` + serviceName + `' was not found on the system`)
+	fail(`Specified service '` + serviceName + `' was not found on the system`)
 	return serviceStatusData, err
 }

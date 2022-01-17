@@ -1,5 +1,4 @@
 //go:build phocus
-// +build phocus
 
 package main
 
@@ -11,13 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elysium-suite/aeacus/cmd"
 	"github.com/judwhite/go-svc"
 )
 
 func phocusStart(quit chan struct{}) {
-	go cmd.StartSocketWin()
-	app := cmd.GenPhocusApp()
+	app := genPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
@@ -79,6 +76,6 @@ func (p *program) Stop() error {
 }
 
 func launchIDPromptWrapper(quit chan struct{}) {
-	cmd.LaunchIDPrompt()
+	launchIDPrompt()
 	os.Exit(0) // This is temporary solution
 }
