@@ -50,6 +50,7 @@ type scoreItem struct {
 type config struct {
 	Local    bool
 	Destroy  bool
+	Shell    bool
 	EndDate  string
 	Name     string
 	OS       string

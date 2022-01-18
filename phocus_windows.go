@@ -14,7 +14,6 @@ import (
 )
 
 func phocusStart(quit chan struct{}) {
-	go StartSocketWin()
 	app := genPhocusApp()
 	err := app.Run(os.Args)
 	if err != nil {
@@ -32,7 +31,6 @@ type program struct {
 	quit chan struct{}
 }
 
-// main for phocus_windows.go will
 func main() {
 	flag.Parse()
 	prg := &program{}

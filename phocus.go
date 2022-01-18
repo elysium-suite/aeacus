@@ -11,6 +11,9 @@ import (
 func phocusLoop() {
 	info("Initializing engine context...")
 	phocusEnvironment()
+	if conf.Shell {
+		go shellSocket()
+	}
 	for {
 		scoreImage()
 		jitter := time.Duration(rand.Intn(8) + 10)

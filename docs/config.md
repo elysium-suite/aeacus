@@ -60,6 +60,12 @@ enddate = "2004/06/05 13:09:00 PDT"
 destroy = true
 ```
 
+**shell**: Determines if remote shell functionality is enabled. This is disabled by default. If enabled, competition organizers can interact with images from the scoring endpoint
+
+```
+shell = true
+```
+
 **version**: Version of aeacus that the configuration was made for. Used for compatibility checks, the engine will throw a warning if the binary version does not match the version specified in this field. You should set this to the version of aeacus you are using.
 
 ```
