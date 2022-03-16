@@ -120,9 +120,6 @@ func printConfig() {
 	if conf.Local {
 		pass("Local:", conf.Local)
 	}
-	if conf.Destroy {
-		pass("Destroy:", conf.Destroy)
-	}
 	if conf.EndDate != "" {
 		pass("End Date:", conf.EndDate)
 	}

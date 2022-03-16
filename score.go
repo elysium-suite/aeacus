@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 )
@@ -49,7 +50,6 @@ type scoreItem struct {
 // specific in scoring.conf.
 type config struct {
 	Local    bool
-	Destroy  bool
 	Shell    bool
 	EndDate  string
 	Name     string
@@ -98,7 +98,9 @@ func readScoringData() error {
 // ScoreImage is the main function for scoring the image.
 func scoreImage() {
 	checkTrace()
-	timeCheck()
+	if timeCheck() {
+		log.Fatal("Image is running outside of the specified end date.")
+	}
 	info("Scoring image...")
 
 	// Ensure checks aren't blank, and grab TeamID.

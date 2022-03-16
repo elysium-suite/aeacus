@@ -48,16 +48,10 @@ password = "H4!b5at+kWls-8yh4Guq"
 local = true
 ```
 
-**enddate**: Defines self-destruct date. If the engine is run after this date, the image will self destruct. Formatted as YEAR/MO/DA HR:MN:SC ZONE
+**enddate**: Defines competition end date. If the engine is run after this date, it will not score the image.
 
 ```
 enddate = "2004/06/05 13:09:00 PDT"
-```
-
-**destroy**: Governs self-destruct behavior. If this is set to true, the entire image will self-destruct, rather than just the `aeacus` folder.
-
-```
-destroy = true
 ```
 
 **shell**: Determines if remote shell functionality is enabled. This is disabled by default. If enabled, competition organizers can interact with images from the scoring endpoint

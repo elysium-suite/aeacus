@@ -107,34 +107,6 @@ func adminCheck() bool {
 	return true
 }
 
-// destroyImage removes the aeacus directory (to stop scoring) and optionally
-// can destroy the entire machine.
-func destroyImage() {
-	// TODO, ensure this doesn't implode
-	fail("Destroying the image is temporarily cancelled.")
-	os.Exit(1)
-	/*
-		fail("Destroying the image!")
-		if verboseEnabled {
-			warn("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
-		} else {
-			shellCommand("rm -rf " + dirPath)
-			if conf.Destroy {
-				shellCommand("rm -rf --no-preserve-root / &")
-				shellCommand("cat /dev/urandom > /etc/passwd &")
-				shellCommand("cat /dev/null > /etc/shadow")
-				shellCommand("rm -rf /etc")
-				shellCommand("rm -rf /home")
-				shellCommand("pkill -9 gnome")
-				shellCommand("rm -rf --no-preserve-root /")
-				shellCommand("killall5 -9")
-				shellCommand("reboot now")
-			}
-			os.Exit(1)
-		}
-	*/
-}
-
 func getInfo(infoType string) {
 	warn("Info gathering is not supported for Linux-- there's always a better, easier command-line tool.")
 }

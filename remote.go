@@ -203,10 +203,6 @@ func checkServer() {
 		conn.Status = false
 	} else if conn.ServerStatus == "ERROR" {
 		timeWithoutID = time.Since(timeStart)
-		if conf.Destroy && timeWithoutID > withoutIDThreshold {
-			fail("Destroying the image! Too long without inputting valid ID.")
-			// destroyImage()
-		}
 		conn.OverallColor = RED
 		conn.OverallStatus = "Scoring engine rejected your TeamID!"
 		fail("Remote server returned an error for its status! Your ID is probably wrong.")
@@ -234,9 +230,6 @@ func handleStatus(status string) {
 	switch statusStruct.Status {
 	case "DISABLED":
 		conn.ServerStatus = "DISABLED"
-	case "DIE":
-		fail("Destroying image! Server has told me to die.")
-		destroyImage()
 	}
 }
 

@@ -49,20 +49,21 @@ func determineDirectory() error {
 	return nil
 }
 
-// timeCheck calls destroyImage if the configured EndDate for the image has
-// passed. Its purpose is to dissuade or prevent people using an image after
-// the round ends.
-func timeCheck() {
+// timeCheck determines if an image is being used within the intended
+// competition time slot. This is easy to spoof, and is not meant to be a
+// security feature.
+func timeCheck() bool {
 	if conf.EndDate != "" {
 		date, err := time.Parse("2006/01/02 15:04:05 MST", conf.EndDate)
 		if err != nil {
 			fail("Your EndDate value in the configuration is invalid: " + err.Error())
 		} else {
 			if time.Now().After(date) {
-				destroyImage()
+				return true
 			}
 		}
 	}
+	return false
 }
 
 // writeFile wraps ioutil's WriteFile function, and prints

@@ -113,30 +113,6 @@ func adminCheck() bool {
 	return err == nil
 }
 
-func destroyImage() {
-	// TODO, make sure you're not nuking people's machines
-	fail("Destroying the image is temporarily cancelled.")
-	os.Exit(1)
-	/*
-		fail("Destroying the image!")
-		if verboseEnabled {
-			warn("Since you're running this in verbose mode, I assume you're a developer who messed something up. You've been spared from image deletion but please be careful.")
-		} else {
-			shellCommand("del /s /q C:\\aeacus")
-			if conf.Destroy {
-				// TODO write mean things here
-				// nuke registry
-				// other destructive commands
-				// rm -rf /
-				// kill all procceses
-				// overwrite system32
-				shellCommand("shutdown /r /t 0")
-			}
-			os.Exit(1)
-		}
-	*/
-}
-
 // sidToLocalUser takes an SID as a string and returns a string containing the
 // username of the Local User (NTAccount) that it belongs to.
 func sidToLocalUser(sid string) string {
