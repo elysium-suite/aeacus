@@ -224,7 +224,8 @@ func (c cond) SecurityPolicy() (bool, error) {
 		c.Key == "LockoutDuration" ||
 		c.Key == "ResetLockoutCount" ||
 		c.Key == "MaximumPasswordAge" ||
-		c.Key == "LockoutBadCount" {
+		c.Key == "LockoutBadCount" ||
+		c.Key == "PasswordHistorySize" {
 
 		// These keys are integers, and support ranges.
 		var outputResult, err = strconv.Atoi(strings.Split(output, " = ")[1])
