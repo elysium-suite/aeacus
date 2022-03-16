@@ -20,6 +20,8 @@ cmd = 'ufw status'
 value = 'Status: active'
 ```
 
+> **Note!** If any check returns an error (e.g., something that it was not expecting), it will _never_ pass, even if it's a `Not` condition. This varies by check, but for example, if you try to check the content of a file that doesn't exist, it will return an error and not succeed-- even if you were doing `FileContainsNot`.
+
 **CommandOutput**: pass if command output matches exactly. If it returns an error, check never passes. Use of this check is discouraged.
 
 ```
@@ -28,7 +30,9 @@ cmd = '(Get-NetFirewallProfile -Name Domain).Enabled'
 value = 'True'
 ```
 
-**DirContains**: pass if directory contains regex string
+**DirContains**: pass if directory contains regular expression (regex) string
+
+> **Note!** Read more about regex [here](regex.md).
 
 ```
 type = 'DirContains'
@@ -41,7 +45,7 @@ value = 'NOPASSWD'
 
 > **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `''' like this! that's neat! C:\path\here '''`), or just normal quotes (but you'll have to escape characters with those).
 
-**FileContains**: pass if file contains regex string. If it returns an error, check will never pass
+**FileContains**: pass if file contains regex string
 
 > Note: `FileContains` will never pass if file does not exist! Add an additional PassOverride check for PathExistsNot, if you want to score that a file does not contain a line, OR it doesn't exist.
 

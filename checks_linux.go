@@ -11,7 +11,7 @@ import (
 func (c cond) AutoCheckUpdatesEnabled() (bool, error) {
 	return cond{
 		Path:  "/etc/apt/apt.conf.d/",
-		Value: `APT::Periodic::Update-Package-Lists\s+"1"`,
+		Value: `(?i)^\s*APT::Periodic::Update-Package-Lists\s+"1"\s*;\s*$`,
 	}.DirContains()
 }
 
@@ -32,7 +32,7 @@ func (c cond) Command() (bool, error) {
 func (c cond) FirewallUp() (bool, error) {
 	return cond{
 		Path:  "/etc/ufw/ufw.conf",
-		Value: `\s*ENABLED\s*=\s*yes`,
+		Value: `^\s*ENABLED=yes\s*$`,
 	}.FileContains()
 }
 
