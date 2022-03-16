@@ -9,16 +9,17 @@ import (
 	"strings"
 	"time"
 
-	wapi "github.com/iamacarpet/go-win64api"
 	"golang.org/x/sys/windows/registry"
+
+	wapi "github.com/iamacarpet/go-win64api"
+	wapiShared "github.com/iamacarpet/go-win64api/shared"
 )
 
 func (c cond) BitlockerEnabled() (bool, error) {
-	const FULLY_ENCRYPTED = 1
-	const ENCRYPTION_IN_PROGRESS = 2
 	status, err := wapi.GetBitLockerConversionStatusForDrive("C:")
 	if err == nil {
-		if status.ConversionStatus == FULLY_ENCRYPTED || status.ConversionStatus == ENCRYPTION_IN_PROGRESS {
+		if status.ConversionStatus == wapiShared.FULLY_ENCRYPTED ||
+		status.ConversionStatus == wapiShared.ENCRYPTION_IN_PROGRESS {
 			return true, nil
 		}
 	}
