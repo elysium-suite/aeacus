@@ -291,10 +291,11 @@ func fileOwner(filePath, owner string) (bool, error) {
 	return theowner == owner, nil
 }
 
-func filePermission(filePath, user, permission string) (bool, error) {
-	cmd := fmt.Sprintf("Get-Acl \"%s\"| Select-Object -ExpandProperty Access | Where-Object identityreference -eq '%s'", filePath, user)
-	lines, _ := commandOutput(cmd)
-	permissions := lines2map(lines)
+func filePermission(filePath, username, permission string) (bool, error) {
+	permissions, err := getFileRights(filePath, username)
+	if err != nil {
+		return false, err
+	}
 	rights := permissions["filesystemrights"]
 	access := permissions["accesscontroltype"]
 	return strings.Contains(rights, permission) && !strings.EqualFold(access, "Deny"), nil
