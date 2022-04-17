@@ -139,16 +139,3 @@ func removeKeys(aeacusPath string) {
 		failPrint("Failed to stat " + keyFile)
 	}
 }
-
-func lines2map(lines string) map[string]string {
-	ret := map[string]string{}
-	for _, line := range strings.Split(lines, "\n") {
-		items := strings.SplitN(line, ":", 2)
-		key, value := strings.TrimSpace(items[0]), ""
-		if len(items) > 1 {
-			value = strings.TrimSpace(items[1])
-		}
-		ret[strings.ToLower(key)] = value
-	}
-	return ret
-}
