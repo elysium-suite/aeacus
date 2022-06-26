@@ -2,7 +2,7 @@
 
 ## Fields
 
-This is a list of configuration fields for `aeacus`.
+This is a list of (non-check) image configuration fields for `aeacus`. For details on check configurations (ex., ensure this file has this content), see the [checks configuration](./checks.md).
 
 **name**: Image name, primarily used to organize remote scoring.
 
@@ -12,19 +12,21 @@ This is a list of configuration fields for `aeacus`.
 name = "ubuntu-18-dabbingdabbers"
 ```
 
-**title**: Round title, as seen in the scoring report and README.
+**title**: Round title, shown in the image's scoring report and README.
 
 ```
 title = "CyberPatio Practice Round 1337"
 ```
 
-**os**: Name of the operating system, as seen in the README.
+**os**: Name of the operating system, shown in the image's README.
 
 ```
 os = "TempleOS 5.03"
 ```
 
 **user**: Main user of the image. This is used when sending notifications.
+
+> **Note!** No other user accounts will get notifications except for this user.
 
 ```
 user = "sysadmin"
@@ -110,12 +112,12 @@ For example:
     [[check.pass]]
     type = 'ScheduledTaskExistsNot'
     name = 'Disk Cleanup Backup'
-    
+
     # OR if the user runnning those tasks is deleted
     [[check.passoverride]]
     type = 'UserExistsNot'
     name = 'CleanupBot'
-    
+
     # AND the scheduled task service is running
     [[check.fail]]
     type = 'ServiceUpNot'

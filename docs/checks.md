@@ -22,7 +22,7 @@ value = 'Status: active'
 
 > **Note!** If any check returns an error (e.g., something that it was not expecting), it will _never_ pass, even if it's a `Not` condition. This varies by check, but for example, if you try to check the content of a file that doesn't exist, it will return an error and not succeed-- even if you were doing `FileContainsNot`.
 
-**CommandOutput**: pass if command output matches exactly. If it returns an error, check never passes. Use of this check is discouraged.
+**CommandOutput**: pass if command output matches string exactly. If it returns an error, check never passes. Use of this check is discouraged.
 
 ```
 type = 'CommandOutput'
@@ -45,7 +45,7 @@ value = 'NOPASSWD'
 
 > **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `''' like this! that's neat! C:\path\here '''`), or just normal quotes (but you'll have to escape characters with those).
 
-**FileContains**: pass if file contains regex string
+**FileContains**: pass if file contains regex
 
 > Note: `FileContains` will never pass if file does not exist! Add an additional PassOverride check for PathExistsNot, if you want to score that a file does not contain a line, OR it doesn't exist.
 
@@ -104,7 +104,10 @@ value = '88.0.1+build1-0ubuntu0.20.04.2'
 ```
 
 ```
-# Windows: get versions from ./aeacus.exe info programs
+# Windows: get versions from .\aeacus.exe info programs
+# Checks version on first matching substring. E.g., for program name 'Ace',
+# it may match on 'Ace Of Spades' rather than 'Ace Ventura'. Make your program
+# name as detailed as possible.
 type = 'ProgramVersion'
 name = 'Firefox'
 value = '95.0.1'
@@ -145,7 +148,7 @@ user = 'HackerUser'
 group = 'Administrators'
 ```
 
-> Linux reads `/etc/group` and Windows checks `net user`.
+> Linux reads `/etc/group` and Windows uses the Windows API.
 
 <hr>
 
@@ -157,7 +160,7 @@ group = 'Administrators'
 type = 'AutoCheckUpdatesEnabled'
 ```
 
-**Command**: pass if command succeeds. Use of this check is discouraged.
+**Command**: pass if command succeeds. Use of this check is discouraged. This check will NOT return an error if the command is not found
 
 ```
 type = 'Command'
@@ -217,7 +220,7 @@ type = "BitlockerEnabled"
 ```
 > This check will succeed if the drive is either encrypted or encryption is in progress.
 
-**FileOwner**: pass if specified owner is the owner of the specified file
+**FileOwner**: pass if specified user/group owns a given file
 
 ```
 type = 'FileOwner'
@@ -225,7 +228,7 @@ path = 'C:\test.txt'
 name = 'BUILTIN\Administrators'
 ```
 
-> Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
+> Get owner of the file using PowerShell: `(Get-Acl [FILENAME]).Owner`
 
 **PasswordChanged**: pass if user password has changed after the specified date
 
@@ -276,7 +279,7 @@ value = '0'
 
 > Values are checking Registry Keys and `secedit.exe` behind the scenes. This means `0` is `Disabled` and `1` is `Enabled`. [See here for reference](securitypolicy.md).
 
-> **Note**: For all integer-based values (such as `MinimumPasswordAge`), you can provide a range of values, as seen below.
+> **Note**: For all integer-based values (such as `MinimumPasswordAge`), you can provide a range of values, as seen below. The lower value must be specified first.
 
 ```
 type = 'SecurityPolicy'
@@ -306,6 +309,8 @@ name = 'ADMIN$'
 
 **UserDetail**: pass if user detail key is equal to value
 
+> **Note!** The valid boolean values for this command (when the field is only True or False) are 'yes', if you want the value to be true, or literally anything else for false (like 'no').
+
 ```
 type = 'UserDetailNot'
 user = 'Administrator'
@@ -324,7 +329,7 @@ name = 'Administrators'
 value = 'SeTimeZonePrivilege'
 ```
 
-> A list of URA and Constant Names (which are used in the config) [can be found here](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment).
+> A list of URA and Constant Names (which are used in the config) [can be found here](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment). On your local machine, check Local Security Policy > User Rights Assignments to see the current assignments.
 
 
 **WindowsFeature**: pass if Windows Feature is enabled
@@ -335,4 +340,3 @@ name = 'SMB1Protocol'
 ```
 
 > **Note:** Use the PowerShell tool `Get-WindowsOptionalFeature -Online` to find the feature you want!
-

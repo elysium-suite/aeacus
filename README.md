@@ -1,6 +1,6 @@
 # aeacus [![Go Report Card](https://goreportcard.com/badge/github.com/elysium-suite/aeacus)](https://goreportcard.com/report/github.com/elysium-suite/aeacus)
 
-<img align="right" width="200" src="assets/img/logo.png"/>
+<img align="right" width="200" src="assets/img/logo.png" alt="aeacus logo"/>
 
 `aeacus` is a vulnerability scoring engine for Windows and Linux, with an emphasis on simplicity.
 
@@ -80,9 +80,9 @@ If you're developing for `aeacus`, compile with these commands to leave debug sy
 - Building for `Linux`: `make lin-dev`
 - Building for `Windows`: `make win-dev`
 
-### Release Archives
+### Releases
 
-You can build release archives (e.g., `aeacus-linux.zip`). These will have auto-generated `crypto.go` files.
+You can build release files (e.g., `aeacus-linux.zip`). These will have auto-randomized `crypto.go` files.
 
 - Building both platforms: `make release`
 
@@ -91,14 +91,14 @@ You can build release archives (e.g., `aeacus-linux.zip`). These will have auto-
 All checks (with examples and notes) [are documented here](docs/checks.md).
 
 Other documentation:
-- [Scoring Configuration](docs/config.md)
+- [Non-Check Scoring Configuration](docs/config.md)
 - [Crypto](docs/crypto.md)
 - [Security Model](docs/security.md)
 - [Windows Security Policy](docs/securitypolicy.md)
 
 ## Remote Endpoint
 
-Set the `remote` field in the configuration, and your image will use remote scoring. If you want remote scoring, you will need to host a remote scoring endpoint. The authors of this project recommend using [sarpedon](https://github.com/elysium-suite/sarpedon). See [this example remote configuration](docs/examples/remote.conf).
+Set the `remote` field in the configuration, and your image will use remote scoring. If you want remote scoring, you will need to host a remote scoring endpoint. The authors of this project recommend using [sarpedon](https://github.com/elysium-suite/sarpedon). See [this example remote configuration for Linux aeacus](docs/examples/linux-remote.conf).
 
 ## Configuration
 

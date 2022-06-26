@@ -27,15 +27,15 @@ type check struct {
 
 // cond, or condition, is the parameters for a given test within a check.
 type cond struct {
-	Type    string
-	Path    string
-	Cmd     string
-	User    string
-	Group   string
-	Name    string
-	Key     string
-	Value   string
-	After   string
+	Type  string
+	Path  string
+	Cmd   string
+	User  string
+	Group string
+	Name  string
+	Key   string
+	Value string
+	After string
 }
 
 func (c cond) requireArgs(args ...interface{}) {
@@ -63,10 +63,10 @@ func (c cond) requireArgs(args ...interface{}) {
 
 		if required {
 			if v.Field(i).String() == "" {
-				fail(c.Type + ":", "missing required argument '" + vType.Field(i).Name + "'")
+				fail(c.Type+":", "missing required argument '"+vType.Field(i).Name+"'")
 			}
 		} else if v.Field(i).String() != "" {
-			warn(c.Type + ":", "specifying unnecessary argument '" + vType.Field(i).Name + "'")
+			warn(c.Type+":", "specifying unnecessary argument '"+vType.Field(i).Name+"'")
 		}
 
 	}
@@ -186,7 +186,6 @@ func (c cond) DirContains() (bool, error) {
 	}
 	return false, nil
 }
-
 
 // DirContainsRegex is an alias for DirContains
 func (c cond) DirContainsRegex() (bool, error) {

@@ -19,7 +19,7 @@ func (c cond) BitlockerEnabled() (bool, error) {
 	status, err := wapi.GetBitLockerConversionStatusForDrive("C:")
 	if err == nil {
 		if status.ConversionStatus == wapiShared.FULLY_ENCRYPTED ||
-		status.ConversionStatus == wapiShared.ENCRYPTION_IN_PROGRESS {
+			status.ConversionStatus == wapiShared.ENCRYPTION_IN_PROGRESS {
 			return true, nil
 		}
 	}
@@ -93,7 +93,7 @@ func (c cond) ProgramVersion() (bool, error) {
 
 func (c cond) RegistryKey() (bool, error) {
 	c.requireArgs("Key", "Value")
-	registryArgs := regexp.MustCompile(`[\\]+`).Split(c.Key, -1)
+	registryArgs := regexp.MustCompile(`\\+`).Split(c.Key, -1)
 	if len(registryArgs) < 2 {
 		fail("Invalid key for RegistryKey. Did you supply 'key'?")
 		return false, errors.New("invalid registry key path: " + c.Key)
@@ -238,7 +238,7 @@ func (c cond) SecurityPolicy() (bool, error) {
 			splitVal := strings.Split(c.Value, "-")
 			if len(splitVal) != 2 {
 				fail("Malformed range value:", c.Value)
-				return false, errors.New("Invalid c.Value range")
+				return false, errors.New("invalid c.Value range")
 			}
 			intLow, err := strconv.Atoi(splitVal[0])
 			if err != nil {
@@ -257,7 +257,7 @@ func (c cond) SecurityPolicy() (bool, error) {
 			desiredValue, err := strconv.Atoi(c.Value)
 			if err != nil {
 				fail(c.Value + " is not a valid integer for SecurityPolicy check")
-				return false, errors.New("Invalid c.Value")
+				return false, errors.New("invalid c.Value")
 			}
 			if outputResult == desiredValue {
 				return true, nil
@@ -335,9 +335,10 @@ func (c cond) UserInGroup() (bool, error) {
 
 func (c cond) UserDetail() (bool, error) {
 	c.requireArgs("User", "Key", "Value")
+	c.Value = strings.TrimSpace(c.Value)
 	c.Key = strings.TrimSpace(c.Key)
 	lookingFor := false
-	if strings.ToLower(c.Key) == "yes" {
+	if strings.ToLower(c.Value) == "yes" {
 		lookingFor = true
 	}
 	user, err := getLocalUser(c.User)
@@ -346,7 +347,7 @@ func (c cond) UserDetail() (bool, error) {
 	}
 	switch c.Key {
 	case "FullName":
-		if user.FullName == c.Key {
+		if user.FullName == c.Value {
 			return true, nil
 		}
 	case "IsEnabled":
@@ -359,7 +360,7 @@ func (c cond) UserDetail() (bool, error) {
 		return user.PasswordNeverExpires == lookingFor, nil
 	default:
 		fail("c.Key (" + c.Key + ") passed to userDetail is invalid.")
-		return false, errors.New("Invalid detail")
+		return false, errors.New("invalid detail")
 	}
 	return false, nil
 }
@@ -392,7 +393,7 @@ func (c cond) UserRights() (bool, error) {
 
 	privStringSplit := strings.Split(privilegeString, " ")
 	if len(privStringSplit) != 3 {
-		return false, errors.New("Error splitting privilege")
+		return false, errors.New("error splitting privilege")
 	}
 
 	privStringSplit = strings.Split(privStringSplit[2], ",")
