@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"crypto/aes"
@@ -18,7 +18,8 @@ import (
 	"time"
 )
 
-var delimiter = "|-S#-|"
+// Use non-ASCII bytes as a delimiter.
+var delimiter = string(byte(255)) + string(byte(222))
 
 const (
 	FAIL  = "FAIL"
@@ -27,38 +28,29 @@ const (
 )
 
 func readTeamID() {
-	fileContent, err := readFile(mc.DirPath + "TeamID.txt")
+	fileContent, err := readFile(dirPath + "TeamID.txt")
 	fileContent = strings.TrimSpace(fileContent)
 	if err != nil {
-		failPrint("TeamID.txt does not exist!")
+		if conf.Remote != "" {
+			fail("TeamID.txt does not exist!")
+			conn.OverallColor = RED
+			conn.OverallStatus = "Your TeamID files does not exist! Failed to score image."
+			conn.Status = false
+		} else {
+			warn("TeamID.txt does not exist! This image is local only, so we will continue.")
+		}
 		sendNotification("TeamID.txt does not exist!")
-		mc.Conn.OverallColor = RED
-		mc.Conn.OverallStatus = "Your TeamID files does not exist! Failed to upload scores."
-		mc.Connection = false
 	} else if fileContent == "" {
-		failPrint("TeamID.txt is empty!")
+		fail("TeamID.txt is empty!")
 		sendNotification("TeamID.txt is empty!")
-		mc.Conn.OverallStatus = RED
-		mc.Conn.OverallStatus = "Your TeamID is empty! Failed to upload scores."
-		mc.Connection = false
+		if conf.Remote != "" {
+			conn.OverallStatus = RED
+			conn.OverallStatus = "Your TeamID is empty! Failed to score image."
+			conn.Status = false
+		}
 	} else {
-		mc.TeamID = fileContent
+		teamID = fileContent
 	}
-}
-
-// genChallenge generates a crypto challenge for the CSS endpoint
-func genChallenge() (string, error) {
-	// Should actually use this for something
-	randomHash1 := "71844fd161e20dc78ce6c985b42611cfb11cf196"
-	randomHash2 := "e31ad5a009753ef6da499f961edf0ab3a8eb6e5f"
-	chalString := hexEncode(xor(randomHash1, randomHash2))
-	hasher := sha256.New()
-	_, err := hasher.Write([]byte(mc.Config.Password))
-	if err != nil {
-		return "", err
-	}
-	key := hexEncode(string(hasher.Sum(nil)))
-	return hexEncode(xor(key, chalString)), nil
 }
 
 func writeString(stringToWrite *strings.Builder, key, value string) {
@@ -71,23 +63,20 @@ func writeString(stringToWrite *strings.Builder, key, value string) {
 func genUpdate() (string, error) {
 	var update strings.Builder
 	// Write values for score update
-	writeString(&update, "team", mc.TeamID)
-	writeString(&update, "image", mc.Config.Name)
-	writeString(&update, "score", strconv.Itoa(mc.Image.Score))
-	chall, err := genChallenge()
-	if err != nil {
-		return "", err
-	}
-	writeString(&update, "challenge", chall)
+	writeString(&update, "team", teamID)
+	writeString(&update, "image", conf.Name)
+	writeString(&update, "score", strconv.Itoa(image.Score))
 	writeString(&update, "vulns", genVulns())
 	writeString(&update, "time", strconv.Itoa(int(time.Now().Unix())))
-	infoPrint("Encrypting score update...")
-	if err := deobfuscateData(&mc.Config.Password); err != nil {
-		errorPrint(err)
+	info("Encrypting score update...")
+	if err := deobfuscateData(&conf.Password); err != nil {
+		fail(err)
+		return "", err
 	}
-	finishedUpdate := hexEncode(encryptString(mc.Config.Password, update.String()))
-	if err := obfuscateData(&mc.Config.Password); err != nil {
-		errorPrint(err)
+	finishedUpdate := hexEncode(encryptString(conf.Password, update.String()))
+	if err := obfuscateData(&conf.Password); err != nil {
+		fail(err)
+		return "", err
 	}
 	return finishedUpdate, nil
 }
@@ -96,59 +85,59 @@ func genVulns() string {
 	var vulnString strings.Builder
 
 	// Vulns achieved
-	vulnString.WriteString(fmt.Sprintf("%d%s", len(mc.Image.Points), delimiter))
+	vulnString.WriteString(fmt.Sprintf("%d%s", len(image.Points), delimiter))
 	// Total vulns
-	vulnString.WriteString(fmt.Sprintf("%d%s", mc.Image.ScoredVulns, delimiter))
+	vulnString.WriteString(fmt.Sprintf("%d%s", image.ScoredVulns, delimiter))
 
 	// Build vuln string
-	for _, penalty := range mc.Image.Penalties {
+	for _, penalty := range image.Penalties {
 		if err := deobfuscateData(&penalty.Message); err != nil {
-			errorPrint(err)
+			fail(err)
 		}
 		vulnString.WriteString(fmt.Sprintf("%s - N%.0f pts", penalty.Message, math.Abs(float64(penalty.Points))))
 		if err := obfuscateData(&penalty.Message); err != nil {
-			errorPrint(err)
+			fail(err)
 		}
 		vulnString.WriteString(delimiter)
 	}
 
-	for _, point := range mc.Image.Points {
+	for _, point := range image.Points {
 		if err := deobfuscateData(&point.Message); err != nil {
-			errorPrint(err)
+			fail(err)
 		}
 		vulnString.WriteString(fmt.Sprintf("%s - %d pts", point.Message, point.Points))
 		if err := obfuscateData(&point.Message); err != nil {
-			errorPrint(err)
+			fail(err)
 		}
 		vulnString.WriteString(delimiter)
 	}
 
-	infoPrint("Encrypting vulnerabilities...")
+	info("Encrypting vulnerabilities...")
 
-	deobfuscateData(&mc.Config.Password)
-	finishedVulns := hexEncode(encryptString(mc.Config.Password, vulnString.String()))
-	obfuscateData(&mc.Config.Password)
+	deobfuscateData(&conf.Password)
+	finishedVulns := hexEncode(encryptString(conf.Password, vulnString.String()))
+	obfuscateData(&conf.Password)
 	return finishedVulns
 }
 
 func reportScore() error {
 	update, err := genUpdate()
 	if err != nil {
-		failPrint(err.Error())
+		fail(err.Error())
 		return err
 	}
-	resp, err := http.PostForm(mc.Config.Remote+"/update",
+	resp, err := http.PostForm(conf.Remote+"/update",
 		url.Values{"update": {update}})
 	if err != nil {
-		failPrint(err.Error())
+		fail(err.Error())
 		return err
 	}
 
 	if resp.StatusCode != 200 {
-		mc.Conn.OverallColor = RED
-		mc.Conn.OverallStatus = "Failed to upload score! Please ensure that your Team ID is correct."
-		mc.Connection = false
-		failPrint("Failed to upload score!")
+		conn.OverallColor = RED
+		conn.OverallStatus = "Failed to upload score! Please ensure that your Team ID is correct."
+		conn.Status = false
+		fail("Failed to upload score!")
 		sendNotification("Failed to upload score!")
 		return errors.New("Non-200 response from remote scoring endpoint")
 	}
@@ -157,103 +146,90 @@ func reportScore() error {
 
 func checkServer() {
 	// Internet check (requisite)
-	infoPrint("Checking for internet connection...")
+	info("Checking for internet connection...")
 
+	// Poor example.org :(
 	client := http.Client{
-		Timeout: 5 * time.Second,
+		Timeout: 10 * time.Second,
 	}
 	_, err := client.Get("http://example.org")
 
 	if err != nil {
-		mc.Conn.NetColor = RED
-		mc.Conn.NetStatus = FAIL
+		conn.NetColor = RED
+		conn.NetStatus = FAIL
 	} else {
-		mc.Conn.NetColor = GREEN
-		mc.Conn.NetStatus = "OK"
+		conn.NetColor = GREEN
+		conn.NetStatus = "OK"
 	}
 
 	// Scoring engine check
-	infoPrint("Checking for scoring engine connection...")
-	resp, err := client.Get(mc.Config.Remote + "/status/" + mc.TeamID + "/" + mc.Config.Name)
-	// todo enforce status/time limit
-	// grab body or status message from minos
-	// if "DESTROY" due to image elapsed time > time_limit,
-	// destroy image
+	info("Checking for scoring engine connection...")
+	resp, err := client.Get(conf.Remote + "/status/" + teamID + "/" + conf.Name)
 
 	if err != nil {
-		mc.Conn.ServerColor = RED
-		mc.Conn.ServerStatus = FAIL
+		conn.ServerColor = RED
+		conn.ServerStatus = FAIL
 	} else {
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			failPrint("Error reading Status body.")
-			mc.Conn.ServerColor = RED
-			mc.Conn.ServerStatus = FAIL
+			fail("Error reading Status body.")
+			conn.ServerColor = RED
+			conn.ServerStatus = FAIL
 		} else {
-			handleStatus(string(body))
 			if resp.StatusCode == 200 {
-				mc.Conn.ServerColor = GREEN
-				mc.Conn.ServerStatus = "OK"
+				conn.ServerColor = GREEN
+				conn.ServerStatus = "OK"
 			} else {
-				mc.Conn.ServerColor = RED
-				mc.Conn.ServerStatus = "ERROR"
+				conn.ServerColor = RED
+				conn.ServerStatus = "ERROR"
 			}
+			handleStatus(string(body))
 		}
 	}
 
 	// Overall
-	if mc.Conn.NetStatus == FAIL && mc.Conn.ServerStatus == "OK" {
+	if conn.NetStatus == FAIL && conn.ServerStatus == "OK" {
 		timeStart = time.Now()
-		mc.Conn.OverallColor = "goldenrod"
-		mc.Conn.OverallStatus = "Server connection good but no Internet. Assuming you're on an isolated LAN."
-		mc.Connection = true
-	} else if mc.Conn.ServerStatus == FAIL {
+		conn.OverallColor = "goldenrod"
+		conn.OverallStatus = "Server connection good but no Internet. Assuming you're on an isolated LAN."
+		conn.Status = true
+	} else if conn.ServerStatus == FAIL {
 		timeStart = time.Now()
-		mc.Conn.OverallColor = RED
-		mc.Conn.OverallStatus = "Failure! Can't access remote scoring server."
-		failPrint("Can't access remote scoring server!")
+		conn.OverallColor = RED
+		conn.OverallStatus = "Failure! Can't access remote scoring server."
+		fail("Can't access remote scoring server!")
 		sendNotification("Score upload failure! Unable to access remote server.")
-		mc.Connection = false
-	} else if mc.Conn.ServerStatus == "ERROR" {
+		conn.Status = false
+	} else if conn.ServerStatus == "ERROR" {
 		timeWithoutID = time.Since(timeStart)
-		if !mc.Config.NoDestroy && timeWithoutID > withoutIDThreshold {
-			failPrint("Destroying the image! Too long without inputting valid ID.")
-			// destroyImage()
-		}
-		mc.Conn.OverallColor = RED
-		mc.Conn.OverallStatus = "Scoring engine rejected your TeamID!"
-		failPrint("Remote server returned an error for its status! Your ID is probably wrong.")
+		conn.OverallColor = RED
+		conn.OverallStatus = "Scoring engine rejected your TeamID!"
+		fail("Remote server returned an error for its status! Your ID is probably wrong.")
 		sendNotification("Status check failed, TeamID incorrect!")
-		mc.Connection = false
-	} else if mc.Conn.ServerStatus == "DISABLED" {
-		mc.Conn.OverallColor = RED
-		mc.Conn.OverallStatus = "Remote scoring server is no longer accepting scores."
-		failPrint("Remote scoring server is no longer accepting scores.")
+		conn.Status = false
+	} else if conn.ServerStatus == "DISABLED" {
+		conn.OverallColor = RED
+		conn.OverallStatus = "Remote scoring server is no longer accepting scores."
+		fail("Remote scoring server is no longer accepting scores.")
 		sendNotification("Remote scoring server is no longer accepting scores.")
-		mc.Connection = false
+		conn.Status = false
 	} else {
 		timeStart = time.Now()
-		mc.Conn.OverallColor = GREEN
-		mc.Conn.OverallStatus = "OK"
-		mc.Connection = true
+		conn.OverallColor = GREEN
+		conn.OverallStatus = "OK"
+		conn.Status = true
 	}
 }
 
 func handleStatus(status string) {
 	var statusStruct statusRes
 	if err := json.Unmarshal([]byte(status), &statusStruct); err != nil {
-		failPrint("Failed to parse JSON response (status): " + err.Error())
+		fail("Failed to parse JSON response (status): " + err.Error())
 	}
-
 	switch statusStruct.Status {
-	case "DIE":
-		failPrint("Destroying image! Server has told me to die.")
-		// destroyImage()
-	case "GIMMESHELL":
-		if !mc.Config.DisableShell && !mc.ShellActive {
-			go connectWs()
-		}
+	case "DISABLED":
+		conn.ServerStatus = "DISABLED"
 	}
 }
 
@@ -268,7 +244,8 @@ func encryptString(password, plainText string) string {
 	hasher := sha256.New()
 	_, err := hasher.Write([]byte(password))
 	if err != nil {
-		errorPrint(err)
+		fail(err)
+		return ""
 	}
 	key := hasher.Sum(nil)
 
@@ -279,25 +256,29 @@ func encryptString(password, plainText string) string {
 	}
 	plainText = plainText + string(paddingArray)
 	if len(plainText)%aes.BlockSize != 0 {
-		panic("plainText is not a multiple of block size!")
+		fail("plainText is not a multiple of block size!")
+		return ""
 	}
 
 	// Create cipher block with key.
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		fail(err)
+		return ""
 	}
 
 	// Generate nonce.
 	nonce := make([]byte, 12)
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		panic(err.Error())
+		fail(err)
+		return ""
 	}
 
 	// Create NewGCM cipher.
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(err.Error())
+		fail(err)
+		return ""
 	}
 
 	// Encrypt and seal plainText.
@@ -313,7 +294,7 @@ func decryptString(password, ciphertext string) string {
 	// Create a sha256sum hash of the password provided.
 	hasher := sha256.New()
 	if _, err := hasher.Write([]byte(password)); err != nil {
-		errorPrint(err)
+		fail(err)
 	}
 	key := hasher.Sum(nil)
 
@@ -324,21 +305,21 @@ func decryptString(password, ciphertext string) string {
 	// Create the AES block object.
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		failPrint(err.Error())
+		fail(err.Error())
 		return ""
 	}
 
 	// Create the AES-GCM cipher with the generated block.
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		failPrint(err.Error())
+		fail(err.Error())
 		return ""
 	}
 
 	// Decrypt (and check validity, since it's GCM) of ciphertext.
 	plainText, err := aesgcm.Open(nil, iv, []byte(ciphertext), nil)
 	if err != nil {
-		failPrint(err.Error())
+		fail(err.Error())
 		return ""
 	}
 

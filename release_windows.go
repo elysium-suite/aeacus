@@ -1,34 +1,34 @@
-package cmd
+package main
 
-// WriteDesktopFiles writes default scoring engine files to the desktop
-func WriteDesktopFiles() {
+// writeDesktopFiles writes default scoring engine files to the desktop.
+func writeDesktopFiles() {
 	firefoxBinary := `C:\Program Files\Mozilla Firefox\firefox.exe`
-	infoPrint("Writing ScoringReport.html shortcut to Desktop...")
-	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\assets\ScoringReport.html"; $Shortcut.Save()`
+	info("Writing ScoringReport.html shortcut to Desktop...")
+	cmdString := `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + conf.User + `\Desktop\ScoringReport.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\assets\ScoringReport.html"; $Shortcut.Save()`
 	shellCommand(cmdString)
-	infoPrint("Writing ReadMe.html shortcut to Desktop...")
-	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\ReadMe.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\assets\ReadMe.html"; $Shortcut.Save()`
+	info("Writing ReadMe.html shortcut to Desktop...")
+	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + conf.User + `\Desktop\ReadMe.lnk"); $Shortcut.TargetPath = "` + firefoxBinary + `"; $Shortcut.Arguments = "C:\aeacus\assets\ReadMe.html"; $Shortcut.Save()`
 	shellCommand(cmdString)
-	infoPrint("Creating or emptying TeamID.txt file...")
+	info("Creating or emptying TeamID.txt file...")
 	cmdString = "echo 'YOUR-TEAMID-HERE' > C:\\aeacus\\TeamID.txt"
 	shellCommand(cmdString)
-	infoPrint("Changing Permissions of TeamID...")
+	info("Changing Permissions of TeamID...")
 	powershellPermission := `
 	$ACL = Get-ACL C:\aeacus\TeamID.txt
 	$ACL.SetOwner([System.Security.Principal.NTAccount] $env:USERNAME)
 	Set-Acl -Path C:\aeacus\TeamID.txt -AclObject $ACL
 	`
 	shellCommand(powershellPermission)
-	infoPrint("Writing TeamID shortcut to Desktop...")
-	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + mc.Config.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Arguments = "-i yes"; $Shortcut.Save()`
+	info("Writing TeamID shortcut to Desktop...")
+	cmdString = `$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut("C:\Users\` + conf.User + `\Desktop\TeamID.lnk"); $Shortcut.TargetPath = "C:\aeacus\phocus.exe"; $Shortcut.Arguments = "-i yes"; $Shortcut.Save()`
 	shellCommand(cmdString)
 
 	// domain compatibility? doubt
 }
 
-// ConfigureAutologin allows the current user to log in automatically
-func ConfigureAutologin() {
-	infoPrint("Setting Up autologin for " + mc.Config.User + "...")
+// configureAutologin allows the current user to log in automatically.
+func configureAutologin() {
+	info("Setting Up autologin for " + conf.User + "...")
 	powershellAutoLogin := `
 	function Test-RegistryValue {
 
@@ -73,9 +73,9 @@ func ConfigureAutologin() {
 	shellCommand(powershellAutoLogin)
 }
 
-// InstallFont installs the Raleway font for ID Prompt
-func InstallFont() {
-	infoPrint("Installing Raleway font for ID Prompt...")
+// installFont installs the Raleway font for ID Prompt.
+func installFont() {
+	info("Installing Raleway font for ID Prompt...")
 	powershellFontInstall := `
 	$SourceDir   = "C:\aeacus\assets\fonts\Raleway"
 	$Source      = "C:\aeacus\assets\fonts\Raleway\*"
@@ -106,15 +106,15 @@ func InstallFont() {
 	shellCommand(powershellFontInstall)
 }
 
-// InstallService installs the Aeacus service on Windows
-func InstallService() {
-	infoPrint("Installing service with sc.exe...")
+// installService installs the Aeacus service on Windows.
+func installService() {
+	info("Installing service with sc.exe...")
 	cmdString := `sc.exe create CSSClient binPath= "C:\aeacus\phocus.exe" start= "auto" DisplayName= "CSSClient"`
 	shellCommand(cmdString)
-	infoPrint("Setting service description...")
+	info("Setting service description...")
 	cmdString = `sc.exe description CSSClient "This is Aeacus's Competition Scoring System client. Don't stop or mess with this unless you want to not get points, and maybe have your registry deleted."`
 	shellCommand(cmdString)
-	infoPrint("Setting up TeamID scheduled task...")
+	info("Setting up TeamID scheduled task...")
 	idTaskCreate := `
 	$action = New-ScheduledTaskAction -Execute "C:\aeacus\phocus.exe" -Argument "-i yes"
 	$trigger = New-ScheduledTaskTrigger -AtLogon
@@ -131,22 +131,22 @@ func InstallService() {
 	shellCommand(serviceTaskCreate)
 }
 
-// CleanUp clears out sensitive files left behind by
-// image developers or the scoring engine itself
-func CleanUp() {
-	infoPrint("Removing .keys file...")
-	removeKeys(WindowsDir)
-
-	infoPrint("Removing scoring.conf and ReadMe.conf...")
+// cleanUp clears out sensitive files left behind by image developers or the
+// scoring engine.
+func cleanUp() {
+	info("Removing scoring.conf and ReadMe.conf...")
 	shellCommand("Remove-Item -Force C:\\aeacus\\scoring.conf")
 	shellCommand("Remove-Item -Force C:\\aeacus\\ReadMe.conf")
-	infoPrint("Removing previous.txt...")
+	info("Removing previous.txt...")
 	shellCommand("Remove-Item -Force C:\\aeacus\\previous.txt")
-	infoPrint("Emptying recycle bin...")
+	if !ask("Do you want to remove cache and history files from this machine?") {
+		return
+	}
+	info("Emptying recycle bin...")
 	shellCommand("Clear-RecycleBin -Force")
-	infoPrint("Clearing recently used...")
+	info("Clearing recently used...")
 	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
-	infoPrint("Clearing run.exe command history...")
+	info("Clearing run.exe command history...")
 	clearRunScript := `$path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU"
 	$arr = (Get-Item -Path $path).Property
 	foreach($item in $arr)
@@ -157,7 +157,7 @@ func CleanUp() {
 	   }
 	}`
 	shellCommand(clearRunScript)
-	infoPrint("Removing Command History for Powershell")
+	info("Removing Command History for Powershell")
 	shellCommand("Remove-Item (Get-PSReadlineOption).HistorySavePath")
-	warnPrint("Done with automatic cleanup! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the assets directory.")
+	warn("Done with automatic cleanup! You need to remove aeacus.exe manually. The only things you need in the C:\\aeacus directory is phocus, scoring.dat, TeamID.txt, and the assets directory.")
 }
