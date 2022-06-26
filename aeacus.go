@@ -1,14 +1,10 @@
-// +build !phocus
+//go:build !phocus
 
 package main
 
 import (
-	"errors"
-	"log"
 	"os"
-	"strconv"
 
-	"github.com/elysium-suite/aeacus/cmd"
 	"github.com/urfave/cli/v2"
 )
 
@@ -21,37 +17,48 @@ import (
 //////////////////////////////////////////////////////////////////
 
 func main() {
-	cmd.FillConstants()
-	cmd.RunningPermsCheck()
 	app := &cli.App{
 		UseShortOptionHandling: true,
 		EnableBashCompletion:   true,
 		Name:                   "aeacus",
 		Usage:                  "setup and score vulnerabilities in an image",
 		Before: func(c *cli.Context) error {
-			cmd.ParseFlags(c)
+			err := determineDirectory()
+			if err != nil {
+				return err
+			}
 			return nil
 		},
 		Action: func(c *cli.Context) error {
-			cmd.CheckConfig(cmd.ScoringConf)
-			cmd.ScoreImage()
+			permsCheck()
+			readConfig()
+			scoreImage()
 			return nil
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
-				Name:    "verbose",
-				Aliases: []string{"v"},
-				Usage:   "Print extra information",
+				Name:        "verbose",
+				Aliases:     []string{"v"},
+				Usage:       "Print extra information",
+				Destination: &verboseEnabled,
 			},
 			&cli.BoolFlag{
-				Name:    "debug",
-				Aliases: []string{"d"},
-				Usage:   "Print a lot of information",
+				Name:        "debug",
+				Aliases:     []string{"d"},
+				Usage:       "Print a lot of information",
+				Destination: &debugEnabled,
 			},
 			&cli.BoolFlag{
-				Name:    "yes",
-				Aliases: []string{"y"},
-				Usage:   "Automatically answer 'yes' to any prompts",
+				Name:        "yes",
+				Aliases:     []string{"y"},
+				Usage:       "Automatically answer 'yes' to any prompts",
+				Destination: &yesEnabled,
+			},
+			&cli.StringFlag{
+				Name:        "dir",
+				Aliases:     []string{"r"},
+				Usage:       "Directory for aeacus and its files",
+				Destination: &dirPath,
 			},
 		},
 		Commands: []*cli.Command{
@@ -60,8 +67,9 @@ func main() {
 				Aliases: []string{"s"},
 				Usage:   "Score image with current scoring config",
 				Action: func(c *cli.Context) error {
-					cmd.CheckConfig(cmd.ScoringConf)
-					cmd.ScoreImage()
+					permsCheck()
+					readConfig()
+					scoreImage()
 					return nil
 				},
 			},
@@ -70,28 +78,18 @@ func main() {
 				Aliases: []string{"c"},
 				Usage:   "Check that the scoring config is valid",
 				Action: func(c *cli.Context) error {
-					cmd.CheckConfig(cmd.ScoringConf)
+					readConfig()
 					return nil
 				},
 			},
 			{
 				Name:    "readme",
 				Aliases: []string{"rd"},
-				Usage:   "Compile the readme",
+				Usage:   "Compile the README",
 				Action: func(c *cli.Context) error {
-					cmd.CheckConfig(cmd.ScoringConf)
-					cmd.GenReadMe()
-					return nil
-				},
-			},
-			{
-				Name:    "test",
-				Aliases: []string{"t"},
-				Usage:   "Score the image and render a readme",
-				Action: func(c *cli.Context) error {
-					cmd.CheckConfig(cmd.ScoringConf)
-					cmd.GenReadMe()
-					cmd.ScoreImage()
+					permsCheck()
+					readConfig()
+					genReadMe()
 					return nil
 				},
 			},
@@ -100,40 +98,23 @@ func main() {
 				Aliases: []string{"e"},
 				Usage:   "Encrypt scoring configuration",
 				Action: func(c *cli.Context) error {
-					cmd.WriteConfig(cmd.ScoringConf, cmd.ScoringData)
+					permsCheck()
+					readConfig()
+					writeConfig()
 					return nil
 				},
 			},
 			{
 				Name:    "decrypt",
 				Aliases: []string{"d"},
-				Usage:   "Check that scoring data file is valid",
+				Usage:   "Check that encrypted scoring data file is valid",
 				Action: func(c *cli.Context) error {
-					err := cmd.ReadScoringData()
-					return err
-				},
-			},
-			{
-				Name:    "forensics",
-				Aliases: []string{"f"},
-				Usage:   "Create forensic question files",
-				Action: func(c *cli.Context) error {
-					numFqs, err := strconv.Atoi(c.Args().First())
-					if err != nil {
-						return errors.New("Invalid or missing number passed to forensics")
+					permsCheck()
+					err := readScoringData()
+					if err == nil && verboseEnabled {
+						printConfig()
 					}
-					cmd.CheckConfig(cmd.ScoringConf)
-					cmd.CreateFQs(numFqs)
-					return nil
-				},
-			},
-			{
-				Name:    "configure",
-				Aliases: []string{"g"},
-				Usage:   "Launch configuration GUI",
-				Action: func(c *cli.Context) error {
-					cmd.LaunchConfigGui()
-					return nil
+					return err
 				},
 			},
 			{
@@ -141,7 +122,7 @@ func main() {
 				Aliases: []string{"p"},
 				Usage:   "Launch TeamID GUI prompt",
 				Action: func(c *cli.Context) error {
-					cmd.LaunchIDPrompt()
+					launchIDPrompt()
 					return nil
 				},
 			},
@@ -150,8 +131,9 @@ func main() {
 				Aliases: []string{"i"},
 				Usage:   "Get info about the system",
 				Action: func(c *cli.Context) error {
-					cmd.SetVerbose(true)
-					cmd.GetInfo(c.Args().Get(0))
+					permsCheck()
+					verboseEnabled = true
+					getInfo(c.Args().Get(0))
 					return nil
 				},
 			},
@@ -160,8 +142,7 @@ func main() {
 				Aliases: []string{"v"},
 				Usage:   "Print the current version of aeacus",
 				Action: func(c *cli.Context) error {
-					println("=== aeacus ===")
-					println("version " + cmd.AeacusVersion)
+					println("aeacus version " + version)
 					return nil
 				},
 			},
@@ -170,9 +151,8 @@ func main() {
 				Aliases: []string{"r"},
 				Usage:   "Prepare the image for release",
 				Action: func(c *cli.Context) error {
-					if !cmd.YesEnabled {
-						cmd.ConfirmPrint("Are you sure you want to begin the image release process?")
-					}
+					permsCheck()
+					confirm("Are you sure you want to begin the image release process?")
 					releaseImage()
 					return nil
 				},
@@ -182,7 +162,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		fail(err.Error())
 	}
 }
 
@@ -190,12 +170,13 @@ func main() {
 // writing the ReadMe/Desktop Files, installing the system service,
 // and cleaning the image for release.
 func releaseImage() {
-	cmd.CheckConfig(cmd.ScoringConf)
-	cmd.WriteConfig(cmd.ScoringConf, cmd.ScoringData)
-	cmd.GenReadMe()
-	cmd.WriteDesktopFiles()
-	cmd.ConfigureAutologin()
-	cmd.InstallFont()
-	cmd.InstallService()
-	cmd.CleanUp()
+	readConfig()
+	writeConfig()
+	genReadMe()
+	writeDesktopFiles()
+	configureAutologin()
+	installFont()
+	installService()
+	confirm("Everything is done except cleanup. Are you sure you want to continue, and remove your scoring configuration and other aeacus files?")
+	cleanUp()
 }
