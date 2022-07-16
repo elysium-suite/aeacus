@@ -137,6 +137,7 @@ func cleanUp() {
 	info("Removing scoring.conf and ReadMe.conf...")
 	shellCommand("Remove-Item -Force C:\\aeacus\\scoring.conf")
 	shellCommand("Remove-Item -Force C:\\aeacus\\ReadMe.conf")
+	shellCommand("Remove-Item -Path 'C:\\aeacus\\[R|r]*.conf' -Force")
 	info("Removing previous.txt...")
 	shellCommand("Remove-Item -Force C:\\aeacus\\previous.txt")
 	if !ask("Do you want to remove cache and history files from this machine?") {

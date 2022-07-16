@@ -62,7 +62,7 @@ func cleanUp() {
 
 	info("Removing other setup files...")
 	shellCommand("rm -rf " + dirPath + "misc/")
-	shellCommand("rm -rf " + dirPath + "ReadMe.conf")
+	shellCommand("find " + dirPath + " -name '[R|r]*.conf' -type f -delete")
 	shellCommand("rm -rf " + dirPath + "README.md")
 	shellCommand("rm -rf " + dirPath + ".git")
 	shellCommand("rm -rf " + dirPath + ".github")
