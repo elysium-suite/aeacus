@@ -358,6 +358,8 @@ func (c cond) UserDetail() (bool, error) {
 		return user.IsAdmin == lookingFor, nil
 	case "PasswordNeverExpires":
 		return user.PasswordNeverExpires == lookingFor, nil
+	case "NoChangePassword":
+		return user.NoChangePassword == lookingFor, nil
 	default:
 		fail("c.Key (" + c.Key + ") passed to userDetail is invalid.")
 		return false, errors.New("invalid detail")
