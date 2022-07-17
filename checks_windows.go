@@ -337,7 +337,7 @@ func (c cond) UserDetail() (bool, error) {
 	c.requireArgs("User", "Key", "Value")
 	c.Value = strings.TrimSpace(c.Value)
 	c.Key = strings.TrimSpace(c.Key)
-	c.Type = strings.TrimSpace(c.Type)
+	c.Modifier = strings.TrimSpace(c.Modifier)
 	lookingFor := false
 	if strings.ToLower(c.Value) == "yes" {
 		lookingFor = true
@@ -357,7 +357,7 @@ func (c cond) UserDetail() (bool, error) {
 		case "NumberOfLogons":
 			num = int(user.NumberOfLogons)
 		}
-		switch c.Type {
+		switch c.Modifier {
 		case "less":
 			return num < val, nil
 		case "greater":
@@ -375,7 +375,7 @@ func (c cond) UserDetail() (bool, error) {
 			fail("Could not parse date: \"" + c.Value + "\". Correct format is \"Monday, January 02, 2006 3:04:05 PM\"")
 			return false, err
 		}
-		switch c.Type {
+		switch c.Modifier {
 		case "before":
 			return lastLogon.Before(parse), nil
 		case "after":

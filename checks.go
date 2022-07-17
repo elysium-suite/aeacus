@@ -27,15 +27,16 @@ type check struct {
 
 // cond, or condition, is the parameters for a given test within a check.
 type cond struct {
-	Type  string
-	Path  string
-	Cmd   string
-	User  string
-	Group string
-	Name  string
-	Key   string
-	Value string
-	After string
+	Type     string
+	Path     string
+	Cmd      string
+	User     string
+	Group    string
+	Name     string
+	Key      string
+	Value    string
+	After    string
+	Modifier string
 }
 
 func (c cond) requireArgs(args ...interface{}) {
