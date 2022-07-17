@@ -337,6 +337,7 @@ func (c cond) UserDetail() (bool, error) {
 	c.requireArgs("User", "Key", "Value")
 	c.Value = strings.TrimSpace(c.Value)
 	c.Key = strings.TrimSpace(c.Key)
+	c.Type = strings.TrimSpace(c.Type)
 	lookingFor := false
 	if strings.ToLower(c.Value) == "yes" {
 		lookingFor = true
@@ -345,6 +346,45 @@ func (c cond) UserDetail() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	val, _ := strconv.Atoi(c.Value)
+	if c.Key == "PasswordAge" || c.Key == "BadPasswordCount" || c.Key == "NumberOfLogons" {
+		var num int
+		switch c.Key {
+		case "PasswordAge":
+			num = int(user.PasswordAge.Hours() / 24)
+		case "BadPasswordCount":
+			num = int(user.BadPasswordCount)
+		case "NumberOfLogons":
+			num = int(user.NumberOfLogons)
+		}
+		switch c.Type {
+		case "less":
+			return num < val, nil
+		case "greater":
+			return num > val, nil
+		default:
+			return num == val, nil
+		}
+	}
+
+	//Monday, January 02, 2006 3:04:05 PM
+	if c.Key == "LastLogon" {
+		lastLogon := user.LastLogon
+		parse, err := time.Parse(c.Value, "Monday, January 02, 2006 3:04:05 PM")
+		if err != nil {
+			fail("Could not parse date: \"" + c.Value + "\". Correct format is \"Monday, January 02, 2006 3:04:05 PM\"")
+			return false, err
+		}
+		switch c.Type {
+		case "before":
+			return lastLogon.Before(parse), nil
+		case "after":
+			return lastLogon.After(parse), nil
+		default:
+			return lastLogon.Equal(parse), nil
+		}
+	}
+
 	switch c.Key {
 	case "FullName":
 		if user.FullName == c.Value {
