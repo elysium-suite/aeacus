@@ -369,10 +369,12 @@ func (c cond) UserDetail() (bool, error) {
 
 	//Monday, January 02, 2006 3:04:05 PM
 	if c.Key == "LastLogon" {
-		lastLogon := user.LastLogon
-		parse, err := time.Parse(c.Value, "Monday, January 02, 2006 3:04:05 PM")
+		lastLogon := user.LastLogon.UTC()
+		parse, err := time.Parse("Monday, January 02, 2006 3:04:05 PM", c.Value)
+		fmt.Print(lastLogon)
+		fmt.Print(parse)
 		if err != nil {
-			fail("Could not parse date: \"" + c.Value + "\". Correct format is \"Monday, January 02, 2006 3:04:05 PM\"")
+			fail("Could not parse date: \"" + c.Value + "\". Correct format is \"Monday, January 02, 2006 3:04:05 PM\" and in UTC time.")
 			return false, err
 		}
 		switch c.Modifier {

@@ -25,7 +25,7 @@ Valid modifiers:
 >
 >`greater`: The property is greater than the `value` field.
 >
->`equal`: The property is equal to the `value` field.
+>`equal`: The property is equal to the `value` field. This is the default. (or literally any word that isn't less or greater)
 - `PasswordAge`: Number of Days (e.g. "7")
   - How old is the password?
 - `BadPasswordCount`: Number of incorrect passwords (e.g. "3")
@@ -37,5 +37,8 @@ Valid modifiers for the `LastLogonTime` property:
 > `before`: The property is before the `value` field's date.
 >
 > `after`: The property is after the `value` field's date.
+>
+> `equal`: The property is equal to the `value` field's date. This is the default. (or literally any word that isn't before or after)
 - `LastLogonTime`: Date in format: Monday, January 02, 2006 3:04:05 PM
     - If the date is not in that exact format, the check will fail.
+    - Time **must** be in UTC to pass.

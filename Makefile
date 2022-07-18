@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := all
-.SILENT: release-lin
+.SILENT: release-lin release-win release
 
 all:
 	CGO_ENABLED=0 GOOS=windows go build -ldflags '-s -w' -tags phocus -o ./phocus.exe . && \
