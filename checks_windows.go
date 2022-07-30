@@ -337,16 +337,22 @@ func (c cond) UserDetail() (bool, error) {
 	c.requireArgs("User", "Key", "Value")
 	c.Value = strings.TrimSpace(c.Value)
 	c.Key = strings.TrimSpace(c.Key)
-	c.Modifier = strings.TrimSpace(c.Modifier)
-	lookingFor := false
-	if strings.ToLower(c.Value) == "yes" {
-		lookingFor = true
+	modifier := 0
+	splitVal := c.Value
+	if strings.Contains(c.Value, "<") {
+		modifier = 1
+		splitVal = strings.Split(c.Value, "<")[1]
 	}
+	if strings.Contains(c.Value, ">") {
+		modifier = 2
+		splitVal = strings.Split(c.Value, "<")[1]
+	}
+	lookingFor := strings.ToLower(c.Value) == "yes"
 	user, err := getLocalUser(c.User)
 	if err != nil {
 		return false, err
 	}
-	val, _ := strconv.Atoi(c.Value)
+	val, _ := strconv.Atoi(splitVal)
 	if c.Key == "PasswordAge" || c.Key == "BadPasswordCount" || c.Key == "NumberOfLogons" {
 		var num int
 		switch c.Key {
@@ -357,10 +363,10 @@ func (c cond) UserDetail() (bool, error) {
 		case "NumberOfLogons":
 			num = int(user.NumberOfLogons)
 		}
-		switch c.Modifier {
-		case "less":
+		switch modifier {
+		case 1:
 			return num < val, nil
-		case "greater":
+		case 2:
 			return num > val, nil
 		default:
 			return num == val, nil
@@ -370,15 +376,15 @@ func (c cond) UserDetail() (bool, error) {
 	//Monday, January 02, 2006 3:04:05 PM
 	if c.Key == "LastLogon" {
 		lastLogon := user.LastLogon.UTC()
-		parse, err := time.Parse("Monday, January 02, 2006 3:04:05 PM", c.Value)
+		parse, err := time.Parse("Monday, January 02, 2006 3:04:05 PM", splitVal)
 		if err != nil {
 			fail("Could not parse date: \"" + c.Value + "\". Correct format is \"Monday, January 02, 2006 3:04:05 PM\" and in UTC time.")
 			return false, err
 		}
-		switch c.Modifier {
-		case "before":
+		switch modifier {
+		case 1:
 			return lastLogon.Before(parse), nil
-		case "after":
+		case 2:
 			return lastLogon.After(parse), nil
 		default:
 			return lastLogon.Equal(parse), nil

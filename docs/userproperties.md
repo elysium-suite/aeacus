@@ -19,13 +19,13 @@ These are the user properties that you would normally find the user edit dialog.
 - `NoPasswordChange`: Yes or No
   - Password cannot be changed.
 
-For these checks, the `modifier` field can be used to specify comparison.
-Valid modifiers:
->`less`: The property is less than the `value` field.
+For these checks, you can specify comparison through less, greater, and equal to through adding characters to the beginning of the value field.
+This character **must** be added as the first character of the value field, as shown below.
+>`<[value]`: The property is less than the `value` field.
 >
->`greater`: The property is greater than the `value` field.
+>`>[value]`: The property is greater than the `value` field.
 >
->`equal`: The property is equal to the `value` field. This is the default. (or literally any word that isn't less or greater)
+>`[value]`: The property is equal to the `value` field. This is the default.
 - `PasswordAge`: Number of Days (e.g. "7")
   - How old is the password?
 - `BadPasswordCount`: Number of incorrect passwords (e.g. "3")
@@ -33,12 +33,12 @@ Valid modifiers:
 - `NumberOfLogons`: Number of total logons (e.g. "4")
   - How many times has the user logged on?
 
-Valid modifiers for the `LastLogonTime` property:
-> `before`: The property is before the `value` field's date.
+For the `LastLogonTime` property:
+> `<[value]`: The property is before the `value` field's date.
 >
-> `after`: The property is after the `value` field's date.
+> `>[value]`: The property is after the `value` field's date.
 >
-> `equal`: The property is equal to the `value` field's date. This is the default. (or literally any word that isn't before or after)
+> `[value]`: The property is equal to the `value` field's date. This is the default.
 - `LastLogonTime`: Date in format: Monday, January 02, 2006 3:04:05 PM
     - If the date is not in that exact format, the check will fail.
     - Time **must** be in UTC to pass.
