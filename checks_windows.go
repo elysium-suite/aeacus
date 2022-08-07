@@ -337,14 +337,78 @@ func (c cond) UserDetail() (bool, error) {
 	c.requireArgs("User", "Key", "Value")
 	c.Value = strings.TrimSpace(c.Value)
 	c.Key = strings.TrimSpace(c.Key)
-	lookingFor := false
-	if strings.ToLower(c.Value) == "yes" {
-		lookingFor = true
-	}
+	splitVal := c.Value
+	lookingFor := strings.ToLower(c.Value) == "yes"
 	user, err := getLocalUser(c.User)
 	if err != nil {
 		return false, err
 	}
+	if c.Key == "PasswordAge" || c.Key == "BadPasswordCount" || c.Key == "NumberOfLogons" {
+		var num int
+		switch c.Key {
+		case "PasswordAge":
+			num = int(user.PasswordAge.Hours() / 24)
+		case "BadPasswordCount":
+			num = int(user.BadPasswordCount)
+		case "NumberOfLogons":
+			num = int(user.NumberOfLogons)
+		}
+		if len(c.Value) < 1 {
+			fail("Invalid value input:", c.Value)
+			return false, errors.New("invalid c.Value range")
+		}
+		var val int
+		switch c.Value[0] {
+		case '<':
+			splitVal = strings.Split(c.Value, "<")[1]
+			val, err = strconv.Atoi(splitVal)
+			if err == nil {
+				return num < val, nil
+			}
+		case '>':
+			splitVal = strings.Split(c.Value, ">")[1]
+			val, err = strconv.Atoi(splitVal)
+			if err == nil {
+				return num > val, nil
+			}
+		default:
+			val, err = strconv.Atoi(splitVal)
+			if err == nil {
+				return num == val, nil
+			}
+
+		}
+		fail("c.Value not an integer:", val)
+		return false, err
+	}
+
+	//Monday, January 02, 2006 3:04:05 PM
+	if c.Key == "LastLogon" {
+		lastLogon := user.LastLogon.UTC()
+		var timeComparison func(time.Time) bool
+		var timeString string
+		if len(c.Value) < 2 {
+			fail("Could not parse date: \"" + c.Value + "\". Correct format is \"Monday, January 02, 2006 3:04:05 PM\" and in UTC time.")
+			return false, errors.New("invalid c.Value date")
+		}
+		switch c.Value[0] {
+		case '<':
+			timeString = strings.Split(c.Value, "<")[1]
+			timeComparison = lastLogon.Before
+		case '>':
+			timeString = strings.Split(c.Value, ">")[1]
+			timeComparison = lastLogon.After
+		default:
+			timeComparison = lastLogon.Equal
+		}
+		parse, err := time.Parse("Monday, January 02, 2006 3:04:05 PM", timeString)
+		if err != nil {
+			fail("Could not parse date: \"" + c.Value + "\". Correct format is \"Monday, January 02, 2006 3:04:05 PM\" and in UTC time.")
+			return false, err
+		}
+		return timeComparison(parse), nil
+	}
+
 	switch c.Key {
 	case "FullName":
 		if user.FullName == c.Value {

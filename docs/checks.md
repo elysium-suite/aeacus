@@ -320,6 +320,15 @@ value = 'No'
 
 > See [here](userproperties.md) for all `UserDetail` properties.
 
+> **Note!** For non-boolean details, you can use modifiers in the value field to specify the comparison.
+> This is specified in the above property document.
+```
+type = 'UserDetail'
+user = 'Administrator'
+key = 'PasswordAge'
+value = '>90'
+```
+
 
 **UserRights**: pass if specified user or group has specified privilege
 
