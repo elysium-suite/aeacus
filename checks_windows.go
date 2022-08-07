@@ -361,20 +361,20 @@ func (c cond) UserDetail() (bool, error) {
 		case '<':
 			splitVal = strings.Split(c.Value, "<")[1]
 			val, err := strconv.Atoi(splitVal)
-			if err != nil {
+			if err == nil {
 				return num < val, nil
 			}
 			fail("c.Value not an integer:", val)
 		case '>':
 			splitVal = strings.Split(c.Value, ">")[1]
 			val, err := strconv.Atoi(splitVal)
-			if err != nil {
+			if err == nil {
 				return num > val, nil
 			}
 			fail("c.Value not an integer:", val)
 		default:
 			val, err := strconv.Atoi(splitVal)
-			if err != nil {
+			if err == nil {
 				return num == val, nil
 			}
 			fail("c.Value not an integer:", val)
