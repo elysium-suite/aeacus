@@ -320,14 +320,13 @@ value = 'No'
 
 > See [here](userproperties.md) for all `UserDetail` properties.
 
-> **Note!** For non-boolean details, you can use the "modifier" field to specify the comparison.
+> **Note!** For non-boolean details, you can use modifiers in the value field to specify the comparison.
 > This is specified in the above property document.
 ```
 type = 'UserDetail'
 user = 'Administrator'
 key = 'PasswordAge'
-value = '90'
-modifier = 'greater'
+value = '>90'
 ```
 
 
