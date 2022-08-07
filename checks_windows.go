@@ -357,28 +357,29 @@ func (c cond) UserDetail() (bool, error) {
 			fail("Invalid value input:", c.Value)
 			return false, errors.New("invalid c.Value range")
 		}
+		var val int
 		switch c.Value[0] {
 		case '<':
 			splitVal = strings.Split(c.Value, "<")[1]
-			val, err := strconv.Atoi(splitVal)
+			val, err = strconv.Atoi(splitVal)
 			if err == nil {
 				return num < val, nil
 			}
-			fail("c.Value not an integer:", val)
 		case '>':
 			splitVal = strings.Split(c.Value, ">")[1]
-			val, err := strconv.Atoi(splitVal)
+			val, err = strconv.Atoi(splitVal)
 			if err == nil {
 				return num > val, nil
 			}
-			fail("c.Value not an integer:", val)
 		default:
-			val, err := strconv.Atoi(splitVal)
+			val, err = strconv.Atoi(splitVal)
 			if err == nil {
 				return num == val, nil
 			}
-			fail("c.Value not an integer:", val)
+
 		}
+		fail("c.Value not an integer:", val)
+		return false, err
 	}
 
 	//Monday, January 02, 2006 3:04:05 PM
