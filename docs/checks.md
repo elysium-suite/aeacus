@@ -238,7 +238,7 @@ name = 'Domain'
 value = 'Allow'
 key = 'Inbound'
 ```
-> Valid "name" (profile) values are: Domain, Public, Private, All
+> Valid "name" (profile) values are: Domain, Public, Private
 >
 > Valid "value" (behavior) values are: Allow, Block
 >

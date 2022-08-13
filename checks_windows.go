@@ -57,8 +57,6 @@ func (c cond) FirewallDefaultBehavior() (bool, error) {
 		profile = wapi.NET_FW_PROFILE2_PRIVATE
 	case "public":
 		profile = wapi.NET_FW_PROFILE2_PUBLIC
-	case "all":
-		profile = wapi.NET_FW_PROFILE2_ALL
 	default:
 		fail("Unknown firewall profile: '" + c.Name + "'")
 		return false, nil
