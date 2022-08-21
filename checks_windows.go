@@ -59,7 +59,7 @@ func (c cond) FirewallDefaultBehavior() (bool, error) {
 		profile = wapi.NET_FW_PROFILE2_PUBLIC
 	default:
 		fail("Unknown firewall profile: '" + c.Name + "'")
-		return false, nil
+		return false, errors.New("Unknown firewall profile: " + c.Name)
 	}
 	switch strings.ToLower(c.Value) {
 	case "allow":
@@ -68,7 +68,7 @@ func (c cond) FirewallDefaultBehavior() (bool, error) {
 		behavior = wapi.NET_FW_ACTION_BLOCK
 	default:
 		fail("Unknown firewall action: '" + c.Value + "'")
-		return false, nil
+		return false, errors.New("Unknown firewall action: " + c.Value)
 	}
 	switch strings.ToLower(c.Key) {
 	case "inbound":
@@ -79,7 +79,7 @@ func (c cond) FirewallDefaultBehavior() (bool, error) {
 		return action == behavior, err
 	default:
 		fail("Unknown firewall direction: '" + c.Key + "'")
-		return false, nil
+		return false, errors.New("Unknown firewall direction: " + c.Key)
 	}
 }
 
