@@ -63,6 +63,8 @@ github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpO
 github.com/iamacarpet/go-win64api v0.0.0-20210311141720-fe38760bed28/go.mod h1:oGJx9dz0Ny7HC7U55RZ0Smd6N9p3hXP/+hOFtuYrAxM=
 github.com/iamacarpet/go-win64api v0.0.0-20220314100901-d3a958911279 h1:T1atnl3wZ5m6SaVM7qimhKUKwRcjdloacML8KPftQxA=
 github.com/iamacarpet/go-win64api v0.0.0-20220314100901-d3a958911279/go.mod h1:B7zFQPAznj+ujXel5X+LUoK3LgY6VboCdVYHZNn7gpg=
+github.com/iamacarpet/go-win64api v0.0.0-20220720120512-241a9064deec h1:y9s6kHAovwyzFLhemqf99/gG1fLTmd8LpyQEMlasj/A=
+github.com/iamacarpet/go-win64api v0.0.0-20220720120512-241a9064deec/go.mod h1:B7zFQPAznj+ujXel5X+LUoK3LgY6VboCdVYHZNn7gpg=
 github.com/judwhite/go-svc v1.2.1 h1:a7fsJzYUa33sfDJRF2N/WXhA+LonCEEY8BJb1tuS5tA=
 github.com/judwhite/go-svc v1.2.1/go.mod h1:mo/P2JNX8C07ywpP9YtO2gnBgnUiFTHqtsZekJrUuTk=
 github.com/mattn/go-colorable v0.1.9 h1:sqDoxXbdeALODt0DAeJCVp38ps9ZogZEAXjus69YV3U=

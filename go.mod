@@ -9,7 +9,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/gen2brain/beeep v0.0.0-20210529141713-5586760f0cc1
 	github.com/gorilla/websocket v1.5.0
-	github.com/iamacarpet/go-win64api v0.0.0-20220314100901-d3a958911279
+	github.com/iamacarpet/go-win64api v0.0.0-20220720120512-241a9064deec
 	github.com/judwhite/go-svc v1.2.1
 	github.com/urfave/cli/v2 v2.4.0
 	golang.org/x/sys v0.0.0-20220315194320-039c03cc5b86
