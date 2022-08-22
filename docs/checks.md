@@ -230,6 +230,22 @@ name = 'BUILTIN\Administrators'
 
 > Get owner of the file using PowerShell: `(Get-Acl [FILENAME]).Owner`
 
+**FirewallDefaultBehavior**: pass if the firewall profile's default behavior is set to the specified value
+
+```
+type = 'FirewallDefaultBehavior'
+name = 'Domain'
+value = 'Allow'
+key = 'Inbound'
+```
+> Valid "name" (profile) values are: Domain, Public, Private
+>
+> Valid "value" (behavior) values are: Allow, Block
+>
+> Valid "key" (direction) values are: Inbound, Outbound
+
+
+
 **PasswordChanged**: pass if user password has changed after the specified date
 
 ```

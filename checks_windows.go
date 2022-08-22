@@ -46,6 +46,43 @@ func (c cond) FirewallUp() (bool, error) {
 	return true, nil
 }
 
+func (c cond) FirewallDefaultBehavior() (bool, error) {
+	c.requireArgs("Name", "Key", "Value")
+	var profile int32
+	var behavior int32
+	switch strings.ToLower(c.Name) {
+	case "domain":
+		profile = wapi.NET_FW_PROFILE2_DOMAIN
+	case "private":
+		profile = wapi.NET_FW_PROFILE2_PRIVATE
+	case "public":
+		profile = wapi.NET_FW_PROFILE2_PUBLIC
+	default:
+		fail("Unknown firewall profile: '" + c.Name + "'")
+		return false, errors.New("Unknown firewall profile: " + c.Name)
+	}
+	switch strings.ToLower(c.Value) {
+	case "allow":
+		behavior = wapi.NET_FW_ACTION_ALLOW
+	case "block":
+		behavior = wapi.NET_FW_ACTION_BLOCK
+	default:
+		fail("Unknown firewall action: '" + c.Value + "'")
+		return false, errors.New("Unknown firewall action: " + c.Value)
+	}
+	switch strings.ToLower(c.Key) {
+	case "inbound":
+		action, err := wapi.FirewallGetDefaultInboundAction(profile)
+		return action == behavior, err
+	case "outbound":
+		action, err := wapi.FirewallGetDefaultOutboundAction(profile)
+		return action == behavior, err
+	default:
+		fail("Unknown firewall direction: '" + c.Key + "'")
+		return false, errors.New("Unknown firewall direction: " + c.Key)
+	}
+}
+
 // PasswordChanged checks if the password for a given user was changed more
 // recently than specified. The date format output by this command is:
 //     Monday, January 02, 2006 3:04:05 PM
