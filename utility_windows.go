@@ -105,7 +105,9 @@ func playAudio(wavPath string) {
 }
 
 // adminCheck (Windows) will attempt to open:
-//     \\.\PHYSICALDRIVE0
+//
+//	\\.\PHYSICALDRIVE0
+//
 // and will return true if this succeeds, which means the process is running
 // as Administrator.
 func adminCheck() bool {
@@ -128,14 +130,18 @@ func localUserToSid(userName string) (string, error) {
 }
 
 // getSecedit returns the string value of the secedit.exe command:
-//     secedit.exe /export
+//
+//	secedit.exe /export
+//
 // which contains security policy options that can't be found in the registry.
 func getSecedit() (string, error) {
 	return shellCommandOutput("secedit.exe /export /cfg sec.cfg /log NUL; Get-Content sec.cfg; Remove-Item sec.cfg")
 }
 
 // getNetUserInfo returns the string output from the command:
-//     net user {username}
+//
+//	net user {username}
+//
 // in order to get user properties and details.
 func getNetUserInfo(userName string) (string, error) {
 	return shellCommandOutput("net user " + userName)

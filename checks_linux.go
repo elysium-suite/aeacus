@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -89,10 +88,22 @@ func (c cond) PermissionIs() (bool, error) {
 		return false, err
 	}
 
-	perm := fmt.Sprint(f.Mode().Perm())
-	if len(perm) != 10 {
-		fail("System permission string is wrong length:", perm)
+	fileMode := f.Mode()
+	modeBytes := []byte(fileMode.String())
+	if len(modeBytes) != 10 {
+		fail("System permission string is wrong length:", string(modeBytes))
 		return false, errors.New("Invalid system permission string")
+	}
+
+	// Permission string includes suid/sgid as the special bit (MSB), while
+	// GNU coreutils replaces the executable bit, which we need to emulate.
+	if fileMode&os.ModeSetuid != 0 {
+		modeBytes[0] = '-'
+		modeBytes[3] = 's'
+	}
+	if fileMode&os.ModeSetgid != 0 {
+		modeBytes[0] = '-'
+		modeBytes[6] = 's'
 	}
 
 	c.Value = strings.TrimSpace(c.Value)
@@ -107,7 +118,7 @@ func (c cond) PermissionIs() (bool, error) {
 		if c.Value[i] == '?' {
 			continue
 		}
-		if c.Value[i] != perm[i] {
+		if c.Value[i] != modeBytes[i] {
 			return false, nil
 		}
 	}

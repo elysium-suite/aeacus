@@ -85,7 +85,9 @@ func (c cond) FirewallDefaultBehavior() (bool, error) {
 
 // PasswordChanged checks if the password for a given user was changed more
 // recently than specified. The date format output by this command is:
-//     Monday, January 02, 2006 3:04:05 PM
+//
+//	Monday, January 02, 2006 3:04:05 PM
+//
 // Which somehow manages to defy every common date format. Thanks, Windows.
 func (c cond) PasswordChanged() (bool, error) {
 	c.requireArgs("User", "After")

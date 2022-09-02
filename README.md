@@ -234,6 +234,14 @@ Print information with `./aeacus info type` where `type` is one the following (N
 ``` bash
 while true; do ./aeacus -v; sleep 20; done
 ```
+-   Set all .desktop files as launchable on Ubuntu+GNOME:
+```bash
+for i in $HOME/Desktop/*.desktop; do
+    # Try "yes" rather than true on Ubuntu <20
+    gio set "$i" "metadata::trusted" true
+    chmod +x "$i"
+done
+```
 
 ## Contributing and Disclaimer
 
