@@ -2,15 +2,17 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
+	"unsafe"
 
+	"github.com/DataDog/datadog-agent/pkg/util/winutil"
 	"github.com/gen2brain/beeep"
 	wapi "github.com/iamacarpet/go-win64api"
 	"github.com/iamacarpet/go-win64api/shared"
+	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -227,4 +229,74 @@ func getLocalServiceStatus(serviceName string) (shared.Service, error) {
 	}
 	fail(`Specified service '` + serviceName + `' was not found on the system`)
 	return serviceStatusData, err
+}
+
+func getFileAccess(mask uint32) string {
+	var ret []string
+
+	if mask == 0x1f01ff {
+		ret = append(ret, "FullControl")
+	} else if mask == 0x1301bf {
+		ret = append(ret, "Modify")
+	} else {
+		if mask&windows.FILE_WRITE_ATTRIBUTES != 0 {
+			ret = append(ret, "Write")
+		}
+		if mask&windows.FILE_READ_ATTRIBUTES != 0 {
+			if mask&0x000020 != 0 {
+				ret = append(ret, "ReadAndExecute")
+			} else {
+				ret = append(ret, "Read")
+			}
+		}
+	}
+	return strings.Join(ret, ", ")
+}
+
+func getFileRights(filePath, username string) (map[string]string, error) {
+
+	userSID, _, _, err := windows.LookupSID("", username)
+
+	if err != nil {
+		return nil, errors.Wrapf(err, "acl: failed to lookup sid for user '%s'", username)
+	}
+
+	ret := map[string]string{}
+
+	var fileDACL *winutil.Acl
+	if err := winutil.GetNamedSecurityInfo(filePath,
+		winutil.SE_FILE_OBJECT,
+		winutil.DACL_SECURITY_INFORMATION,
+		nil,
+		nil,
+		&fileDACL,
+		nil,
+		nil); err != nil {
+		return nil, errors.Wrapf(err, "acl: failed to get security info for '%s' ", filePath)
+	}
+
+	var aclSizeInfo winutil.AclSizeInformation
+	if err := winutil.GetAclInformation(fileDACL, &aclSizeInfo, winutil.AclSizeInformationEnum); err != nil {
+		return nil, errors.Wrapf(err, "acl: failed to get acl size info for '%s' ", filePath)
+	}
+
+	for i := uint32(0); i < aclSizeInfo.AceCount; i++ {
+		var pACE *winutil.AccessAllowedAce
+		if err := winutil.GetAce(fileDACL, i, &pACE); err != nil {
+			return nil, errors.Wrapf(err, "acl: failed to get acl for '%s' ", filePath)
+		}
+		// update
+		sid := (*windows.SID)(unsafe.Pointer(&pACE.SidStart))
+		if strings.EqualFold(userSID.String(), sid.String()) {
+			ret["identityreference"] = username
+			if pACE.AceType == winutil.ACCESS_DENIED_ACE_TYPE {
+				ret["accesscontroltype"] = "Deny"
+			}
+			if pACE.AceType == winutil.ACCESS_ALLOWED_ACE_TYPE {
+				ret["accesscontroltype"] = "Allow"
+			}
+			ret["filesystemrights"] = getFileAccess(pACE.AccessMask)
+		}
+	}
+	return ret, nil
 }

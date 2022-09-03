@@ -288,6 +288,7 @@ type = 'ScheduledTaskExists'
 name = 'Disk Cleanup'
 ```
 
+<<<<<<< HEAD
 **SecurityPolicy**: pass if key is within the bounds for value
 
 ```
@@ -368,3 +369,18 @@ name = 'SMB1Protocol'
 ```
 
 > **Note:** Use the PowerShell tool `Get-WindowsOptionalFeature -Online` to find the feature you want!
+=======
+> Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
+
+
+**FilePermission**: pass if specified user has specified permission on 
+
+```
+type='FilePermission'
+arg1='C:\test.txt'
+arg2='BUILTIN\Administrators'
+arg3='FullControl'
+```
+
+> Get a users permission of the file using `(Get-Acl [FILENAME]).Access`.
+>>>>>>> dolphin/add-filePermission-check
