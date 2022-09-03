@@ -62,7 +62,7 @@
 -   Image preparation (cleanup, README, etc)
 -   Remote score reporting
 
-> Note: `aeacus` ships with weak crypto on purpose. You should implement your own crypto functions if you want to make it harder to crack. See [Adding Crypto](/docs/crypto.md) for more information.
+> Note: `aeacus` ships with weak crypto on purpose. You should implement your own crypto functions if you want to make it harder to crack with static analysis. See [Adding Crypto](/docs/crypto.md) for more information.
 
 ## Compiling
 

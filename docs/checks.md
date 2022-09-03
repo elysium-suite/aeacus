@@ -105,26 +105,55 @@ type = 'PathExists'
 path = 'C:\importantfolder\'
 ```
 
-> **Note!**: Please use absolute paths (rather than relative) for safety and specificity.
+**PermissionIs**: pass if specified user has specified permission on a given file
+
+For Linux, use the standard octal `rwx` format (`ls -la yourfile` will show them). Use question marks to omit bits you don't care about.
+
+```
+type = 'PermissionIs'
+path = '/etc/shadow
+value = 'rw-rw----'
+```
+
+For example, this one checks that /bin/bash is not SUID and not world writable at the same time:
+
+```
+type = 'PermissionIsNot'
+path = '/bin/bash'
+value = '???s????w?'
+```
+
+For Windows, get a users permission of the file using `(Get-Acl [FILENAME]).Access`.
+
+```
+type = 'FilePermission'
+path = 'C:\test.txt'
+name = 'BUILTIN\Administrators'
+value = 'FullControl'
+```
+
+> **Note!**: Use absolute paths when possible (rather than relative) for more reliable scoring.
 
 **ProgramInstalled**: pass if program is installed. On Linux, will use `dpkg`, and on Windows, checks if any installed programs contain your program string.
 
 ```
 type = 'ProgramInstalled'
 name = 'Mozilla Firefox 75 (x64 en-US)'
-
 ```
 
 **ProgramVersion**: pass if a program meets the version requirements
 
-For Linux, get version from `dpkg -s programnamehere`
+For Linux, get version from `dpkg -s programnamehere`.
+
 ```
 type = 'ProgramVersion'
 name = 'Firefox'
 value = '88.0.1+build1-0ubuntu0.20.04.2'
 ```
+> Only works for `dpkg` based distributions (such as Debian and Ubuntu).
 
-For Windows, get versions from `.\aeacus.exe info programs`
+For Windows, get versions from `.\aeacus.exe info programs`.
+
 ```
 # Checks version on first matching substring. E.g., for program name 'Ace',
 # it may match on 'Ace Of Spades' rather than 'Ace Ventura'. Make your program
@@ -204,23 +233,6 @@ value = '5.4.0-42-generic'
 
 > Tip: Check your `KernelVersion` with `uname -r`. This check performs the `uname` syscall.
 
-> Only works for standard `apt` installs.
-
-
-**PermissionIs**: pass if the specified file has octal permissions specified. Use question marks to omit bits you don't care about.
-
-```
-type = 'PermissionIs'
-path = '/etc/shadow
-value = 'rw-rw----'
-```
-
-For example, this one checks that /bin/bash is not SUID and not world writable at the same time:
-```
-type = 'PermissionIsNot'
-path = '/bin/bash'
-value = '???s????w?'
-```
 
 <hr>
 
@@ -242,6 +254,7 @@ name = 'BUILTIN\Administrators'
 ```
 
 > Get owner of the file using PowerShell: `(Get-Acl [FILENAME]).Owner`
+
 
 **FirewallDefaultBehavior**: pass if the firewall profile's default behavior is set to the specified value
 
@@ -288,7 +301,6 @@ type = 'ScheduledTaskExists'
 name = 'Disk Cleanup'
 ```
 
-<<<<<<< HEAD
 **SecurityPolicy**: pass if key is within the bounds for value
 
 ```
@@ -369,18 +381,3 @@ name = 'SMB1Protocol'
 ```
 
 > **Note:** Use the PowerShell tool `Get-WindowsOptionalFeature -Online` to find the feature you want!
-=======
-> Get owner of the file using `(Get-Acl [FILENAME]).Owner`.
-
-
-**FilePermission**: pass if specified user has specified permission on 
-
-```
-type='FilePermission'
-arg1='C:\test.txt'
-arg2='BUILTIN\Administrators'
-arg3='FullControl'
-```
-
-> Get a users permission of the file using `(Get-Acl [FILENAME]).Access`.
->>>>>>> dolphin/add-filePermission-check

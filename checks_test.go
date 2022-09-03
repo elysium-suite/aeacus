@@ -30,21 +30,6 @@ func TestCommandContains(t *testing.T) {
 	if err != nil || out != false {
 		t.Error(c, "failed:", out, err)
 	}
-
-	// Should fail: command execution fails
-	c.Value = ""
-	c.Cmd = "commanddoesntexist"
-	out, err = c.CommandContains()
-	if err == nil || out != true {
-		t.Error(c, "failed:", out, err)
-	}
-
-	// Should fail: command returns error
-	c.Cmd = "cat /etc/file/doesnt/exist"
-	out, err = c.CommandContains()
-	if err == nil || out != true {
-		t.Error(c, "failed:", out, err)
-	}
 }
 
 func TestCommandOutput(t *testing.T) {
@@ -70,21 +55,6 @@ func TestCommandOutput(t *testing.T) {
 	c.Value = "bye"
 	out, err = c.CommandOutput()
 	if err != nil || out != false {
-		t.Error(c, "failed:", out, err)
-	}
-
-	// Should fail: command execution fails
-	c.Value = ""
-	c.Cmd = "commanddoesntexist"
-	out, err = c.CommandOutput()
-	if err == nil || out != true {
-		t.Error(c, "failed:", out, err)
-	}
-
-	// Should fail: command returns error
-	c.Cmd = "cat /etc/file/doesnt/exist"
-	out, err = c.CommandOutput()
-	if err == nil || out != true {
 		t.Error(c, "failed:", out, err)
 	}
 }

@@ -86,12 +86,12 @@ func (c cond) FirewallDefaultBehavior() (bool, error) {
 // PasswordChanged checks if the password for a given user was changed more
 // recently than specified. The date format output by this command is:
 //
-//	Monday, January 02, 2006 3:04:05 PM
+//	Monday, January 2, 2006 3:04:05 PM
 //
 // Which somehow manages to defy every common date format. Thanks, Windows.
 func (c cond) PasswordChanged() (bool, error) {
 	c.requireArgs("User", "After")
-	timeStr := "Monday, January 02, 2006 3:04:05 PM"
+	timeStr := "Monday, January 2, 2006 3:04:05 PM"
 	configDate, err := time.Parse(timeStr, strings.TrimSpace(c.After))
 	if err != nil {
 		return false, err
@@ -105,6 +105,17 @@ func (c cond) PasswordChanged() (bool, error) {
 		return false, err
 	}
 	return changeDate.After(configDate), nil
+}
+
+func (c cond) PermissionIs() (bool, error) {
+	c.requireArgs("Path", "Name", "Value")
+	permissions, err := getFileRights(c.Path, c.Name)
+	if err != nil {
+		return false, err
+	}
+	rights := permissions["filesystemrights"]
+	access := permissions["accesscontroltype"]
+	return strings.Contains(rights, c.Value) && !strings.EqualFold(access, "Deny"), nil
 }
 
 func (c cond) ProgramInstalled() (bool, error) {

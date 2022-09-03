@@ -231,7 +231,7 @@ func getLocalServiceStatus(serviceName string) (shared.Service, error) {
 	return serviceStatusData, err
 }
 
-func getFileAccess(mask uint32) string {
+func getFileAccessFromMask(mask uint32) string {
 	var ret []string
 
 	if mask == 0x1f01ff {
@@ -263,6 +263,7 @@ func getFileRights(filePath, username string) (map[string]string, error) {
 
 	ret := map[string]string{}
 
+	// Partially adopted from https://github.com/DataDog/datadog-agent
 	var fileDACL *winutil.Acl
 	if err := winutil.GetNamedSecurityInfo(filePath,
 		winutil.SE_FILE_OBJECT,
@@ -285,7 +286,7 @@ func getFileRights(filePath, username string) (map[string]string, error) {
 		if err := winutil.GetAce(fileDACL, i, &pACE); err != nil {
 			return nil, errors.Wrapf(err, "acl: failed to get acl for '%s' ", filePath)
 		}
-		// update
+
 		sid := (*windows.SID)(unsafe.Pointer(&pACE.SidStart))
 		if strings.EqualFold(userSID.String(), sid.String()) {
 			ret["identityreference"] = username
@@ -295,7 +296,7 @@ func getFileRights(filePath, username string) (map[string]string, error) {
 			if pACE.AceType == winutil.ACCESS_ALLOWED_ACE_TYPE {
 				ret["accesscontroltype"] = "Allow"
 			}
-			ret["filesystemrights"] = getFileAccess(pACE.AccessMask)
+			ret["filesystemrights"] = getFileAccessFromMask(pACE.AccessMask)
 		}
 	}
 	return ret, nil
