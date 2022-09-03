@@ -71,6 +71,27 @@ type = 'FirewallUp'
 
 > **Note**: On Linux, only `ufw` is supported (checks `/etc/ufw/ufw.conf`). On Window, this passes if all three Windows Firewall profiles are active.
 
+**PasswordChanged**: pass if user password has changed
+
+For Linux, check if user's password hash is not next to their username in `/etc/shadow`. If you don't use the whole hash, make sure you start it from the beginning (typically `$X$...` where X is a number).
+
+```
+type = 'PasswordChanged'
+user = 'bob'
+value = '$6$BgBsRlajjwVOoQCY$rw5WBSha4nkpynzfCzc3yYkV1OyDhr.ELoJOPpidwZoygUzRFBFSrtE3fyP0ITubCwN9Bb9DUqVV3mzTHL8sw/'
+```
+
+> This check will never pass if the user does not exist, so don't use this with users that should be removed.
+
+For Windows, check if password was changed after the specified date:
+
+```
+type = 'PasswordChanged'
+user = 'username'
+after = 'Monday, January 02, 2006 3:04:05 PM'
+```
+
+> You should take the value from `(Get-LocalUser <USERNAME>).PasswordLastSet` and use it as `after`. This check will never pass if the user does not exist, so don't use this with users that should be removed.
 
 **PathExists**: pass if specified path exists. This works for both files AND folders (directories).
 
@@ -96,15 +117,15 @@ name = 'Mozilla Firefox 75 (x64 en-US)'
 
 **ProgramVersion**: pass if a program meets the version requirements
 
+For Linux, get version from `dpkg -s programnamehere`
 ```
-# Linux: get version from dpkg -s programhere
 type = 'ProgramVersion'
 name = 'Firefox'
 value = '88.0.1+build1-0ubuntu0.20.04.2'
 ```
 
+For Windows, get versions from `.\aeacus.exe info programs`
 ```
-# Windows: get versions from .\aeacus.exe info programs
 # Checks version on first matching substring. E.g., for program name 'Ace',
 # it may match on 'Ace Of Spades' rather than 'Ace Ventura'. Make your program
 # name as detailed as possible.
@@ -119,19 +140,20 @@ value = '95.0.1'
 
 **ServiceUp**: pass if service is running
 
+For Linux, use the `systemd` service name.
 ```
 type = 'ServiceUp'
 name = 'sshd'
 ```
 
+For Windows: check the service 'Properties' to find the real service name
 ```
-# Windows: check the service 'Properties' to find the real service name
 type = 'ServiceUp'
 name = 'tapisrv' # this is telephony
 
 ```
 
-> For services, Linux uses `systemctl`, Windows uses `Get-Service`
+> For services, Linux uses `systemctl`, Windows uses `Get-Service`. If you are using a different init system on Linux, you can use a `Command` check.
 
 **UserExists**: pass if user exists on system
 
@@ -184,15 +206,6 @@ value = '5.4.0-42-generic'
 
 > Only works for standard `apt` installs.
 
-**PasswordChanged**: pass if user's password hash is not next to their username in `/etc/shadow`. If you don't use the whole hash, make sure you start it from the beginning (typically `$X$...` where X is a number).
-
-```
-type = 'PasswordChanged'
-user = 'bob'
-value = '$6$BgBsRlajjwVOoQCY$rw5WBSha4nkpynzfCzc3yYkV1OyDhr.ELoJOPpidwZoygUzRFBFSrtE3fyP0ITubCwN9Bb9DUqVV3mzTHL8sw/'
-```
-
-> This check will never pass if the user does not exist, so don't use this with users that should be removed.
 
 **PermissionIs**: pass if the specified file has octal permissions specified. Use question marks to omit bits you don't care about.
 
@@ -202,11 +215,11 @@ path = '/etc/shadow
 value = 'rw-rw----'
 ```
 
-For example, this one checks that /bin/bash is not SUID and not world writable:
+For example, this one checks that /bin/bash is not SUID and not world writable at the same time:
 ```
 type = 'PermissionIsNot'
 path = '/bin/bash'
-value = 's???????w?'
+value = '???s????w?'
 ```
 
 <hr>
@@ -244,16 +257,6 @@ key = 'Inbound'
 >
 > Valid "key" (direction) values are: Inbound, Outbound
 
-
-
-**PasswordChanged**: pass if user password has changed after the specified date
-
-```
-type = 'PasswordChanged'
-user = 'username'
-after = 'Monday, January 02, 2006 3:04:05 PM'
-```
-> You should take the value from `(Get-LocalUser <USERNAME>).PasswordLastSet` and use it as `after`. This check will never pass if the user does not exist, so don't use this with users that should be removed.
 
 **RegistryKey**: pass if key is equal to value
 
