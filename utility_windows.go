@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"os/user"
 	"strings"
 	"unsafe"
 
@@ -266,11 +265,11 @@ func getFileOwner(path string) (string, error) {
 		nil); err != nil {
 		return "", errors.Wrapf(err, "acl: failed to get security info for '%s' ", path)
 	}
-	var ownerUser, err = user.LookupId(sid.String())
+	var ownerAccount, _, _, err = sid.LookupAccount("")
 	if err != nil {
-		return "", errors.Wrapf(err, "Failed to find user for SID '%s'", sid.String())
+		return "", errors.Wrapf(err, "Failed to find account for SID '%s'", sid.String())
 	}
-	return ownerUser.Username, nil
+	return ownerAccount, nil
 }
 
 func getFileRights(filePath, username string) (map[string]string, error) {
