@@ -68,7 +68,6 @@ func (c cond) requireArgs(args ...interface{}) {
 		} else if v.Field(i).String() != "" {
 			warn(c.Type+":", "specifying unnecessary argument '"+vType.Field(i).Name+"'")
 		}
-
 	}
 }
 
@@ -125,6 +124,11 @@ func runCheck(cond cond) bool {
 	}
 
 	debug("Result is", result, "and error is", err)
+
+	if verboseEnabled && !err.IsNil() {
+		warn(condFunc, "returned an error:", err)
+	}
+	
 	return err.IsNil() && result
 }
 
@@ -164,8 +168,7 @@ func (c cond) DirContains() (bool, error) {
 			files = append(files, path)
 		}
 		if len(files) > 10000 {
-			fail("Recursive indexing has exceeded limit, erroring out.")
-			return errors.New("Indexed too many files in recursive search")
+			return errors.New("attempted to index too many files in recursive search")
 		}
 		return nil
 	})
@@ -206,7 +209,6 @@ func (c cond) FileContains() (bool, error) {
 	for _, line := range strings.Split(fileContent, "\n") {
 		found, err = regexp.Match(c.Value, []byte(line))
 		if err != nil {
-			fail("There's an error with your regular expression for FileContains: " + err.Error())
 			return false, err
 		}
 		if found {

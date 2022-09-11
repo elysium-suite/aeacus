@@ -21,8 +21,11 @@ func main() {
 		UseShortOptionHandling: true,
 		EnableBashCompletion:   true,
 		Name:                   "aeacus",
-		Usage:                  "setup and score vulnerabilities in an image",
+		Usage:                  "score image vulnerabilities",
 		Before: func(c *cli.Context) error {
+    			if debugEnabled {
+        			verboseEnabled = true
+    			}
 			err := determineDirectory()
 			if err != nil {
 				return err
@@ -105,20 +108,7 @@ func main() {
 				},
 			},
 			{
-				Name:    "decrypt",
-				Aliases: []string{"d"},
-				Usage:   "Check that encrypted scoring data file is valid",
-				Action: func(c *cli.Context) error {
-					permsCheck()
-					err := readScoringData()
-					if err == nil && verboseEnabled {
-						printConfig()
-					}
-					return err
-				},
-			},
-			{
-				Name:    "idprompt",
+				Name:    "prompt",
 				Aliases: []string{"p"},
 				Usage:   "Launch TeamID GUI prompt",
 				Action: func(c *cli.Context) error {
