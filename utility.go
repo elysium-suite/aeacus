@@ -44,7 +44,7 @@ func determineDirectory() error {
 			return errors.New("unknown OS: " + runtime.GOOS)
 		}
 	} else if dirPath[len(dirPath)-1] != '\\' && dirPath[len(dirPath)-1] != '/' {
-		return errors.New("Your scoring directory must end in a slash: " + dirPath + "/")
+		return errors.New("Your scoring directory must end in a slash: try " + dirPath + "/")
 	}
 	return nil
 }
@@ -80,7 +80,7 @@ func writeFile(fileName, fileContent string) {
 // permissions are needed.
 func permsCheck() {
 	if !adminCheck() {
-		fail("You need to run this binary as root or Administrator!")
+		fail("You need to run this binary as root or Administrator in order to take privileged actions.")
 		os.Exit(1)
 	}
 }
