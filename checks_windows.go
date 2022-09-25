@@ -28,8 +28,7 @@ func (c cond) BitlockerEnabled() (bool, error) {
 
 func (c cond) FileOwner() (bool, error) {
 	c.requireArgs("Path", "Name")
-	owner, err := shellCommandOutput("(Get-Acl " + c.Path + ").Owner")
-	owner = strings.TrimSpace(owner)
+	owner, err := getFileOwner(c.Path)
 	return owner == c.Name, err
 }
 

@@ -2,13 +2,13 @@ package main
 
 import (
 	"bytes"
+	"github.com/DataDog/datadog-agent/pkg/util/winutil"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
 	"unsafe"
 
-	"github.com/DataDog/datadog-agent/pkg/util/winutil"
 	"github.com/gen2brain/beeep"
 	wapi "github.com/iamacarpet/go-win64api"
 	"github.com/iamacarpet/go-win64api/shared"
@@ -251,6 +251,25 @@ func getFileAccessFromMask(mask uint32) string {
 		}
 	}
 	return strings.Join(ret, ", ")
+}
+
+func getFileOwner(path string) (string, error) {
+	var sid *windows.SID
+	if err := winutil.GetNamedSecurityInfo(path,
+		winutil.SE_FILE_OBJECT,
+		winutil.OWNER_SECURITY_INFORMATION,
+		&sid,
+		nil,
+		nil,
+		nil,
+		nil); err != nil {
+		return "", errors.Wrapf(err, "acl: failed to get security info for '%s' ", path)
+	}
+	var ownerAccount, _, _, err = sid.LookupAccount("")
+	if err != nil {
+		return "", errors.Wrapf(err, "Failed to find account for SID '%s'", sid.String())
+	}
+	return ownerAccount, nil
 }
 
 func getFileRights(filePath, username string) (map[string]string, error) {
