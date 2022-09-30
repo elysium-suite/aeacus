@@ -61,6 +61,7 @@ func (c cond) KernelVersion() (bool, error) {
 		}
 		releaseUint = append(releaseUint, uint8(utsname.Release[i]))
 	}
+	debug("System uname value is", string(releaseUint), "and our value is", c.Value)
 	return string(releaseUint) == c.Value, err
 }
 
@@ -73,8 +74,10 @@ func (c cond) PasswordChanged() (bool, error) {
 	for _, line := range strings.Split(fileContent, "\n") {
 		if strings.Contains(line, c.User+":") {
 			if strings.Contains(line, c.User+":"+c.Value) {
+				debug("Exact value found in /etc/shadow for user", c.User+":", line)
 				return false, nil
 			}
+			debug("Differing value found in /etc/shadow for user", c.User+":", line)
 			return true, nil
 		}
 	}

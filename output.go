@@ -58,7 +58,15 @@ func warn(p ...interface{}) {
 }
 
 func debug(p ...interface{}) {
-	if debugEnabled {
+	// Function inlining and dead code elimination means that debug calls
+	// (and their strings) will be optimized out on phocus builds, with any
+	// recent Go compiler.
+	//
+	// So, we can make as many debug calls as we want, and it won't make a
+	// specific version of phocus easier to reverse. (Easier than it already
+	// is, since source code is available.) This really only benefits those
+	// with custom builds.
+	if DEBUG_BUILD && debugEnabled {
 		toPrint := fmt.Sprintln(p...)
 		printStr := printer(color.FgMagenta, "DBUG", toPrint)
 		fmt.Printf(printStr)

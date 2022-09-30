@@ -80,7 +80,7 @@ func writeFile(fileName, fileContent string) {
 // permissions are needed.
 func permsCheck() {
 	if !adminCheck() {
-		fail("You need to run this binary as root or Administrator in order to take privileged actions.")
+		fail("You need to run this binary as root or Administrator in order to do that.")
 		os.Exit(1)
 	}
 }
@@ -105,6 +105,7 @@ func shellCommand(commandGiven string) error {
 // returns its output.
 func shellCommandOutput(commandGiven string) (string, error) {
 	out, err := rawCmd(commandGiven).Output()
+	debug("Command output (error:", err.Error()+"):", out)
 	if err != nil {
 		if verboseEnabled {
 			if len(commandGiven) > shellCmdLen {

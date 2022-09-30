@@ -16,6 +16,10 @@ import (
 // `Y888""8o `Y8bod8P' `Y888""8o `Y8bod8P'  `V88V"V8P' 8""888P' //
 //////////////////////////////////////////////////////////////////
 
+const (
+	DEBUG_BUILD = true
+)
+
 func main() {
 	app := &cli.App{
 		UseShortOptionHandling: true,

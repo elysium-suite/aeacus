@@ -1,3 +1,5 @@
+//go:build phocus
+
 package main
 
 import (
@@ -6,6 +8,10 @@ import (
 	"time"
 
 	"github.com/urfave/cli/v2"
+)
+
+const (
+	DEBUG_BUILD = false
 )
 
 func phocusLoop() {
