@@ -105,8 +105,14 @@ func shellCommand(commandGiven string) error {
 // returns its output.
 func shellCommandOutput(commandGiven string) (string, error) {
 	out, err := rawCmd(commandGiven).Output()
-	debug("Command output (error:", err.Error()+"):", out)
+	maxOutput := 300
+	suffix := "..."
+	if len(out) < maxOutput {
+		maxOutput = len(out)
+		suffix = ""
+	}
 	if err != nil {
+		debug("Command output ( len:", len(out), ") (error:", err.Error()+"):", string(out[:maxOutput])+suffix)
 		if verboseEnabled {
 			if len(commandGiven) > shellCmdLen {
 				fail("Command \"" + commandGiven[:shellCmdLen] + "...\" errored out (code " + err.Error() + ").")
@@ -115,6 +121,8 @@ func shellCommandOutput(commandGiven string) (string, error) {
 			}
 		}
 		return "", err
+	} else {
+		debug("Command output ( len:", len(out), ") (error: nil):", string(out[:maxOutput])+suffix)
 	}
 	return string(out), err
 }

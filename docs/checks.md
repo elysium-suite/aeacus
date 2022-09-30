@@ -12,7 +12,7 @@ This is a list of vulnerability checks that can be used in the configuration for
 
 > Note: `Command*` checks are prone to interception, modification, and tomfoolery. Your scoring configuration will be much more robust if you rely on checks using native mechanisms rather than shell commands (for example, `PathExists` instead of ls).
 
-**CommandContains**: pass if command output contains string. If it returns an error, check never passes. Use of this check is discouraged.
+**CommandContains**: pass if command output contains string. If executing the command fails (the check returns an error), check never passes. Use of this check is discouraged.
 
 ```
 type = 'CommandContains'
@@ -60,7 +60,7 @@ value = 'ANSWER:\sCool[a-zA-Z]+VariedAnswer'
 ```
 type = 'FileEquals'
 path = '/etc/sysctl.conf'
-name = 'e61ff3fb83b51fe9f2cd03cc0408afa15d4e8e69b8488b4ed1ecb854ae25da9b'
+value = 'e61ff3fb83b51fe9f2cd03cc0408afa15d4e8e69b8488b4ed1ecb854ae25da9b'
 ```
 
 **FirewallUp**: pass if firewall is active
@@ -115,18 +115,19 @@ path = '/etc/shadow
 value = 'rw-rw----'
 ```
 
-For example, this one checks that /bin/bash is not SUID and not world writable at the same time:
+For example, this one checks that /bin/bash is not SUID and world writable at the same time:
 
 ```
 type = 'PermissionIsNot'
 path = '/bin/bash'
 value = '???s????w?'
 ```
+So if `/bin/bash` is no longer world writable OR no longer SUID, the check will pass. If you want to ensure both attributes are removed, you should use two conditions in the same check.
 
 For Windows, get a users permission of the file using `(Get-Acl [FILENAME]).Access`.
 
 ```
-type = 'FilePermission'
+type = 'PermissionIs'
 path = 'C:\test.txt'
 name = 'BUILTIN\Administrators'
 value = 'FullControl'
@@ -211,7 +212,7 @@ group = 'Administrators'
 type = 'AutoCheckUpdatesEnabled'
 ```
 
-**Command**: pass if command succeeds. Use of this check is discouraged. This check will NOT return an error if the command is not found
+**Command**: pass if command succeeds (command is executed, and has a return code of zero). Use of this check is discouraged. This check will NOT return an error if the command is not found
 
 ```
 type = 'Command'

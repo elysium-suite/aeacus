@@ -23,6 +23,13 @@ func (c cond) Command() (bool, error) {
 	}
 	err := shellCommand(c.Cmd)
 	if err != nil {
+		// This check does not return errors, since it is based on successful
+		// execution. If any errors occurred, it means that the check failed,
+		// not errored out.
+		//
+		// It would be an error if failure to execute the command resulted in
+		// an inability to meaningfully score the check (e.g., if the uname
+		// syscall failed for KernelVersion).
 		return false, nil
 	}
 	return true, nil

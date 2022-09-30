@@ -26,6 +26,7 @@ func readTeamID() {
 	fileContent, err := readFile(dirPath + "TeamID.txt")
 	fileContent = strings.TrimSpace(fileContent)
 	if err != nil {
+		teamID = ""
 		if conf.Remote != "" {
 			fail("TeamID.txt does not exist!")
 			conn.OverallColor = RED
@@ -36,6 +37,7 @@ func readTeamID() {
 		}
 		sendNotification("TeamID.txt does not exist!")
 	} else if fileContent == "" {
+		teamID = ""
 		fail("TeamID.txt is empty!")
 		sendNotification("TeamID.txt is empty!")
 		if conf.Remote != "" {

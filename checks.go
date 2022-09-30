@@ -102,6 +102,13 @@ func runCheck(cond cond) bool {
 	not := "Not"
 	condFunc := ""
 	negation := false
+
+	// Ensure that condition type is a valid length
+	if len(cond.Type) <= len(not) {
+		fail(`Condition type "` + cond.Type + `" is not long enough to be valid`)
+		return false
+	}
+
 	condEnding := cond.Type[len(cond.Type)-len(not) : len(cond.Type)]
 	if condEnding == not {
 		negation = true
