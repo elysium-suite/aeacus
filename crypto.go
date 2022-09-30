@@ -114,9 +114,22 @@ func decryptConfig(cipherText string) (string, error) {
 
 	// Read into our created buffer
 	dataBuffer := bytes.NewBuffer(nil)
+
+	// HACK
+	//
+	// For some reason, when we use zlib in combination with AES-GCM, zlib throws
+	// an unexpected EOF when the EOF is very expected. The hack right now is to
+	// just ignore errors if it's an unexpected EOF.
+	//
+	// Likely related: https://github.com/golang/go/issues/14675
 	_, err = io.Copy(dataBuffer, reader)
 	if err != nil {
-		return "", errors.New("error decrypting or decompressing zlib data:" + err.Error())
+		if err.Error() == "unexpected EOF" {
+			debug("zlib returned unexpected EOF")
+			err = nil
+		} else {
+			return "", errors.New("error decrypting or decompressing zlib data: " + err.Error())
+		}
 	}
 
 	// Sanity check that decryptedConfig is not empty
@@ -166,7 +179,7 @@ func deobfuscateData(datum *string) error {
 	}
 	*datum = xor(string(tossKey()), *datum)
 	if *datum, err = decryptConfig(*datum); err != nil {
-		fail("crypto: failed to deobufscate datum: ", *datum, err.Error())
+		fail("crypto: failed to deobfuscate datum: ", *datum, err.Error())
 		return err
 	}
 	return nil
