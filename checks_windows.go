@@ -171,7 +171,7 @@ func (c cond) RegistryKey() (bool, error) {
 		return false, errors.New("Unknown registry hive " + registryHiveText)
 	}
 
-	debug("Getting key", keyPath, "from hive ", registryHiveText)
+	debug("Getting key", keyPath, "from hive", registryHiveText)
 	// Actually get the key
 	k, err := registry.OpenKey(registryHive, keyPath, registry.QUERY_VALUE)
 	if err != nil {

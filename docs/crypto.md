@@ -4,7 +4,9 @@
 
 The public releases of `aeacus` ship with weak crypto (cryptographic security), which means that the encryption and/or encoding of scoring data files is not very "secure".
 
-You can compile it yourself to generate random keys (`make release`). This means the public release decrypt function will not work, which should be enough for most situations.
+While it is non-trivial, extracting the keys from a GitHub release of aeacus is very possible, and not too difficult. If someone does that, and you use that release of the engine, your configs will be instantly compromised.
+
+You should compile it yourself to generate random keys (`make release`). This means you will be using different keys than the public release, which is good enough for most situations.
 
 If security of the configuration is very important to you, or you feel the competition integrity is at risk, (e.g., you're running a competition with prizes, or running a practice session for beginner reverse engineers), you should compile the binary for yourself after adding stronger crypto operations.
 
@@ -18,4 +20,4 @@ Once you implement your functions, ensure they work. You can run built-in tests 
 CGO_ENABLED=0 go test -v
 ```
 
-This model of engine can never be 100% secure (see [security](security.md)), but you can get pretty ok security.
+This model of engine can never be 100% secure (see [security](security.md)), but you can get ok security.

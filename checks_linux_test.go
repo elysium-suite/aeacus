@@ -13,17 +13,17 @@ func TestCommand(t *testing.T) {
 		t.Error(c, "failed:", out, err)
 	}
 
-	// Should fail: command execution fails
+	// Should fail: command return false
 	c.Cmd = "commanddoesntexist"
 	out, err = c.Command()
-	if err == nil || out != false {
+	if err != nil || out != false {
 		t.Error(c, "failed:", out, err)
 	}
 
-	// Should fail: command returns error
+	// Should fail: command return false
 	c.Cmd = "cat /etc/file/doesnt/exist"
 	out, err = c.Command()
-	if err == nil || out != false {
+	if err != nil || out != false {
 		t.Error(c, "failed:", out, err)
 	}
 }

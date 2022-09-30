@@ -1,3 +1,5 @@
+//go:build phocus
+
 package main
 
 import (
@@ -6,6 +8,10 @@ import (
 	"time"
 
 	"github.com/urfave/cli/v2"
+)
+
+const (
+	DEBUG_BUILD = false
 )
 
 func phocusLoop() {
@@ -56,7 +62,7 @@ func genPhocusApp() *cli.App {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:    "idprompt",
+				Name:    "prompt",
 				Aliases: []string{"p"},
 				Usage:   "Launch TeamID GUI prompt",
 				Action: func(c *cli.Context) error {
@@ -69,7 +75,7 @@ func genPhocusApp() *cli.App {
 				Aliases: []string{"v"},
 				Usage:   "Print the current version of phocus",
 				Action: func(c *cli.Context) error {
-					info("phocus version " + version)
+					println("phocus version " + version)
 					return nil
 				},
 			},

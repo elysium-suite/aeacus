@@ -30,7 +30,7 @@ func parseConfig(configContent string) {
 
 	if conf.Remote != "" {
 		if conf.Remote[len(conf.Remote)-1] == '/' {
-			fail("Your remote URL must not end with a slash:", conf.Remote[:len(conf.Remote)-1])
+			fail("Your remote URL must not end with a slash: try", conf.Remote[:len(conf.Remote)-1])
 			os.Exit(1)
 		}
 		if conf.Name == "" {
@@ -70,11 +70,11 @@ func writeConfig() {
 }
 
 // ReadConfig parses the scoring configuration file.
-func readConfig() error {
+func readConfig() {
 	fileContent, err := readFile(dirPath + scoringConf)
 	if err != nil {
 		fail("Configuration file (" + dirPath + scoringConf + ") not found!")
-		return err
+		os.Exit(1)
 	}
 	parseConfig(fileContent)
 	assignPoints()
@@ -83,7 +83,6 @@ func readConfig() error {
 		printConfig()
 	}
 	obfuscateConfig()
-	return nil
 }
 
 // PrintConfig offers a printed representation of the config, as parsed

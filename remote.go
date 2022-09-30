@@ -1,14 +1,9 @@
 package main
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
-	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -31,6 +26,7 @@ func readTeamID() {
 	fileContent, err := readFile(dirPath + "TeamID.txt")
 	fileContent = strings.TrimSpace(fileContent)
 	if err != nil {
+		teamID = ""
 		if conf.Remote != "" {
 			fail("TeamID.txt does not exist!")
 			conn.OverallColor = RED
@@ -41,6 +37,7 @@ func readTeamID() {
 		}
 		sendNotification("TeamID.txt does not exist!")
 	} else if fileContent == "" {
+		teamID = ""
 		fail("TeamID.txt is empty!")
 		sendNotification("TeamID.txt is empty!")
 		if conf.Remote != "" {
@@ -231,97 +228,4 @@ func handleStatus(status string) {
 	case "DISABLED":
 		conn.ServerStatus = "DISABLED"
 	}
-}
-
-// encryptString takes a password and a plaintext and returns an encrypted byte
-// sequence (as a string). It uses AES-GCM with a 12-byte IV (as is
-// recommended). The IV is prefixed to the string.
-//
-// This function is used in aeacus to encrypt reported vulnerability data to
-// the remote scoring endpoint (ex. minos).
-func encryptString(password, plainText string) string {
-	// Create a sha256sum hash of the password provided.
-	hasher := sha256.New()
-	_, err := hasher.Write([]byte(password))
-	if err != nil {
-		fail(err)
-		return ""
-	}
-	key := hasher.Sum(nil)
-
-	// Pad plainText to be a 16-byte block.
-	paddingArray := make([]byte, (aes.BlockSize - len(plainText)%aes.BlockSize))
-	for char := range paddingArray {
-		paddingArray[char] = 0x20 // Padding with space character.
-	}
-	plainText = plainText + string(paddingArray)
-	if len(plainText)%aes.BlockSize != 0 {
-		fail("plainText is not a multiple of block size!")
-		return ""
-	}
-
-	// Create cipher block with key.
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		fail(err)
-		return ""
-	}
-
-	// Generate nonce.
-	nonce := make([]byte, 12)
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		fail(err)
-		return ""
-	}
-
-	// Create NewGCM cipher.
-	aesgcm, err := cipher.NewGCM(block)
-	if err != nil {
-		fail(err)
-		return ""
-	}
-
-	// Encrypt and seal plainText.
-	ciphertext := aesgcm.Seal(nil, nonce, []byte(plainText), nil)
-	ciphertext = []byte(fmt.Sprintf("%s%s", nonce, ciphertext))
-
-	return string(ciphertext)
-}
-
-// decryptString takes a password and a ciphertext and returns a decrypted
-// byte sequence (as a string). The function uses typical AES-GCM.
-func decryptString(password, ciphertext string) string {
-	// Create a sha256sum hash of the password provided.
-	hasher := sha256.New()
-	if _, err := hasher.Write([]byte(password)); err != nil {
-		fail(err)
-	}
-	key := hasher.Sum(nil)
-
-	// Grab the IV from the first 12 bytes of the file.
-	iv := []byte(ciphertext[:12])
-	ciphertext = ciphertext[12:]
-
-	// Create the AES block object.
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		fail(err.Error())
-		return ""
-	}
-
-	// Create the AES-GCM cipher with the generated block.
-	aesgcm, err := cipher.NewGCM(block)
-	if err != nil {
-		fail(err.Error())
-		return ""
-	}
-
-	// Decrypt (and check validity, since it's GCM) of ciphertext.
-	plainText, err := aesgcm.Open(nil, iv, []byte(ciphertext), nil)
-	if err != nil {
-		fail(err.Error())
-		return ""
-	}
-
-	return strings.TrimSpace(string(plainText))
 }

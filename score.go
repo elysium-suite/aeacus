@@ -141,7 +141,7 @@ func scoreImage() {
 		err := reportScore()
 		if err != nil {
 			image = &imageData{}
-			warn("Local is disabled, scoring data removed.")
+			warn("Reporting image score failed, and local is disabled. Score data removed.")
 		}
 		genReport(image)
 	}
@@ -247,8 +247,7 @@ func scoreCheck(check check) {
 
 func checkFails(check *check) bool {
 	for _, cond := range check.Fail {
-		failStatus := runCheck(cond)
-		if failStatus {
+		if runCheck(cond) {
 			return true
 		}
 	}
@@ -257,8 +256,7 @@ func checkFails(check *check) bool {
 
 func checkPassOverrides(check *check) bool {
 	for _, cond := range check.PassOverride {
-		status := runCheck(cond)
-		if status {
+		if runCheck(cond) {
 			return true
 		}
 	}

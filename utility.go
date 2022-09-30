@@ -44,7 +44,7 @@ func determineDirectory() error {
 			return errors.New("unknown OS: " + runtime.GOOS)
 		}
 	} else if dirPath[len(dirPath)-1] != '\\' && dirPath[len(dirPath)-1] != '/' {
-		return errors.New("Your scoring directory must end in a slash: " + dirPath + "/")
+		return errors.New("Your scoring directory must end in a slash: try " + dirPath + "/")
 	}
 	return nil
 }
@@ -80,7 +80,7 @@ func writeFile(fileName, fileContent string) {
 // permissions are needed.
 func permsCheck() {
 	if !adminCheck() {
-		fail("You need to run this binary as root or Administrator!")
+		fail("You need to run this binary as root or Administrator in order to do that.")
 		os.Exit(1)
 	}
 }
@@ -105,7 +105,14 @@ func shellCommand(commandGiven string) error {
 // returns its output.
 func shellCommandOutput(commandGiven string) (string, error) {
 	out, err := rawCmd(commandGiven).Output()
+	maxOutput := 300
+	suffix := "..."
+	if len(out) < maxOutput {
+		maxOutput = len(out)
+		suffix = ""
+	}
 	if err != nil {
+		debug("Command output ( len:", len(out), ") (error:", err.Error()+"):", string(out[:maxOutput])+suffix)
 		if verboseEnabled {
 			if len(commandGiven) > shellCmdLen {
 				fail("Command \"" + commandGiven[:shellCmdLen] + "...\" errored out (code " + err.Error() + ").")
@@ -114,6 +121,8 @@ func shellCommandOutput(commandGiven string) (string, error) {
 			}
 		}
 		return "", err
+	} else {
+		debug("Command output ( len:", len(out), ") (error: nil):", string(out[:maxOutput])+suffix)
 	}
 	return string(out), err
 }
