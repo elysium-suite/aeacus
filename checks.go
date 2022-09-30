@@ -128,7 +128,7 @@ func runCheck(cond cond) bool {
 	if verboseEnabled && !err.IsNil() {
 		warn(condFunc, "returned an error:", err)
 	}
-	
+
 	return err.IsNil() && result
 }
 

@@ -23,9 +23,9 @@ func main() {
 		Name:                   "aeacus",
 		Usage:                  "score image vulnerabilities",
 		Before: func(c *cli.Context) error {
-    			if debugEnabled {
-        			verboseEnabled = true
-    			}
+			if debugEnabled {
+				verboseEnabled = true
+			}
 			err := determineDirectory()
 			if err != nil {
 				return err
