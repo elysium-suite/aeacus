@@ -17,10 +17,15 @@ func parseConfig(configContent string) {
 		fail("Configuration is empty!")
 		os.Exit(1)
 	}
-
-	if _, err := toml.Decode(configContent, &conf); err != nil {
+	md, err := toml.Decode(configContent, &conf)
+	if err != nil {
 		fail("Error decoding TOML: " + err.Error())
 		os.Exit(1)
+	}
+	if verboseEnabled {
+		for _, undecoded := range md.Undecoded() {
+			warn("Undecoded scoring key \"" + undecoded.String() + "\" will not be used")
+		}
 	}
 
 	// If there's no remote, local must be enabled.
@@ -44,6 +49,18 @@ func parseConfig(configContent string) {
 		warn("Scoring version does not match Aeacus version! Compatibility issues may occur.")
 		info("Consider updating your config to include:")
 		info("    version = '" + version + "'")
+	}
+
+	for i, check := range conf.Check {
+		allConditions := append(append(append([]cond{}, check.Pass[:]...), check.Fail[:]...), check.PassOverride[:]...)
+		if len(allConditions) == 0 {
+			warn("Check " + fmt.Sprintf("%d", i+1) + " does not define any possible ways to pass")
+		}
+		for j, cond := range allConditions {
+			if cond.Type == "" {
+				warn("Check " + fmt.Sprintf("%d condition %d", i+1, j+1) + " has an empty type and will crash at runtime")
+			}
+		}
 	}
 }
 
