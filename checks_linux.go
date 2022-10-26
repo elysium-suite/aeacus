@@ -146,6 +146,7 @@ func (c cond) ProgramVersion() (bool, error) {
 	c.requireArgs("Name", "Value")
 	return cond{
 		Cmd: `dpkg -s ` + c.Name + ` | grep Version | cut -d" " -f2`,
+		Value: c.Value,
 	}.CommandOutput()
 }
 
