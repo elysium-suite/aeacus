@@ -38,6 +38,8 @@ type cond struct {
 	After string
 }
 
+// requireArgs is a convenience function that prints a warning if any required
+// parameters for a given condition are not provided.
 func (c cond) requireArgs(args ...interface{}) {
 	// Don't process internal calls -- assume the developers know what they're
 	// doing. This also prevents extra errors being printed when they don't pass
@@ -105,7 +107,7 @@ func runCheck(cond cond) bool {
 
 	// Ensure that condition type is a valid length
 	if len(cond.Type) <= len(not) {
-		fail(`Condition type "` + cond.Type + `" is not long enough to be valid`)
+		fail(`Condition type "` + cond.Type + `" is not long enough to be valid. Do you have a "type = 'CheckTypeHere'" for all check conditions?`)
 		return false
 	}
 

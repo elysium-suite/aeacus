@@ -146,14 +146,14 @@ message = "Malicious user 'user' can't read /etc/shadow"
 	type = "CommandNot"
 	cmd  = "sudo -u user cat /etc/shadow"
 
-	[[check.pass]]  		# "pass" conditions are logically AND with other pass
-	type = "FileExists"		# conditions. This means they all must pass for a check
-	path = "/etc/shadow"	# to be considered successful.
+	[[check.pass]]          # "pass" conditions are logically AND with other pass
+	type = "FileExists"     # conditions. This means they all must pass for a check
+	path = "/etc/shadow"    # to be considered successful.
 
 	[[check.passoverride]]  # If you a check to succeed if just one condition
 	type = "UserExistsNot"  # passes, regardless of other pass checks, use
 	user = "user"           # an override pass (passoverride). This is a logical OR.
-							# passoverride is overridden by fail conditions.
+	                        # passoverride is overridden by fail conditions.
 
 	[[check.fail]]          # If any fail conditions succeed, the entire check will fail.
 	type = "FileExistsNot"

@@ -12,7 +12,7 @@
 //
 // If you compile the source code yourself, using the Makefile, random strings
 // will be generated for you. This means that the pre-compiled release will no
-// longer work for decrypting your configs-- which is ideal.
+// longer work for decrypting your configs, which is good.
 
 package main
 
@@ -260,14 +260,14 @@ func decryptString(password, ciphertext string) string {
 	// Create the AES-GCM cipher with the generated block.
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		fail(err.Error())
+		fail("Error creating AES cipher (please tell the developers):", err.Error())
 		return ""
 	}
 
 	// Decrypt (and check validity, since it's GCM) of ciphertext.
 	plainText, err := aesgcm.Open(nil, iv, []byte(ciphertext), nil)
 	if err != nil {
-		fail(err.Error())
+		fail("Error decrypting (are you using the correct aeacus/phocus? you may need to re-encrypt your config):", err.Error())
 		return ""
 	}
 

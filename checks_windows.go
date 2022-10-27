@@ -374,9 +374,15 @@ func (c cond) UserInGroup() (bool, error) {
 		return false, nil
 	}
 	for _, user := range users {
-		justName := strings.Split(user.Name, `\`)[1]
-		if c.User == user.Name || c.User == justName {
+		if c.User == user.Name {
 			return true, nil
+		}
+		// If username contains a backslash (for hostname or domain), compare
+		// against only the second part as well
+		if splitName := strings.Split(user.Name, `\`); len(splitName) > 1 {
+			if c.User == splitName[1] {
+				return true, nil
+			}
 		}
 	}
 	return false, nil

@@ -24,7 +24,7 @@ func parseConfig(configContent string) {
 	}
 	if verboseEnabled {
 		for _, undecoded := range md.Undecoded() {
-			warn("Undecoded scoring key \"" + undecoded.String() + "\" will not be used")
+			warn("Undecoded scoring configuration key \"" + undecoded.String() + "\" will not be used.")
 		}
 	}
 
@@ -51,14 +51,15 @@ func parseConfig(configContent string) {
 		info("    version = '" + version + "'")
 	}
 
+	// Print warnings for impossible checks and undefined check types.
 	for i, check := range conf.Check {
 		allConditions := append(append(append([]cond{}, check.Pass[:]...), check.Fail[:]...), check.PassOverride[:]...)
 		if len(allConditions) == 0 {
-			warn("Check " + fmt.Sprintf("%d", i+1) + " does not define any possible ways to pass")
+			warn("Check " + fmt.Sprintf("%d", i+1) + " does not define any possible ways to pass!")
 		}
 		for j, cond := range allConditions {
 			if cond.Type == "" {
-				warn("Check " + fmt.Sprintf("%d condition %d", i+1, j+1) + " has an empty type and will crash at runtime")
+				warn("Check " + fmt.Sprintf("%d condition %d", i+1, j+1) + " does not have a check type!")
 			}
 		}
 	}
@@ -187,7 +188,7 @@ func obfuscateConfig() {
 }
 
 // obfuscateCond is a convenience function to obfuscate all string fields of a
-// struct using reflection. ONLY use it on a struct of strings.
+// struct using reflection. It assumes all struct fields are strings.
 func obfuscateCond(c *cond) error {
 	s := reflect.ValueOf(c).Elem()
 	for i := 0; i < s.NumField(); i++ {

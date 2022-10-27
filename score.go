@@ -67,10 +67,11 @@ type statusRes struct {
 	Status string `json:"status"`
 }
 
-// ReadScoringData is a convenience function around readData and decodeString,
+// readScoringData is a convenience function around readData and decodeString,
 // which parses the encrypted scoring configuration file.
 func readScoringData() error {
 	info("Decrypting data from " + dirPath + scoringData + "...")
+
 	// Read in the encrypted configuration file
 	dataFile, err := readFile(dirPath + scoringData)
 	if err != nil {
@@ -78,10 +79,8 @@ func readScoringData() error {
 	} else if dataFile == "" {
 		return errors.New("Scoring data is empty!")
 	}
+
 	decryptedData, err := decryptConfig(dataFile)
-	if err != nil {
-		return err
-	}
 	if err != nil {
 		fail("Error reading in scoring data: " + err.Error())
 		return err
@@ -91,6 +90,7 @@ func readScoringData() error {
 	} else {
 		info("Data decryption successful!")
 	}
+
 	parseConfig(decryptedData)
 	return nil
 }
