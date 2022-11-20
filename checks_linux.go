@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 	"os"
+	"os/user"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -89,6 +91,27 @@ func (c cond) PasswordChanged() (bool, error) {
 		}
 	}
 	return false, errors.New("user not found")
+}
+
+func (c cond) FileOwner() (bool, error) {
+	c.requireArgs("Path", "Name")
+	u, err := user.Lookup(c.Name)
+	if err != nil {
+		return false, err
+	}
+
+	f, err := os.Stat(c.Path)
+	if err != nil {
+		return false, err
+	}
+
+	uid := f.Sys().(*syscall.Stat_t).Uid
+	o, err := strconv.ParseUint(u.Uid, 10, 32)
+	if err != nil {
+		return false, err
+	}
+	debug("File owner for", c.Path, "uid is", strconv.FormatUint(uint64(uid), 10))
+	return uint32(o) == uid, nil
 }
 
 func (c cond) PermissionIs() (bool, error) {

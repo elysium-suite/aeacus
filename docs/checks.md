@@ -63,6 +63,17 @@ path = '/etc/sysctl.conf'
 value = 'e61ff3fb83b51fe9f2cd03cc0408afa15d4e8e69b8488b4ed1ecb854ae25da9b'
 ```
 
+**FileOwner**: pass if specified user owns a given file
+
+```
+type = 'FileOwner'
+path = 'C:\test.txt'
+name = 'BUILTIN\Administrators'
+```
+
+> Get owner of the file in both Windows and Linux. Both use golang libraries instead of commands to perform this check.
+
+
 **FirewallUp**: pass if firewall is active
 
 ```
@@ -245,17 +256,6 @@ value = '5.4.0-42-generic'
 type = "BitlockerEnabled"
 ```
 > This check will succeed if the drive is either encrypted or encryption is in progress.
-
-**FileOwner**: pass if specified user/group owns a given file
-
-```
-type = 'FileOwner'
-path = 'C:\test.txt'
-name = 'BUILTIN\Administrators'
-```
-
-> Get owner of the file using PowerShell: `(Get-Acl [FILENAME]).Owner`
-
 
 **FirewallDefaultBehavior**: pass if the firewall profile's default behavior is set to the specified value
 
