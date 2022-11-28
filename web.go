@@ -17,7 +17,7 @@ func genReport(img *imageData) {
 	if len(teamID) < 7 {
 		displayTeamID = "1010 1101"
 	} else {
-		displayTeamID = teamID
+		displayTeamID = html.EscapeString(teamID)
 	}
 
 	header := `<!DOCTYPE html> <html> <head> <meta http-equiv="refresh" content="60"> <title>Aeacus Scoring Report</title> <style type="text/css"> h1 { text-align: center; } h2 { text-align: center; } body { font-family: Arial, Verdana, sans-serif; font-size: 14px; margin: 0; padding: 0; width: 100%; height: 100%; background: url('./img/background.png'); background-size: cover; background-attachment: fixed; background-position: top center; background-color: #336699; } .red {color: red;} .green {color: green;} .blue {color: blue;} .main { margin-top: 10px; margin-bottom: 10px; margin-left: auto; margin-right: auto; padding: 0px; border-radius: 12px; background-color: white; width: 900px; max-width: 100%; min-width: 600px; box-shadow: 0px 0px 12px #003366; } .text { padding: 12px; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; } .center { text-align: center; } .binary { position: relative; overflow: hidden; } .binary::before { position: absolute; top: -1000px; left: -1000px; display: block; width: 500%; height: 300%; -webkit-transform: rotate(-45deg); -moz-transform: rotate(-45deg); -ms-transform: rotate(-45deg); transform: rotate(-45deg); content: attr(data-binary); opacity: 0.15; line-height: 2em; letter-spacing: 2px; color: #369; font-size: 10px; pointer-events: none; } </style> <meta http-equiv="refresh"> </head> <body><div class="main"><div class="text"><div class="binary" data-binary="` + displayTeamID + `"><p align=center style="width:100%;text-align:center"><img align=middle style="width:180px; float:middle" src="./img/logo.png"></p>`
@@ -29,7 +29,7 @@ func genReport(img *imageData) {
 	htmlFile.WriteString(header)
 	htmlFile.WriteString("<h1>" + html.EscapeString(conf.Title) + "</h1>")
 	htmlFile.WriteString("<h2>Report Generated At: " + genTime.Format("2006/01/02 15:04:05 MST") + " </h2>")
-	htmlFile.WriteString(`<script>var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(10000).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CCS Scoring service may not be running</h2></span>'); } </script>`)
+	htmlFile.WriteString(`<script>var bin = document.querySelectorAll('.binary'); [].forEach.call(bin, function(el) { el.dataset.binary = Array(10000).join(el.dataset.binary + ' ') }); var currentdate = new Date().getTime(); gendate = Date.parse('0000/00/00 00:00:00 UTC'); diff = Math.abs(currentdate - gendate); if ( gendate > 0 && diff > 1000 * 60 * 5 ) { document.write('<span style="color:red"><h2>WARNING: CSS Scoring service may not be running</h2></span>'); } </script>`)
 
 	if conf.Remote != "" {
 		if teamID == "" {
