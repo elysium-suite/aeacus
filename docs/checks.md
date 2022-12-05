@@ -52,7 +52,7 @@ value = 'NOPASSWD'
 ```
 type = 'FileContains'
 path = 'C:\Users\coolUser\Desktop\Forensic Question 1.txt'
-value = 'ANSWER:\sCool[a-zA-Z]+VariedAnswer'
+value = 'ANSWER:\s*Cool[a-zA-Z]+VariedAnswer'
 ```
 
 **FileEquals**: pass if file equals sha256 hash
@@ -71,7 +71,13 @@ path = 'C:\test.txt'
 name = 'BUILTIN\Administrators'
 ```
 
-> Get owner of the file in both Windows and Linux. Both use golang libraries instead of commands to perform this check.
+```
+type = 'FileOwner'
+path = '/etc/passwd'
+name = 'root'
+```
+
+> Get owner of the file in both Windows and Linux. You can see the owner of a file on Windows using PowerShell: `(Get-Acl [FILENAME]).Owner`. For Linux, use `ls -la FILENAME`.
 
 
 **FirewallUp**: pass if firewall is active
@@ -133,7 +139,7 @@ type = 'PermissionIsNot'
 path = '/bin/bash'
 value = '???s????w?'
 ```
-So if `/bin/bash` is no longer world writable OR no longer SUID, the check will pass. If you want to ensure both attributes are removed, you should use two conditions in the same check.
+So if `/bin/bash` is no longer world writable OR no longer SUID, the check will pass. If you want to ensure both attributes are removed, you should use two conditions in the same check (`pass` for writeable bit, in addition to `pass` for SUID bit).
 
 For Windows, get a users permission of the file using `(Get-Acl [FILENAME]).Access`.
 

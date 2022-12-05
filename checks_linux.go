@@ -140,8 +140,11 @@ func (c cond) PermissionIs() (bool, error) {
 	}
 
 	c.Value = strings.TrimSpace(c.Value)
+
 	if len(c.Value) == 9 {
-		c.Value = "-" + c.Value
+		// If we're provided a mode string of only 9 characters, we'll assume
+		// that the 0th bit is irrelevant and should be a wildcard
+		c.Value = "?" + c.Value
 	} else if len(c.Value) != 10 {
 		fail("Your permission string is the wrong length (should be 9 or 10 characters):", c.Value)
 		return false, errors.New("Invalid user permission string")

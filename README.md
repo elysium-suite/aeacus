@@ -150,7 +150,7 @@ message = "Malicious user 'user' can't read /etc/shadow"
 	type = "FileExists"     # conditions. This means they all must pass for a check
 	path = "/etc/shadow"    # to be considered successful.
 
-	[[check.passoverride]]  # If you a check to succeed if just one condition
+	[[check.passoverride]]  # If you want a check to succeed when any condition
 	type = "UserExistsNot"  # passes, regardless of other pass checks, use
 	user = "user"           # an override pass (passoverride). This is a logical OR.
 	                        # passoverride is overridden by fail conditions.
