@@ -152,7 +152,7 @@ value = 'FullControl'
 
 > **Note**: Use absolute paths when possible (rather than relative) for more reliable scoring.
 
-**ProgramInstalled**: pass if program is installed. On Linux, will use `dpkg`, and on Windows, checks if any installed programs contain your program string.
+**ProgramInstalled**: pass if program is installed. On Linux, will use `dpkg` (or `rpm` for RHEL-based systems), and on Windows, checks if any installed programs contain your program string.
 
 ```
 type = 'ProgramInstalled'

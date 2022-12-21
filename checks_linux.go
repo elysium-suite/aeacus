@@ -181,6 +181,13 @@ func (c cond) ProgramInstalled() (bool, error) {
 	return cond{
 		Cmd: "dpkg -s " + c.Name,
 	}.Command()
+	
+	// If dpkg fails, check for rpm
+	if err != nil {
+		return cond{
+			Cmd: "rpm -q " + c.Name,
+		}.Command()
+	}
 }
 
 func (c cond) ProgramVersion() (bool, error) {
