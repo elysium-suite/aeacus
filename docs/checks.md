@@ -4,13 +4,12 @@
 
 This is a list of vulnerability checks that can be used in the configuration for `aeacus`. The notes on this page contain a lot of important information, please be sure to read them.
 
-> **Note!** Each of the commands here can check for the opposite by appending 'Not' to the check type. For example, `PathExistsNot` to pass if a file does not exist.
+> **Note**: Each of the commands here can check for the opposite by appending 'Not' to the check type. For example, `PathExistsNot` to pass if a file does not exist.
 
-> **Note!** If a check has negative points assigned to it, it automatically becomes a penalty.
+> **Note**: If a check has negative points assigned to it, it automatically becomes a penalty.
 
-> **Note!** Each of these check types can be used for `Pass`, `PassOverride` or `Fail` conditions, and there can be multiple conditions per check. See [configuration](config.md) for more details.
+> **Note**: Each of these check types can be used for `Pass`, `PassOverride` or `Fail` conditions, and there can be multiple conditions per check. See [configuration](config.md) for more details.
 
-> Note: `Command*` checks are prone to interception, modification, and tomfoolery. Your scoring configuration will be much more robust if you rely on checks using native mechanisms rather than shell commands (for example, `PathExists` instead of ls).
 
 **CommandContains**: pass if command output contains string. If executing the command fails (the check returns an error), check never passes. Use of this check is discouraged.
 
@@ -20,7 +19,8 @@ cmd = 'ufw status'
 value = 'Status: active'
 ```
 
-> **Note!** If any check returns an error (e.g., something that it was not expecting), it will _never_ pass, even if it's a `Not` condition. This varies by check, but for example, if you try to check the content of a file that doesn't exist, it will return an error and not succeed-- even if you were doing `FileContainsNot`.
+> **Note**: `Command*` checks are prone to interception, modification, and tomfoolery. Your scoring configuration will be much more robust if you rely on checks using native mechanisms rather than shell commands (for example, `PathExists` instead of ls).
+> **Note**: If any check returns an error (e.g., something that it was not expecting), it will _never_ pass, even if it's a `Not` condition. This varies by check, but for example, if you try to check the content of a file that doesn't exist, it will return an error and not succeed-- even if you were doing `FileContainsNot`.
 
 **CommandOutput**: pass if command output matches string exactly. If it returns an error, check never passes. Use of this check is discouraged.
 
@@ -32,7 +32,7 @@ value = 'True'
 
 **DirContains**: pass if directory contains regular expression (regex) string
 
-> **Note!** Read more about regex [here](regex.md).
+> **Note**: Read more about regex [here](regex.md).
 
 ```
 type = 'DirContains'
@@ -43,11 +43,11 @@ value = 'NOPASSWD'
 > `DirContains` is recursive! This means it checks every folder and subfolder. It currently is capped at 10,000 files, so you should begin your search at the deepest folder possible.
 
 
-> **Note!** You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `''' like this! that's neat! C:\path\here '''`), or just normal quotes (but you'll have to escape characters with those).
+> **Note**: You don't have to escape any characters because we're using single quotes, which are literal strings in TOML. If you need use single quotes, use a TOML multi-line string literal `''' like this! that's neat! C:\path\here '''`), or just normal quotes (but you'll have to escape characters with those).
 
 **FileContains**: pass if file contains regex
 
-> Note: `FileContains` will never pass if file does not exist! Add an additional PassOverride check for PathExistsNot, if you want to score that a file does not contain a line, OR it doesn't exist.
+> **Note**: `FileContains` will never pass if file does not exist! Add an additional PassOverride check for PathExistsNot, if you want to score that a file does not contain a line, OR it doesn't exist.
 
 ```
 type = 'FileContains'
@@ -86,7 +86,7 @@ name = 'root'
 type = 'FirewallUp'
 ```
 
-> **Note**: On Linux, only `ufw` is supported (checks `/etc/ufw/ufw.conf`). On Window, this passes if all three Windows Firewall profiles are active.
+> **Note**: On Linux, `ufw` (checks `/etc/ufw/ufw.conf`) and `firewalld` are supported. If the `ufw` config does not exist, the engine checks if `firewalld` is running. On Window, this passes if all three Windows Firewall profiles are active.
 
 **PasswordChanged**: pass if user password has changed
 
@@ -150,7 +150,7 @@ name = 'BUILTIN\Administrators'
 value = 'FullControl'
 ```
 
-> **Note!**: Use absolute paths when possible (rather than relative) for more reliable scoring.
+> **Note**: Use absolute paths when possible (rather than relative) for more reliable scoring.
 
 **ProgramInstalled**: pass if program is installed. On Linux, will use `dpkg`, and on Windows, checks if any installed programs contain your program string.
 
@@ -223,7 +223,7 @@ group = 'Administrators'
 
 ### Linux-Specific Checks
 
-**AutoCheckUpdatesEnabled**: pass if the system is configured to automatically check for updates
+**AutoCheckUpdatesEnabled**: pass if the system is configured to automatically check for updates (supports `apt` and `dnf-automatic`)
 
 ```
 type = 'AutoCheckUpdatesEnabled'
@@ -286,7 +286,7 @@ key = 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD
 value = '0'
 ```
 
-> Note: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to check that a key was deleted, use `RegistryKeyExists`.
+> **Note**: This check will never pass if retrieving the key fails (wrong hive, key doesn't exist, etc). If you want to check that a key was deleted, use `RegistryKeyExists`.
 
 > **Administrative Templates**: There are 4000+ admin template fields. See [this list of registry keys and descriptions](https://docs.google.com/spreadsheets/d/1N7uuke4Jg1R9FBhj8o5dxJQtEntQlea0McYz5upaiTk/edit?usp=sharing), then use the `RegistryKey` or `RegistryKeyExists` check.
 
@@ -297,9 +297,9 @@ type = 'RegistryKeyExists'
 key = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\DisableCAD'
 ```
 
-> **Note!**: Notice the single quotes `'` on the above argument! This means it's a _string literal_ in TOML. If you don't do this, you have to make sure to escape your slashes (`\` --> `\\`)
+> **Note**: Notice the single quotes `'` on the above argument! This means it's a _string literal_ in TOML. If you don't do this, you have to make sure to escape your slashes (`\` --> `\\`)
 
-> Note: You can use `SOFTWARE` as a shortcut for `HKEY_LOCAL_MACHINE\SOFTWARE`.
+> **Note**: You can use `SOFTWARE` as a shortcut for `HKEY_LOCAL_MACHINE\SOFTWARE`.
 
 **ScheduledTaskExists**: pass if scheduled task exists
 
@@ -343,12 +343,12 @@ type = 'ShareExists'
 name = 'ADMIN$'
 ```
 
-> **Note!** Don't use any single quotes (`'`) in your parameters for Windows options like this. If you need to, use a double-quoted string instead (ex. `"Admin's files"`)
+> **Note**: Don't use any single quotes (`'`) in your parameters for Windows options like this. If you need to, use a double-quoted string instead (ex. `"Admin's files"`)
 
 
 **UserDetail**: pass if user detail key is equal to value
 
-> **Note!** The valid boolean values for this command (when the field is only True or False) are 'yes', if you want the value to be true, or literally anything else for false (like 'no').
+> **Note**: The valid boolean values for this command (when the field is only True or False) are 'yes', if you want the value to be true, or literally anything else for false (like 'no').
 
 ```
 type = 'UserDetailNot'
@@ -359,7 +359,7 @@ value = 'No'
 
 > See [here](userproperties.md) for all `UserDetail` properties.
 
-> **Note!** For non-boolean details, you can use modifiers in the value field to specify the comparison.
+> **Note**: For non-boolean details, you can use modifiers in the value field to specify the comparison.
 > This is specified in the above property document.
 ```
 type = 'UserDetail'
@@ -387,4 +387,4 @@ type = 'WindowsFeature'
 name = 'SMB1Protocol'
 ```
 
-> **Note:** Use the PowerShell tool `Get-WindowsOptionalFeature -Online` to find the feature you want!
+> **Note**: Use the PowerShell tool `Get-WindowsOptionalFeature -Online` to find the feature you want!
