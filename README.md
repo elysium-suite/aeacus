@@ -105,17 +105,17 @@ Set the `remote` field in the configuration, and your image will use remote scor
 The configuration is written in TOML. Here is a minimal example:
 
 ```toml
-name = "ubuntu-18-supercool" # Image name
+name = "ubuntu-18-supercool"            # Image name
 title = "CoolCyberStuff Practice Round" # Round title
-os = "Ubuntu 18.04" # OS, used for README
-user = "coolUser" # Main user for the image
+os = "Ubuntu 18.04"                     # OS, used for README
+user = "coolUser"                       # Main user for the image
 
 # Set the aeacus version of this scoring file. Set this to the version
 # of aeacus you are using. This is used to make sure your configuration,
 # if re-used, is compatible with the version of aeacus being used.
 #
 # You can print your version of aeacus with ./aeacus version.
-version = "2.0.0"
+version = "2.0.5"
 
 [[check]]
 message = "Removed insecure sudoers rule"
@@ -131,24 +131,25 @@ points = 10
 points = 20
 
 	[[check.pass]]
-	type = "FileExistsNot"
+	type = "PathExistsNot"
 	path = "/usr/bin/ufw-backdoor"
 
-	[[check.pass]]     # You can code multiple pass conditions, but
-	type = "Command"   # they must ALL succeed for the check to pass!
-	cmd  = "ufw status"
+	[[check.pass]]       # You can code multiple pass conditions, but
+	type = "FirewallUp"  # they must ALL succeed for the check to pass!
 
 [[check]]
 message = "Malicious user 'user' can't read /etc/shadow"
 # If no points are specified, they are auto-calculated out of 100.
 
 	[[check.pass]]
-	type = "CommandNot"
-	cmd  = "sudo -u user cat /etc/shadow"
+	type = "PermissionIsNot"
+	path = "/etc/shadow"
+	value = "??????r??"
 
 	[[check.pass]]          # "pass" conditions are logically AND with other pass
-	type = "FileExists"     # conditions. This means they all must pass for a check
-	path = "/etc/shadow"    # to be considered successful.
+	type = "UserInGroupNot" # conditions. This means they all must pass for a check
+	user = "user"           # to be considered successful.
+	group = "sudo"
 
 	[[check.passoverride]]  # If you want a check to succeed when any condition
 	type = "UserExistsNot"  # passes, regardless of other pass checks, use
@@ -156,7 +157,7 @@ message = "Malicious user 'user' can't read /etc/shadow"
 	                        # passoverride is overridden by fail conditions.
 
 	[[check.fail]]          # If any fail conditions succeed, the entire check will fail.
-	type = "FileExistsNot"
+	type = "PathExistsNot"
 	path = "/etc/shadow"
 
 [[check]]
