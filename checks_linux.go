@@ -9,8 +9,8 @@ import (
 	"syscall"
 )
 
-​func (c cond) AutoCheckUpdatesEnabled() (bool, error) {
-    result, err := cond{
+func (c cond) AutoCheckUpdatesEnabled() (bool, error) {
+	result, err := cond{
         Path:  "/etc/apt/apt.conf.d/",
         Value: `(?i)^\s*APT::Periodic::Update-Package-Lists\s+"1"\s*;\s*$`,
     }.DirContains()
