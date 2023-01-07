@@ -25,7 +25,7 @@ func (c cond) AutoCheckUpdatesEnabled() (bool, error) {
         if autoConf {
             applyUpdates, err := cond{
                 Path:  "/etc/dnf/automatic.conf",
-                Value: "(?i)^\s*apply_updates\s*=\s*(1|on|yes|true)",
+                Value: `(?i)^\s*apply_updates\s*=\s*(1|on|yes|true)`,
             }.FileContains()
             if err != nil {
                 return false, err
