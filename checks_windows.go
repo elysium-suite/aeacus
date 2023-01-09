@@ -15,6 +15,11 @@ import (
 	wapiShared "github.com/iamacarpet/go-win64api/shared"
 )
 
+var (
+	ErrNoRegistryValue = errors.New("No RegistryKey value provided")
+	ErrNotExist        = errors.New("Registry key not found")
+)
+
 func (c cond) BitlockerEnabled() (bool, error) {
 	status, err := wapi.GetBitLockerConversionStatusForDrive("C:")
 	if err == nil {
@@ -182,6 +187,10 @@ func (c cond) RegistryKey() (bool, error) {
 	}
 	defer k.Close()
 
+	if c.Value == "" {
+		return false, ErrNoRegistryValue
+	}
+
 	// Fetch registry value
 	registrySlice := make([]byte, 256)
 	regLength, valType, err := k.GetValue(keyLoc, registrySlice)
@@ -190,7 +199,11 @@ func (c cond) RegistryKey() (bool, error) {
 		// are not defined until the setting is explicitly set. However, the
 		// check should not pass for RegistryKey or RegistryKeyNot, so we return
 		// an error.
-		warn("Failed to open registry key:", err)
+		if err == registry.ErrNotExist {
+			// The default error is "The system cannot find the file specified",
+			// which can be confusing for any checks that rely on RegistryKey.
+			err = ErrNotExist
+		}
 		return false, err
 	}
 
@@ -221,10 +234,17 @@ func (c cond) RegistryKey() (bool, error) {
 
 func (c cond) RegistryKeyExists() (bool, error) {
 	c.requireArgs("Key")
-	_, err := c.RegistryKey()
+	_, err := cond{
+		Key: c.Key,
+	}.RegistryKey()
 	if err != nil {
-		if err == registry.ErrNotExist {
+		if err == ErrNotExist {
 			return false, nil
+		} else if err == ErrNoRegistryValue {
+			// If RegistryKey returns this error, that means it was able to
+			// successfully retrieve the key, but fails because we didn't
+			// provide a value.
+			return true, nil
 		} else {
 			return false, err
 		}
