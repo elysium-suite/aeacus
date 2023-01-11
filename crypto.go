@@ -125,7 +125,7 @@ func decryptConfig(cipherText string) (string, error) {
 	_, err = io.Copy(dataBuffer, reader)
 	if err != nil {
 		if err.Error() == "unexpected EOF" {
-			debug("zlib returned unexpected EOF")
+			debug("zlib returned unexpected EOF (expected error)")
 			err = nil
 		} else {
 			return "", errors.New("error decrypting or decompressing zlib data: " + err.Error())

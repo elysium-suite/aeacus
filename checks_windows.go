@@ -180,8 +180,10 @@ func (c cond) RegistryKey() (bool, error) {
 	// Actually get the key
 	k, err := registry.OpenKey(registryHive, keyPath, registry.QUERY_VALUE)
 	if err != nil {
-		if verboseEnabled {
-			warn("Registry opening key failed:", err)
+		if err == registry.ErrNotExist {
+			// The default error is "The system cannot find the file specified",
+			// which can be confusing for any checks that rely on RegistryKey.
+			err = ErrNotExist
 		}
 		return false, err
 	}
@@ -200,8 +202,6 @@ func (c cond) RegistryKey() (bool, error) {
 		// check should not pass for RegistryKey or RegistryKeyNot, so we return
 		// an error.
 		if err == registry.ErrNotExist {
-			// The default error is "The system cannot find the file specified",
-			// which can be confusing for any checks that rely on RegistryKey.
 			err = ErrNotExist
 		}
 		return false, err
