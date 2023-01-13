@@ -11,17 +11,48 @@ import (
 
 func (c cond) AutoCheckUpdatesEnabled() (bool, error) {
 	result, err := cond{
-		Path:  "/etc/apt/apt.conf.d/",
-		Value: `(?i)^\s*APT::Periodic::Update-Package-Lists\s+"1"\s*;\s*$`,
-	}.DirContains()
-	// If /etc/apt/ does not exist, try dnf (RHEL)
-	if err != nil {
-		return cond{
-			Path:  "/etc/dnf/",
-			Value: `(?i)^\s*download_updates\s+=\s+yes$`,
-		}.DirContains()
-	}
-	return result, err
+        Path:  "/etc/apt/apt.conf.d/",
+        Value: `(?i)^\s*APT::Periodic::Update-Package-Lists\s+"1"\s*;\s*$`,
+    }.DirContains()
+    // If /etc/apt/ does not exist, try dnf (RHEL)
+    if err != nil {
+        autoConf, err := cond{
+            Path: "/etc/dnf/automatic.conf",
+        }.PathExists()
+        if err != nil {
+            return false, err
+        }
+        if autoConf {
+            applyUpdates, err := cond{
+                Path:  "/etc/dnf/automatic.conf",
+                Value: `(?i)^\s*apply_updates\s*=\s*(1|on|yes|true)`,
+            }.FileContains()
+            if err != nil {
+                return false, err
+            }
+
+            autoTimer, err := cond{
+                Path: "/etc/systemd/system/timers.target.wants/dnf-automatic.timer",
+            }.PathExists()
+            if err != nil {
+                return false, err
+            }
+
+            if applyUpdates && autoTimer {
+                return true, nil
+            }
+
+            autoInstallTimer, err := cond{
+                Path: "/etc/systemd/system/timers.target.wants/dnf-automatic-install.timer",
+            }.PathExists()
+            if err != nil {
+                return false, err
+            }
+            return autoInstallTimer, nil
+        }
+
+    }
+    return result, err
 }
 
 // Command checks if a given shell command ran successfully (that is, did not
