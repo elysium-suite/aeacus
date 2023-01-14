@@ -43,18 +43,35 @@ func ask(p ...interface{}) bool {
 
 func pass(p ...interface{}) {
 	toPrint := fmt.Sprintln(p...)
-	printStr := printer(color.FgGreen, "PASS", toPrint)
-	fmt.Printf(printStr)
+	var printStr string
+	if checkCount != 0 {
+		printStr = printer(color.FgGreen, fmt.Sprintf("%s:%d", "PASS", checkCount), toPrint)
+	} else {
+		printStr = printer(color.FgGreen, "PASS", toPrint)
+	}
+	fmt.Print(printStr)
 }
 
 func fail(p ...interface{}) {
 	toPrint := fmt.Sprintln(p...)
-	fmt.Printf(printer(color.FgRed, "FAIL", toPrint))
+	var printStr string
+	if checkCount != 0 {
+		printStr = printer(color.FgRed, fmt.Sprintf("%s:%d", "FAIL", checkCount), toPrint)
+	} else {
+		printStr = printer(color.FgRed, "FAIL", toPrint)
+	}
+	fmt.Print(printStr)
 }
 
 func warn(p ...interface{}) {
 	toPrint := fmt.Sprintln(p...)
-	fmt.Printf(printer(color.FgYellow, "WARN", toPrint))
+	var printStr string
+	if checkCount != 0 {
+		printStr = printer(color.FgYellow, fmt.Sprintf("%s:%d", "WARN", checkCount), toPrint)
+	} else {
+		printStr = printer(color.FgYellow, "WARN", toPrint)
+	}
+	fmt.Print(printStr)
 }
 
 func debug(p ...interface{}) {
@@ -68,7 +85,12 @@ func debug(p ...interface{}) {
 	// with custom builds.
 	if DEBUG_BUILD && debugEnabled {
 		toPrint := fmt.Sprintln(p...)
-		printStr := printer(color.FgMagenta, "DBUG", toPrint)
+		var printStr string
+		if checkCount != 0 {
+			printStr = printer(color.FgMagenta, fmt.Sprintf("%s:%d", "DBUG", checkCount), toPrint)
+		} else {
+			printStr = printer(color.FgMagenta, "DBUG", toPrint)
+		}
 		fmt.Printf(printStr)
 	}
 }
@@ -76,7 +98,12 @@ func debug(p ...interface{}) {
 func info(p ...interface{}) {
 	if verboseEnabled {
 		toPrint := fmt.Sprintln(p...)
-		printStr := printer(color.FgCyan, "INFO", toPrint)
+		var printStr string
+		if checkCount != 0 {
+			printStr = printer(color.FgCyan, fmt.Sprintf("%s:%d", "INFO", checkCount), toPrint)
+		} else {
+			printStr = printer(color.FgCyan, "INFO", toPrint)
+		}
 		fmt.Printf(printStr)
 	}
 }

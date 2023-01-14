@@ -13,6 +13,10 @@ var (
 	conf   = &config{}
 	image  = &imageData{}
 	conn   = &connData{}
+
+	// checkCount keeps track of the current check being scored, and is used
+	// for identifying which check caused a given error or warning.
+	checkCount int
 )
 
 // imageData is the current scoring data for the image. It is able to be
@@ -190,9 +194,12 @@ func checkConfigData() {
 
 // scoreChecks runs through every check configured.
 func scoreChecks() {
-	for _, check := range conf.Check {
+	for i, check := range conf.Check {
+		// checkCount is the same as in printConfig, 1-based count
+		checkCount = i + 1
 		scoreCheck(check)
 	}
+	checkCount = 0
 	info(fmt.Sprintf("Score: %d", image.Score))
 }
 
