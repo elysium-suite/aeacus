@@ -94,6 +94,7 @@ Other documentation:
 - [Non-Check Scoring Configuration](docs/config.md)
 - [Crypto](docs/crypto.md)
 - [Security Model](docs/security.md)
+- [Remote Reporting](docs/remote.md)
 - [Windows Security Policy](docs/securitypolicy.md)
 
 ## Remote Endpoint
