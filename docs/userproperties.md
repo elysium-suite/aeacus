@@ -2,7 +2,8 @@
 
 ## Windows User Properties
 
-These are the user properties that you would normally find the user edit dialog. (Plus some extra goodies!)
+These are the user properties that you would normally find the user edit dialog. (Plus some extra goodies!)   
+These properties are used with the check `UserDetail`. For more information on how this check works, please visit our [check documentation](checks.md)!
 
 **Usernames are case-sensitive.** `Yes`/`No` are not case-sensitive. If you input something other than "yes" or "no" for a boolean check, it defaults to "no".
 
