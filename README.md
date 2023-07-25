@@ -38,6 +38,14 @@
 
 > The TeamID is read from `/opt/aeacus/TeamID.txt` or `C:\aeacus\TeamID.txt`.
 
+4. **Check your README and make sure it is to your liking!**
+
+```
+./aeacus --verbose readme
+```
+
+> The ReadMe file will be placed in `/opt/aeacus/assets/ReadMe.html` or `C:\aeacus\assets\ReadMe.html`
+
 4. **Prepare the image for release.**
 
 > **WARNING**: This will remove `scoring.conf`. Back it up somewhere if you want to save it! It will also remove the `aeacus` executable and other sensitive files.
