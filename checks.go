@@ -146,7 +146,11 @@ func runCheck(cond cond) bool {
 func (c cond) CommandContains() (bool, error) {
 	c.requireArgs("Cmd", "Value")
 	out, err := shellCommandOutput(c.Cmd)
-	return strings.Contains(strings.TrimSpace(out), c.Value), err
+	outTrim := strings.TrimSpace(out)
+	if err != nil {
+		return false, err
+	}
+	return regexp.Match(c.Value, []byte(outTrim))
 }
 
 // CommandOutput checks if a given shell command produces an exact output. This
