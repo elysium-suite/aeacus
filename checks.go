@@ -36,6 +36,7 @@ type cond struct {
 	Key   string
 	Value string
 	After string
+	Regex bool
 }
 
 // requireArgs is a convenience function that prints a warning if any required
@@ -51,7 +52,7 @@ func (c cond) requireArgs(args ...interface{}) {
 	v := reflect.ValueOf(c)
 	vType := v.Type()
 	for i := 0; i < v.NumField(); i++ {
-		if vType.Field(i).Name == "Type" {
+		if vType.Field(i).Name == "Type" || vType.Field(i).Name == "Regex" {
 			continue
 		}
 
@@ -102,19 +103,23 @@ func runCheck(cond cond) bool {
 	debug("Running condition:\n", cond)
 
 	not := "Not"
+	regex := "Regex"
 	condFunc := ""
 	negation := false
+	cond.Regex = false
 
 	// Ensure that condition type is a valid length
-	if len(cond.Type) <= len(not) {
+	if len(cond.Type) <= len(regex) {
 		fail(`Condition type "` + cond.Type + `" is not long enough to be valid. Do you have a "type = 'CheckTypeHere'" for all check conditions?`)
 		return false
 	}
 
-	condEnding := cond.Type[len(cond.Type)-len(not) : len(cond.Type)]
-	if condEnding == not {
+	if cond.Type[len(cond.Type)-len(not):len(cond.Type)] == not {
 		negation = true
 		condFunc = cond.Type[:len(cond.Type)-len(not)]
+	} else if cond.Type[len(cond.Type)-len(regex):len(cond.Type)] == regex {
+		cond.Regex = true
+		condFunc = cond.Type[:len(cond.Type)-len(regex)]
 	} else {
 		condFunc = cond.Type
 	}
@@ -141,28 +146,30 @@ func runCheck(cond cond) bool {
 	return err.IsNil() && result
 }
 
-// CommandContains checks if a given shell command contains a certain output.
+// CommandContains checks if a given shell command contains a certain string.
 // This check will always fail if the command returns an error.
 func (c cond) CommandContains() (bool, error) {
 	c.requireArgs("Cmd", "Value")
 	out, err := shellCommandOutput(c.Cmd)
-	outTrim := strings.TrimSpace(out)
-	if err != nil {
-		return false, err
+	if c.Regex {
+		outTrim := strings.TrimSpace(out)
+		if err != nil {
+			return false, err
+		}
+		return regexp.Match(c.Value, []byte(outTrim))
 	}
-	return regexp.Match(c.Value, []byte(outTrim))
+	return strings.Contains(strings.TrimSpace(out), c.Value), err
 }
 
-// CommandOutput checks if a given shell command produces an exact output. This
-// check will always fail if the command returns an error.
+// CommandOutput checks if a given shell command produces an exact output.
+// This check will always fail if the command returns an error.
 func (c cond) CommandOutput() (bool, error) {
 	c.requireArgs("Cmd", "Value")
 	out, err := shellCommandOutput(c.Cmd)
 	return strings.TrimSpace(out) == c.Value, err
 }
 
-// DirContains returns true if any file in the directory matches the regular
-// expression provided.
+// DirContains returns true if any file in the directory contains the string value provided.
 func (c cond) DirContains() (bool, error) {
 	c.requireArgs("Path", "Value")
 	result, err := cond{
@@ -203,11 +210,6 @@ func (c cond) DirContains() (bool, error) {
 	return false, nil
 }
 
-// DirContainsRegex is an alias for DirContains
-func (c cond) DirContainsRegex() (bool, error) {
-	return c.DirContains()
-}
-
 // FileContains determines whether a file contains a given regular expression.
 //
 // Newlines in regex may not work as expected, especially on Windows. It's
@@ -220,7 +222,11 @@ func (c cond) FileContains() (bool, error) {
 	}
 	found := false
 	for _, line := range strings.Split(fileContent, "\n") {
-		found, err = regexp.Match(c.Value, []byte(line))
+		if c.Regex {
+			found, err = regexp.Match(c.Value, []byte(line))
+		} else {
+			found = strings.Contains(line, c.Value)
+		}
 		if err != nil {
 			return false, err
 		}
@@ -229,11 +235,6 @@ func (c cond) FileContains() (bool, error) {
 		}
 	}
 	return found, err
-}
-
-// FileContainsRegex is an alias for FileContains
-func (c cond) FileContainsRegex() (bool, error) {
-	return c.FileContains()
 }
 
 // FileEquals calculates the SHA256 sum of a file and compares it with the hash
