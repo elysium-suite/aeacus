@@ -28,6 +28,7 @@ type check struct {
 // cond, or condition, is the parameters for a given test within a check.
 type cond struct {
 	Type  string
+	Hint  string
 	Path  string
 	Cmd   string
 	User  string
@@ -55,6 +56,11 @@ func (c cond) requireArgs(args ...interface{}) {
 			continue
 		}
 
+		// Ignore hint fields, they only show up in the scoring report
+		if vType.Field(i).Name == "Hint" {
+			continue
+		}
+
 		required := false
 		for _, a := range args {
 			if vType.Field(i).Name == a {
@@ -68,7 +74,7 @@ func (c cond) requireArgs(args ...interface{}) {
 				fail(c.Type+":", "missing required argument '"+vType.Field(i).Name+"'")
 			}
 		} else if v.Field(i).String() != "" {
-			warn(c.Type+":", "specifying unnecessary argument '"+vType.Field(i).Name+"'")
+			warn(c.Type+":", "specifying unused argument '"+vType.Field(i).Name+"'")
 		}
 	}
 }

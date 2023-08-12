@@ -91,7 +91,7 @@ func debug(p ...interface{}) {
 		} else {
 			printStr = printer(color.FgMagenta, "DBUG", toPrint)
 		}
-		fmt.Printf(printStr)
+		fmt.Print(printStr)
 	}
 }
 
@@ -104,24 +104,24 @@ func info(p ...interface{}) {
 		} else {
 			printStr = printer(color.FgCyan, "INFO", toPrint)
 		}
-		fmt.Printf(printStr)
+		fmt.Print(printStr)
 	}
 }
 
 func blue(head string, p ...interface{}) {
 	toPrint := fmt.Sprintln(p...)
 	printStr := printer(color.FgCyan, head, toPrint)
-	fmt.Printf(printStr)
+	fmt.Print(printStr)
 }
 
 func red(head string, p ...interface{}) {
 	toPrint := fmt.Sprintln(p...)
-	fmt.Printf(printer(color.FgRed, head, toPrint))
+	fmt.Print(printer(color.FgRed, head, toPrint))
 }
 
 func green(head string, p ...interface{}) {
 	toPrint := fmt.Sprintln(p...)
-	fmt.Printf(printer(color.FgGreen, head, toPrint))
+	fmt.Print(printer(color.FgGreen, head, toPrint))
 }
 
 func printer(colorChosen color.Attribute, messageType, toPrint string) string {
