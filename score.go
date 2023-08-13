@@ -260,6 +260,13 @@ func scoreCheck(check check) {
 		}
 		image.Score += check.Points
 	} else {
+		// If there is a check-wide hint, add to start of hint messages.
+		if check.Hint != "" {
+			hints := []string{check.Hint}
+			hints = append(hints, hint.Messages...)
+			hint.Messages = hints
+		}
+
 		// If the check failed, and there are hints, see if we should display them.
 		// All hints triggered (based on which conditions ran) are displayed in sequential order.
 		if len(hint.Messages) > 0 {

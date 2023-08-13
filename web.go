@@ -73,7 +73,7 @@ func genReport(img *imageData) {
 		obfuscateData(&point.Message)
 	}
 
-	htmlFile.WriteString("<br>")
+	htmlFile.WriteString("</p>")
 	// for each hint:
 	for _, hint := range img.Hints {
 		if len(hint.Messages) == 1 {
