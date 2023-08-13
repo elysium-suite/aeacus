@@ -96,10 +96,12 @@ You can build release files (e.g., `aeacus-linux.zip`). These will have auto-ran
 
 ## Documentation
 
-All checks (with examples and notes) [are documented here](docs/checks.md).
+All check condition types (with examples and notes) [are documented here](docs/checks.md).
 
 Other documentation:
 - [Non-Check Scoring Configuration](docs/config.md)
+- [Condition Precedence](docs/conditions.md)
+- [Adding Hints](docs/hints.md)
 - [Crypto](docs/crypto.md)
 - [Security Model](docs/security.md)
 - [Remote Reporting](docs/remote.md)
