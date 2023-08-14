@@ -6,7 +6,7 @@ Hints let you provide information on failing checks.
 
 Hints are a way to help make images more approachable.
 
-You can add a conditional hint or a check-wide hint. A conditional hint is printed when the condition is executed and fails. Make sure you understand the check precedence; this can be trickey, as sometimes your check is NOT executed ([read about conditions](conditions.md)).
+You can add a conditional hint or a check-wide hint. A conditional hint is printed when that specific condition is executed and fails. Make sure you understand the check precedence; this can be tricky, as sometimes your check is NOT executed ([read about conditions](conditions.md)).
 
 Example conditional hint:
 ```
