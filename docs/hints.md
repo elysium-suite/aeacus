@@ -21,7 +21,7 @@ points = 5
 	# This hint will NOT print unless the condition above succeeds.
 	# Pass conditions are logically AND-- they all need to succeed.
 	# If one fails, there's no reason to execute the other ones.
-	hint = "Removing just the binary is insufficient; use a package manager to remove all of a tool's files."
+	hint = "Ensure you're using a package manager to remove all of a tool's files, as well as the main program."
 	type = "PathExistsNot"
 	path = "/usr/share/john"
 ```
