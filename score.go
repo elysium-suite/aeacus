@@ -227,17 +227,17 @@ func scoreCheck(check check) {
 
 	// If a Fail condition passes, the check fails, no other checks required.
 	if len(check.Fail) > 0 {
-		failed = checkOr(&check, &hint)
+		failed = checkOr(check.Fail, &hint)
 	}
 
 	// If a PassOverride succeeds, that overrides the Pass checks
 	if !failed && len(check.PassOverride) > 0 {
-		status = checkOr(&check, &hint)
+		status = checkOr(check.PassOverride, &hint)
 	}
 
 	// Finally, we check the normal Pass checks
 	if !failed && !status && len(check.Pass) > 0 {
-		status = checkAnd(&check, &hint)
+		status = checkAnd(check.Pass, &hint)
 	}
 
 	if status {
@@ -281,8 +281,10 @@ func scoreCheck(check check) {
 	}
 }
 
-func checkOr(check *check, hint *hintItem) bool {
-	for _, cond := range check.Fail {
+// checkOr runs a set of conditions and returns true if any of them pass.
+// It is a logical "OR".
+func checkOr(conds []cond, hint *hintItem) bool {
+	for _, cond := range conds {
 		if runCheck(cond) {
 			return true
 		}
@@ -293,8 +295,10 @@ func checkOr(check *check, hint *hintItem) bool {
 	return false
 }
 
-func checkAnd(check *check, hint *hintItem) bool {
-	for _, cond := range check.Pass {
+// checkAnd runs a set of conditions and returns true iff ALL of them pass.
+// It is a logical "AND".
+func checkAnd(conds []cond, hint *hintItem) bool {
+	for _, cond := range conds {
 		if !runCheck(cond) {
 			if cond.Hint != "" {
 				hint.Messages = append(hint.Messages, cond.Hint)
