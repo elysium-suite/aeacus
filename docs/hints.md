@@ -2,7 +2,7 @@
 
 Hints let you provide information on failing checks.
 
-![Hint Example](../misc/gh/ReadMe.png)
+![Hint Example](../misc/gh/hint.png)
 
 Hints are a way to help make images more approachable.
 
