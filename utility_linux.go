@@ -46,7 +46,7 @@ func checkTrace() {
 	result, err := cond{
 		Path:  "/proc/self/status",
 		Value: `^TracerPid:\s+0$`,
-		Regex: true,
+		regex: true,
 	}.FileContains()
 
 	// If there was an error reading the file, the user may be restricting access to /proc for the phocus binary

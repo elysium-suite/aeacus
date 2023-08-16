@@ -36,7 +36,7 @@ type cond struct {
 	Key   string
 	Value string
 	After string
-	Regex bool
+	regex bool
 }
 
 // requireArgs is a convenience function that prints a warning if any required
@@ -106,22 +106,21 @@ func runCheck(cond cond) bool {
 	regex := "Regex"
 	condFunc := ""
 	negation := false
-	cond.Regex = false
+	cond.regex = false
 
 	// Ensure that condition type is a valid length
 	if len(cond.Type) <= len(regex) {
 		fail(`Condition type "` + cond.Type + `" is not long enough to be valid. Do you have a "type = 'CheckTypeHere'" for all check conditions?`)
 		return false
 	}
-
+	condFunc = cond.Type
 	if cond.Type[len(cond.Type)-len(not):len(cond.Type)] == not {
 		negation = true
 		condFunc = cond.Type[:len(cond.Type)-len(not)]
-	} else if cond.Type[len(cond.Type)-len(regex):len(cond.Type)] == regex {
-		cond.Regex = true
+	}
+	if cond.Type[len(cond.Type)-len(regex):len(cond.Type)] == regex {
+		cond.regex = true
 		condFunc = cond.Type[:len(cond.Type)-len(regex)]
-	} else {
-		condFunc = cond.Type
 	}
 
 	// Catch panic if check type doesn't exist
@@ -151,11 +150,11 @@ func runCheck(cond cond) bool {
 func (c cond) CommandContains() (bool, error) {
 	c.requireArgs("Cmd", "Value")
 	out, err := shellCommandOutput(c.Cmd)
-	if c.Regex {
+	if err != nil {
+		return false, err
+	}
+	if c.regex {
 		outTrim := strings.TrimSpace(out)
-		if err != nil {
-			return false, err
-		}
 		return regexp.Match(c.Value, []byte(outTrim))
 	}
 	return strings.Contains(strings.TrimSpace(out), c.Value), err
@@ -222,13 +221,13 @@ func (c cond) FileContains() (bool, error) {
 	}
 	found := false
 	for _, line := range strings.Split(fileContent, "\n") {
-		if c.Regex {
+		if c.regex {
 			found, err = regexp.Match(c.Value, []byte(line))
+			if err != nil {
+				return false, err
+			}
 		} else {
 			found = strings.Contains(line, c.Value)
-		}
-		if err != nil {
-			return false, err
 		}
 		if found {
 			break

@@ -5,7 +5,8 @@ to score something simple, but we think it significantly increases the overall q
 to each line of the input file, so currently, no multi-line regexes are currently possible.
 
 The checks that are specifically supported are `CommandContainsRegex`, `DirContainsRegex`, and `FileContainsRegex`.
-Please note that you **must** append `Regex` to the end for the check to use regular expressions.
+Please note that you **must** add `Regex` for the check to use regular expressions. You can also still append `Not` to
+the end to invert the condition, such as `CommandContainsRegexNot`
 
 > We're using the Golang Regular Expression package ([documentation here](https://godocs.io/regexp)). It uses RE2
 > syntax, which is also generally the same as Perl, Python, and other languages.
