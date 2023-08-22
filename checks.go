@@ -52,7 +52,7 @@ func (c cond) requireArgs(args ...interface{}) {
 	v := reflect.ValueOf(c)
 	vType := v.Type()
 	for i := 0; i < v.NumField(); i++ {
-		if vType.Field(i).Name == "Type" || vType.Field(i).Name == "Regex" {
+		if vType.Field(i).Name == "Type" || vType.Field(i).Name == "regex" {
 			continue
 		}
 
