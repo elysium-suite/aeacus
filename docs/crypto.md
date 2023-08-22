@@ -1,6 +1,4 @@
-# aeacus
-
-## Adding Crypto
+# Adding Crypto
 
 The public releases of `aeacus` ship with weak crypto (cryptographic security), which means that the encryption and/or encoding of scoring data files is not very "secure".
 

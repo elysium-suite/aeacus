@@ -29,6 +29,7 @@ type imageData struct {
 	TotalPoints int
 	Penalties   []scoreItem
 	Points      []scoreItem
+	Hints       []hintItem
 }
 
 // connData represents the current connectivity state of the image to the
@@ -46,8 +47,17 @@ type connData struct {
 // scoreItem is the scoring report representation of a check, containing only
 // the message and points associated with it.
 type scoreItem struct {
+	Index   int
 	Message string
 	Points  int
+}
+
+// hintItem is the scoring report representation of a hint, which can contain
+// multiple messages.
+type hintItem struct {
+	Index    int
+	Messages []string
+	Points   int
 }
 
 // config is a representation of the TOML configuration typically
@@ -209,19 +219,25 @@ func scoreCheck(check check) {
 	status := false
 	failed := false
 
-	// If a fail condition passes, the check fails, no other checks required.
+	// Create hint var in case any checks have hints
+	hint := hintItem{
+		Index:  checkCount,
+		Points: check.Points,
+	}
+
+	// If a Fail condition passes, the check fails, no other checks required.
 	if len(check.Fail) > 0 {
-		failed = checkFails(&check)
+		failed = checkOr(check.Fail, &hint)
 	}
 
 	// If a PassOverride succeeds, that overrides the Pass checks
 	if !failed && len(check.PassOverride) > 0 {
-		status = checkPassOverrides(&check)
+		status = checkOr(check.PassOverride, &hint)
 	}
 
-	// Finally, we check the normal pass checks
+	// Finally, we check the normal Pass checks
 	if !failed && !status && len(check.Pass) > 0 {
-		status = checkPass(&check)
+		status = checkAnd(check.Pass, &hint)
 	}
 
 	if status {
@@ -231,7 +247,7 @@ func scoreCheck(check check) {
 				pass(fmt.Sprintf("Check passed: %s - %d pts", check.Message, check.Points))
 				obfuscateData(&check.Message)
 			}
-			image.Points = append(image.Points, scoreItem{check.Message, check.Points})
+			image.Points = append(image.Points, scoreItem{checkCount, check.Message, check.Points})
 			image.Contribs += check.Points
 		} else {
 			if verboseEnabled {
@@ -239,10 +255,23 @@ func scoreCheck(check check) {
 				fail(fmt.Sprintf("Penalty triggered: %s - %d pts", check.Message, check.Points))
 				obfuscateData(&check.Message)
 			}
-			image.Penalties = append(image.Penalties, scoreItem{check.Message, check.Points})
+			image.Penalties = append(image.Penalties, scoreItem{checkCount, check.Message, check.Points})
 			image.Detracts += check.Points
 		}
 		image.Score += check.Points
+	} else {
+		// If there is a check-wide hint, add to start of hint messages.
+		if check.Hint != "" {
+			hints := []string{check.Hint}
+			hints = append(hints, hint.Messages...)
+			hint.Messages = hints
+		}
+
+		// If the check failed, and there are hints, see if we should display them.
+		// All hints triggered (based on which conditions ran) are displayed in sequential order.
+		if len(hint.Messages) > 0 {
+			image.Hints = append(image.Hints, hint)
+		}
 	}
 
 	// If check is not a penalty, add to total
@@ -252,27 +281,28 @@ func scoreCheck(check check) {
 	}
 }
 
-func checkFails(check *check) bool {
-	for _, cond := range check.Fail {
+// checkOr runs a set of conditions and returns true if any of them pass.
+// It is a logical "OR".
+func checkOr(conds []cond, hint *hintItem) bool {
+	for _, cond := range conds {
 		if runCheck(cond) {
 			return true
+		}
+		if cond.Hint != "" {
+			hint.Messages = append(hint.Messages, cond.Hint)
 		}
 	}
 	return false
 }
 
-func checkPassOverrides(check *check) bool {
-	for _, cond := range check.PassOverride {
-		if runCheck(cond) {
-			return true
-		}
-	}
-	return false
-}
-
-func checkPass(check *check) bool {
-	for _, cond := range check.Pass {
+// checkAnd runs a set of conditions and returns true iff ALL of them pass.
+// It is a logical "AND".
+func checkAnd(conds []cond, hint *hintItem) bool {
+	for _, cond := range conds {
 		if !runCheck(cond) {
+			if cond.Hint != "" {
+				hint.Messages = append(hint.Messages, cond.Hint)
+			}
 			return false
 		}
 	}

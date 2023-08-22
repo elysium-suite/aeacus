@@ -215,8 +215,9 @@ func (c cond) PermissionIs() (bool, error) {
 func (c cond) ProgramInstalled() (bool, error) {
 	c.requireArgs("Name")
 	result, err := cond{
-		Cmd: "dpkg -s " + c.Name,
-	}.Command()
+		Cmd:   "dpkg -s " + c.Name,
+		Value: " install",
+	}.CommandContains()
 
 	// If dpkg fails, use rpm
 	if err != nil {
