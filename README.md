@@ -124,7 +124,7 @@ user = "coolUser"                       # Main user for the image
 # if re-used, is compatible with the version of aeacus being used.
 #
 # You can print your version of aeacus with ./aeacus version.
-version = "2.0.6"
+version = "2.1.0"
 
 [[check]]
 message = "Removed insecure sudoers rule"
