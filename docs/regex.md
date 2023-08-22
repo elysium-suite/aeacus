@@ -1,6 +1,6 @@
 # Regular Expressions
 
-Many of the checks in `aeacus` require regular expression (regex) strings as input. This may seem inconvenient if you want to score something simple, but we think it significantly increases the overall quality of checks. Each regex is applied to each line of the input file, so currently, no multi-line regexes are currently possible.
+Many of the checks in `aeacus` use regular expression (regex) strings as input. This may seem inconvenient if you want to score something simple, but we think it significantly increases the overall quality of checks. Each regex is applied to each line of the input file, so currently, no multi-line regexes are currently possible.
 
 > We're using the Golang Regular Expression package ([documentation here](https://godocs.io/regexp)). It uses RE2 syntax, which is also generally the same as Perl, Python, and other languages.
 

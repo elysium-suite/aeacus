@@ -53,10 +53,10 @@ func parseConfig(configContent string) {
 
 	// Print warnings for impossible checks and undefined check types.
 	for i, check := range conf.Check {
-		allConditions := append(append(append([]cond{}, check.Pass[:]...), check.Fail[:]...), check.PassOverride[:]...)
-		if len(allConditions) == 0 {
+		if len(check.Pass) == 0 && len(check.PassOverride) == 0 {
 			warn("Check " + fmt.Sprintf("%d", i+1) + " does not define any possible ways to pass!")
 		}
+		allConditions := append(append(append([]cond{}, check.Pass[:]...), check.Fail[:]...), check.PassOverride[:]...)
 		for j, cond := range allConditions {
 			if cond.Type == "" {
 				warn("Check " + fmt.Sprintf("%d condition %d", i+1, j+1) + " does not have a check type!")
@@ -168,6 +168,11 @@ func obfuscateConfig() {
 	for i, check := range conf.Check {
 		if err := obfuscateData(&conf.Check[i].Message); err != nil {
 			fail(err.Error())
+		}
+		if conf.Check[i].Hint != "" {
+			if err := obfuscateData(&conf.Check[i].Hint); err != nil {
+				fail(err.Error())
+			}
 		}
 		for j := range check.Pass {
 			if err := obfuscateCond(&conf.Check[i].Pass[j]); err != nil {
