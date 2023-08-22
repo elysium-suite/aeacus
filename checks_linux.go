@@ -13,6 +13,7 @@ func (c cond) AutoCheckUpdatesEnabled() (bool, error) {
 	result, err := cond{
 		Path:  "/etc/apt/apt.conf.d/",
 		Value: `(?i)^\s*APT::Periodic::Update-Package-Lists\s+"1"\s*;\s*$`,
+		regex: true,
 	}.DirContains()
 	// If /etc/apt/ does not exist, try dnf (RHEL)
 	if err != nil {
@@ -26,6 +27,7 @@ func (c cond) AutoCheckUpdatesEnabled() (bool, error) {
 			applyUpdates, err := cond{
 				Path:  "/etc/dnf/automatic.conf",
 				Value: `(?i)^\s*apply_updates\s*=\s*(1|on|yes|true)`,
+				regex: true,
 			}.FileContains()
 			if err != nil {
 				return false, err
@@ -80,6 +82,7 @@ func (c cond) FirewallUp() (bool, error) {
 	result, err := cond{
 		Path:  "/etc/ufw/ufw.conf",
 		Value: `^\s*ENABLED=yes\s*$`,
+		regex: true,
 	}.FileContains()
 	if err != nil {
 		// If ufw.conf does not exist, check firewalld status (RHEL)
@@ -95,11 +98,13 @@ func (c cond) GuestDisabledLDM() (bool, error) {
 	result, err := cond{
 		Path:  "/usr/share/lightdm/lightdm.conf.d/",
 		Value: guestStr,
+		regex: true,
 	}.DirContains()
 	if !result {
 		return cond{
 			Path:  "/etc/lightdm/",
 			Value: guestStr,
+			regex: true,
 		}.DirContains()
 	}
 	return result, err
@@ -245,6 +250,7 @@ func (c cond) UserExists() (bool, error) {
 	return cond{
 		Path:  "/etc/passwd",
 		Value: "^" + c.User + ":",
+		regex: true,
 	}.FileContains()
 }
 
@@ -253,5 +259,6 @@ func (c cond) UserInGroup() (bool, error) {
 	return cond{
 		Path:  "/etc/group",
 		Value: c.Group + `[0-9a-zA-Z,:\s+]+` + c.User,
+		regex: true,
 	}.FileContains()
 }
