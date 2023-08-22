@@ -193,7 +193,7 @@ func obfuscateCond(c *cond) error {
 	s := reflect.ValueOf(c).Elem()
 	for i := 0; i < s.NumField(); i++ {
 		if s.Type().Field(i).Name == "regex" {
-			break
+			continue
 		}
 		datum := s.Field(i).String()
 		if err := obfuscateData(&datum); err != nil {
@@ -210,7 +210,7 @@ func deobfuscateCond(c *cond) error {
 	s := reflect.ValueOf(c).Elem()
 	for i := 0; i < s.NumField(); i++ {
 		if s.Type().Field(i).Name == "regex" {
-			break
+			continue
 		}
 		datum := s.Field(i).String()
 		if err := deobfuscateData(&datum); err != nil {
