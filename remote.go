@@ -70,7 +70,15 @@ func genUpdate() (string, error) {
 		fail(err)
 		return "", err
 	}
-	finishedUpdate := hexEncode(encryptString(conf.Password, update.String()))
+
+	// If no password has been specified in the configuration (i.e. is empty), don't encrypt the update.
+	finishedUpdate := ""
+	if conf.Password == "" {
+		finishedUpdate = hexEncode(update.String())
+	} else {
+		finishedUpdate = hexEncode(encryptString(conf.Password, update.String()))
+	}
+
 	if err := obfuscateData(&conf.Password); err != nil {
 		fail(err)
 		return "", err
