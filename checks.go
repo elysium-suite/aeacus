@@ -123,13 +123,13 @@ func runCheck(cond cond) bool {
 		return false
 	}
 	condFunc = cond.Type
-	if cond.Type[len(cond.Type)-len(not):len(cond.Type)] == not {
+	if condFunc[len(condFunc)-len(not):] == not {
 		negation = true
-		condFunc = cond.Type[:len(cond.Type)-len(not)]
+		condFunc = condFunc[:len(condFunc)-len(not)]
 	}
-	if cond.Type[len(cond.Type)-len(regex):len(cond.Type)] == regex {
+	if condFunc[len(condFunc)-len(regex):] == regex {
 		cond.regex = true
-		condFunc = cond.Type[:len(cond.Type)-len(regex)]
+		condFunc = condFunc[:len(condFunc)-len(regex)]
 	}
 
 	// Catch panic if check type doesn't exist
