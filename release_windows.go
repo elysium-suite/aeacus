@@ -129,6 +129,13 @@ func installService() {
 	`
 	shellCommand(idTaskCreate)
 	shellCommand(serviceTaskCreate)
+
+	addExclusions := `
+	Add-MpPreference -ExclusionPath "C:\aeacus\phocus.exe"
+ 	Add-MpPreference -ExclusionPath "C:\aeacus\"
+  	`
+	shellCommand(addExclusions)
+ 
 }
 
 // cleanUp clears out sensitive files left behind by image developers or the
