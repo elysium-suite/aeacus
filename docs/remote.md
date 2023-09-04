@@ -22,6 +22,6 @@ Firewall has been activated - 5 pts
 
 Each newline in the text above actually represents a delimiter, which is a sequence of two bytes (0xff followed by 0xde). This was randomly chosen and serves to separate information from one another in the config update more reliably than a newline.
 
-The report is encrypted with the configuration password, and hex encoded, before being sent to the remote.
+The report is encrypted with the configuration password and hex encoded (unless `DisableRemoteEncryption` is set to `true`), before being sent to the remote.
 
 The function `genUpdate()` creates the report while `reportScore()` sends it.

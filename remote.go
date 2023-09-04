@@ -71,9 +71,10 @@ func genUpdate() (string, error) {
 		return "", err
 	}
 
-	// If no password has been specified in the configuration (i.e. is empty), don't encrypt the update.
 	finishedUpdate := ""
-	if conf.Password == "" {
+
+	// If DisableRemoteEncryption has been set to true in the configuration, don't encrypt the update.
+	if conf.DisableRemoteEncryption {
 		finishedUpdate = hexEncode(update.String())
 	} else {
 		finishedUpdate = hexEncode(encryptString(conf.Password, update.String()))

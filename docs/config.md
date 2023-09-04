@@ -44,6 +44,12 @@ remote = "http://scoring.example.com"
 password = "H4!b5at+kWls-8yh4Guq"
 ```
 
+**DisableRemoteEncryption**: Disables encryption of remote reporting traffic. This is not recommended, but can be useful for debugging or if you are using a custom remote endpoint that does not support encryption.
+
+```
+DisableRemoteEncryption = true
+```
+
 **local**: Enables local scoring. If no remote address is specified, this will automatically be set to true.
 
 ```
