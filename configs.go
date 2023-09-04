@@ -44,6 +44,16 @@ func parseConfig(configContent string) {
 			fail("Need image name in config if remote is enabled.")
 			os.Exit(1)
 		}
+
+		if conf.Password == "" && conf.DisableRemoteEncryption == false {
+			fail("Need password in config if remote is enabled.")
+			os.Exit(1)
+		}
+
+		if conf.DisableRemoteEncryption && conf.Password != "" {
+			warn("Remote encryption is disabled, but a password is still defined!")
+		}
+
 	}
 
 	// Check if the config version matches ours.
