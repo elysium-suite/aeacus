@@ -31,9 +31,11 @@ func parseConfig(configContent string) {
 	// If there's no remote, local must be enabled.
 	if conf.Remote == "" {
 		conf.Local = true
-	}
-
-	if conf.Remote != "" {
+		if conf.DisableRemoteEncryption {
+			fail("Remote encryption cannot be disabled if remote is not enabled!")
+			os.Exit(1)
+		}
+	} else {
 		if conf.Remote[len(conf.Remote)-1] == '/' {
 			fail("Your remote URL must not end with a slash: try", conf.Remote[:len(conf.Remote)-1])
 			os.Exit(1)
@@ -42,6 +44,16 @@ func parseConfig(configContent string) {
 			fail("Need image name in config if remote is enabled.")
 			os.Exit(1)
 		}
+
+		if conf.Password == "" && conf.DisableRemoteEncryption == false {
+			fail("Need password in config if remote is enabled.")
+			os.Exit(1)
+		}
+
+		if conf.DisableRemoteEncryption && conf.Password != "" {
+			warn("Remote encryption is disabled, but a password is still defined!")
+		}
+
 	}
 
 	// Check if the config version matches ours.
@@ -133,6 +145,11 @@ func printConfig() {
 	}
 	if conf.Remote != "" {
 		pass("Remote:", conf.Remote)
+	}
+	if conf.DisableRemoteEncryption {
+		pass("Remote Encryption:", "Disabled")
+	} else {
+		pass("Remote Encryption:", "Enabled")
 	}
 	if conf.Local {
 		pass("Local:", conf.Local)

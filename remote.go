@@ -70,7 +70,16 @@ func genUpdate() (string, error) {
 		fail(err)
 		return "", err
 	}
-	finishedUpdate := hexEncode(encryptString(conf.Password, update.String()))
+
+	finishedUpdate := ""
+
+	// If DisableRemoteEncryption has been set to true in the configuration, don't encrypt the update.
+	if conf.DisableRemoteEncryption {
+		finishedUpdate = hexEncode(update.String())
+	} else {
+		finishedUpdate = hexEncode(encryptString(conf.Password, update.String()))
+	}
+
 	if err := obfuscateData(&conf.Password); err != nil {
 		fail(err)
 		return "", err
