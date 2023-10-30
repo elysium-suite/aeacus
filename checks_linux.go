@@ -9,12 +9,14 @@ import (
 	"syscall"
 )
 
-func (c cond) AutoCheckUpdatesEnabled() (bool, error) {
-	result, err := cond{
+type AutoCheckUpdatesEnabled struct{}
+
+func (a *AutoCheckUpdatesEnabled) Score() (bool, error) {
+	result, err := DirContains{
 		Path:  "/etc/apt/apt.conf.d/",
 		Value: `(?i)^\s*APT::Periodic::Update-Package-Lists\s+"1"\s*;\s*$`,
 		regex: true,
-	}.DirContains()
+	}.Score()
 	// If /etc/apt/ does not exist, try dnf (RHEL)
 	if err != nil {
 		autoConf, err := cond{
