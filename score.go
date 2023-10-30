@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/safinsingh/aeaconf2"
 )
 
 var (
@@ -74,7 +76,8 @@ type config struct {
 	Title                   string
 	User                    string
 	Version                 string
-	Check                   []check
+	MaxPoints               int
+	Checks                  []*aeaconf2.Check
 }
 
 // statusRes is to parse a JSON response from the remote server.

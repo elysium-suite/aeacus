@@ -127,6 +127,16 @@ func shellCommandOutput(commandGiven string) (string, error) {
 	return string(out), err
 }
 
+func countLines(source []byte) int {
+	ret := 0
+	for _, b := range source {
+		if b == '\n' {
+			ret++
+		}
+	}
+	return ret + 1
+}
+
 // assignPoints is used to automatically assign points to checks that don't
 // have a hardcoded points value.
 func assignPoints() {
