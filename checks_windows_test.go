@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -12,7 +11,7 @@ import (
 
 func TestPermissionIs(t *testing.T) {
 	filePath := "misc/tests/permTest.txt"
-	ioutil.WriteFile(filePath, []byte("testContent"), os.ModePerm)
+	os.WriteFile(filePath, []byte("testContent"), os.ModePerm)
 	defer os.Remove(filePath)
 
 	c := cond{

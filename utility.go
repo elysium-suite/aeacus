@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"runtime"
 	"strings"
@@ -66,10 +65,10 @@ func timeCheck() bool {
 	return false
 }
 
-// writeFile wraps ioutil's WriteFile function, and prints
+// writeFile wraps os's WriteFile function, and prints
 // the error the screen if one occurs.
 func writeFile(fileName, fileContent string) {
-	err := ioutil.WriteFile(fileName, []byte(fileContent), 0o644)
+	err := os.WriteFile(fileName, []byte(fileContent), 0o644)
 	if err != nil {
 		fail("Error writing file: " + err.Error())
 	}

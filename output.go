@@ -35,10 +35,7 @@ func ask(p ...interface{}) bool {
 	fmt.Print(toPrint + " [Y/n]: ")
 	var resp string
 	fmt.Scanln(&resp)
-	if strings.ToLower(strings.TrimSpace(resp)) == "n" {
-		return false
-	}
-	return true
+	return !(strings.ToLower(strings.TrimSpace(resp)) == "n")
 }
 
 func pass(p ...interface{}) {

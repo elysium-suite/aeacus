@@ -135,7 +135,7 @@ func installService() {
  	Add-MpPreference -ExclusionPath "C:\aeacus\"
   	`
 	shellCommand(addExclusions)
- 
+
 }
 
 // cleanUp clears out sensitive files left behind by image developers or the
@@ -152,7 +152,7 @@ func cleanUp() {
 	info("Emptying recycle bin...")
 	shellCommand("Clear-RecycleBin -Force")
 	info("Clearing recently used...")
-	shellCommand("Remove-Item -Force '${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent‌​*.lnk'")
+	shellCommand("Remove-Item -Force \"${env:USERPROFILE}\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\*.lnk\"")
 	info("Clearing run.exe command history...")
 	clearRunScript := `$path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU"
 	$arr = (Get-Item -Path $path).Property

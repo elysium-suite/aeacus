@@ -2,12 +2,13 @@ package main
 
 import (
 	"bytes"
-	"github.com/DataDog/datadog-agent/pkg/util/winutil"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
 	"unsafe"
+
+	"github.com/DataDog/datadog-agent/pkg/util/winutil"
 
 	"github.com/gen2brain/beeep"
 	wapi "github.com/iamacarpet/go-win64api"
@@ -26,7 +27,7 @@ var (
 // readFile (Windows) uses ioutil's ReadFile function and passes the returned
 // byte sequence to decodeString.
 func readFile(filename string) (string, error) {
-	raw, err := ioutil.ReadFile(filename)
+	raw, err := os.ReadFile(filename)
 	if err != nil {
 		return "", err
 	}

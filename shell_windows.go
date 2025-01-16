@@ -89,8 +89,7 @@ func shellSocket() {
 				continue
 			}
 		} else {
-			select {
-			case <-ticker.C:
+			for range ticker.C {
 				if disconnected {
 					readTeamID()
 					curTeamID := string(teamID)

@@ -150,7 +150,7 @@ func (c cond) RegistryKey() (bool, error) {
 	registryArgs := regexp.MustCompile(`\\+`).Split(c.Key, -1)
 	if len(registryArgs) < 2 {
 		fail("Invalid key for RegistryKey. Did you supply 'key'?")
-		return false, errors.New("invalid registry key path: " + c.Key)
+		return false, errors.New("Invalid registry key path: " + c.Key)
 	}
 	registryHiveText := registryArgs[0]
 	keyPath := fmt.Sprintf(strings.Join(registryArgs[1:len(registryArgs)-1], `\`))

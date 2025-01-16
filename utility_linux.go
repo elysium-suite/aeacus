@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/md5"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/user"
@@ -12,7 +11,7 @@ import (
 
 // readFile (Linux) wraps ioutil's ReadFile function.
 func readFile(fileName string) (string, error) {
-	fileContent, err := ioutil.ReadFile(fileName)
+	fileContent, err := os.ReadFile(fileName)
 	return string(fileContent), err
 }
 
@@ -108,6 +107,6 @@ func adminCheck() bool {
 	return true
 }
 
-func getInfo(infoType string) {
+func getInfo(_ string) {
 	warn("Info gathering is not supported for Linux-- there's always a better, easier command-line tool.")
 }
